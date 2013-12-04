@@ -1,0 +1,14 @@
+
+<?xml version="1.0"?>
+
+<funcion> nombre:"main" tipo:"int (void)"
+   <body>
+      <declaracion>
+          <variable> nombre:"a" tipo:"int"</variable>
+          <valor> tipo:"int" cardinal:0</valor>
+      </declaracion>
+      <return> tipo:"int"
+          <variable> nombre:"a" tipo:"int"</variable>
+      </return>
+   </body>
+</funcion>
