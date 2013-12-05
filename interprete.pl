@@ -34,6 +34,8 @@ evalua('funcion', Contenido, Resto) :-
 	!,
 	write('Estamos en la parte de funcion\n'),
 	write('Tenemos como contenido { '), write(Contenido), write(' }\n'),
+	transforma(Contenido,Array),
+	incluyeHechos(Array),
 	interpreta(Resto).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,6 +118,14 @@ evalua('return', Contenido, Resto) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 evalua(_,_,[]).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%		TRANSFORMA		  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Transformamos el String en un array: ej: nombre:"main" tipo:"int (void)" --> ['nombre:', main, 'tipo:', int (void)]
+	
+transforma() :-
 
 
 /*
