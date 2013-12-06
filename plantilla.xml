@@ -1,33 +1,23 @@
 
 <?xml version="1.0"?>
 
-<funcion nombre:"main" tipo:"void">
-	<parametros>
-		<param nombre:"x" tipo:"int"></param>
-	</parametros>
+<funcion nombre="main" tipo="void">
+	<param nombre="x" tipo="int"/>
+	<param nombre="y" tipo="int"/>
 	<body>
-		<if>
-			<condicion>
-				<expresion relacion:"mayor" parte1:"x" parte2:"0">	</expresion>
-			</condicion>
-			<then>
-				<asignacion nombre:"a" valor:"3" ></asignacion>
-			</then>
-			<else>
-				<asignacion nombre:"a" valor:"6" ></asignacion>
-			</else>
-		</if>
+		<asignacion nombre="x" valor="1"/>
+		<asignacion nombre="y" valor="2"/>
+		<asignacion nombre="x" valor="3"/>
 	</body>
 </funcion>
 
 
 <!-- 
 
-void main(int x){
-	if(x > 0)
-		x = 3;
-	else
-		x = 6;
+void main(int x, int y){
+	x = 1;
+	y = 2;
+	x = 3;
 }
 
 -->

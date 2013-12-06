@@ -5,157 +5,92 @@
 interprete :- 
 	cd('/PFC'),
 	use_module(library(sgml)),
-	load_xml_file('ejemplo.xml', Xs),
-	interpreta(Xs).
+	load_xml_file('plantilla.xml', Xs),
+	ejecuta(Xs,[],TVact),
+	write('Tabla de Valores:\n'),
+	write(TVact).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		INTERPRETA		  %
+%		EJECUTA			  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-interpreta([]).
-interpreta([element(Nombre,_,[Contido|Resto])|Xs]) :-
+ejecuta([],TV,TV) :- !.
+ejecuta([X|Xs],TV,TVactT) :-	% TV = Tabla de Variables, TVact = Tabla de Variables actualizada
 	!,
-	evalua(Nombre,Contido,Resto),
-	interpreta(Xs).
-
-interpreta([_|Xs]):-
-	interpreta(Xs).
+	execute(X,TV,TVact),
+	ejecuta(Xs,TVact,TVactT).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		FUNCION			  %
+%		EXECUTE			  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-evalua('funcion', Contenido, []) :-
-	!,
-	write('Estamos en la parte de funcion\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n').
+execute(element(Nombre,Atributos,Resto),TV,TVactTotal) :-
+	!, 
+	%write('\n'),
+	%write('Nombre :'), write(Nombre), write('\n'),
+	%write('Atributos :'), write(Atributos), write('\n'),
+	%write('Resto :'), write(Resto), write('\n'),
 	
-evalua('funcion', Contenido, Resto) :-
-	!,
-	write('Estamos en la parte de funcion\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n'),
-	transforma(Contenido,Array),
-	incluyeHechos(Array),
-	interpreta(Resto).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		BODY			  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-evalua('body', Contenido, []):-
-	!,
-	write('Estamos en la parte de body\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n').
+	evalua(Nombre,Atributos,TV,TVact),
+	ejecuta(Resto,TVact,TVactTotal).
 	
-evalua('body', Contenido, Resto):-
+execute(_,TV,TV).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%		EVALUA			  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+evalua('funcion',[NombreFuncion,ValorSalida],TV,TVact) :- !, append(TV,[(NombreFuncion,ValorSalida,'')],TVact).
+
+evalua('param',[NombreParametro,TipoParametro],TV,TVact) :- !, append(TV,[(NombreParametro,TipoParametro,'')], TVact).
+
+evalua('body',_,TV,TV) :- ! .
+
+evalua('asignacion',[Nombre,Valor],TV,TVact) :- !, actualizaVariable(TV,(Nombre,Valor), [], TVact).
+
+evalua(_,_,TV,TV).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	FUNCIONES AUXILIARES  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+actualizaVariable([],_,TVaux,TVaux) .
+
+actualizaVariable([(Nombre,Tipo,_)|TV],(Nombre,Valor),TVaux, TVresul):-
 	!,
-	write('Estamos en la parte de body\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n'),
-	interpreta(Resto).
+	append(TVaux,[(Nombre,Tipo,Valor)],TVactAux),
+	append(TVactAux,TV,TVresul).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		DECLARACION		  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-evalua('declaracion', Contenido, []) :-
-	!,
-	write('Estamos en la parte de declaracion\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n').
-
-evalua('declaracion', Contenido, Resto) :-
-	!,
-	write('Estamos en la parte de declaracion\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n'),
-	interpreta(Resto).
-	
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		VARIABLE    	  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-evalua('variable', Contenido, []) :-
-	!,
-	write('Estamos en la parte de variable con lista vacia\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n').
-	
-evalua('variable', Contenido, Resto) :-
-	!,
-	write('Estamos en la parte de variable\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n'),
-	interpreta(Resto).
-	
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		VALOR			  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-evalua('valor', Contenido, []) :-
-	!,
-	write('Estamos en la parte de valor\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n').
-	
-evalua('valor', Contenido, Resto) :-
-	!,
-	write('Estamos en la parte de valor\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n'),
-	interpreta(Resto).
-	
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		RETURN			  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-evalua('return', Contenido, []) :-
-	!,
-	write('Estamos en la parte de return\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n').
-	
-evalua('return', Contenido, Resto) :-
-	!,
-	write('Estamos en la parte de return\n'),
-	write('Tenemos como contenido { '), write(Contenido), write(' }\n'),
-	interpreta(Resto).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%	Caso Base evalua	  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-evalua(_,_,[]).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		TRANSFORMA		  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Transformamos el String en un array: ej: nombre:"main" tipo:"int (void)" --> ['nombre:', main, 'tipo:', int (void)]
-	
-transforma() :-
+actualizaVariable([(Nombre1,Tipo,Valor)|TV],(Nombre2,V),TVaux, TVact):-
+	append(TVaux,[(Nombre1,Tipo,Valor)],TVactAux),
+	actualizaVariable(TV, (Nombre2,V), TVactAux, TVact).
 
 
 /*
 
 ----------------------------------------------------------------------------
 
-<funcion> nombre:"main" tipo:"int (void)"
-   <body>
-      <declaracion>
-          <variable> nombre:"a" tipo:"int"</variable>
-          <valor> tipo:"int" cardinal:0</valor>
-      </declaracion>
-      <return> tipo:"int"
-          <variable> nombre:"a" tipo:"int"</variable>
-      </return>
-   </body>
-</funcion>
+[element(funcion,[nombre=main,tipo=void],[
+        ,element(param,[nombre=x,tipo=int],[]),
+        ,element(param,[nombre=y,tipo=int],[]),
+        ,element(body,[],[
+                ,element(asignacion,[nombre=x,valor=1],[]),
+                ,element(asignacion,[nombre=y,valor=2],[]),
+                ,element(asignacion,[nombre=x,valor=3],[]),
+        ]),
+])]
 
 ----------------------------------------------------------------------------
 
-[element(funcion,[],[ nombre:"main" tipo:"int (void)"
-	,element(body,[],[
-   		,element(declaracion,[],[
-        	,element(variable,[],[ nombre:"a" tipo:"int"]),
-          	,element(valor,[],[ tipo:"int" cardinal:0]),
-      	]),
-      	,element(return,[],[ tipo:"int"
-        	,element(variable,[],[ nombre:"a" tipo:"int"]),
-      	]),
-   	]),
-])]
+<funcion nombre="main" tipo="void">
+	<param nombre="x" tipo="int"/>
+	<param nombre="y" tipo="int"/>
+	<body>
+		<asignacion nombre="x" valor="1"/>
+		<asignacion nombre="y" valor="2"/>
+		<asignacion nombre="x" valor="3"/>
+	</body>
+</funcion>
+
 
 */
