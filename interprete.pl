@@ -3,7 +3,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interprete :- 
-	cd('/PFC'),
+	cd('../PFC'),
 	use_module(library(sgml)),
 	load_xml_file('plantilla.xml', Xs),
 	ejecuta(Xs,[],TVact),
