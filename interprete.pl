@@ -39,13 +39,13 @@ execute(_,TV,TV).
 %		EVALUA			  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-evalua('funcion',[NombreFuncion,ValorSalida],TV,TVact) :- !, append(TV,[(NombreFuncion,ValorSalida,'')],TVact).
+evalua('funcion',[_=NombreFuncion,_=ValorSalida],TV,TVact) :- !,funcionOMetodo(ValorSalida,FunOmet) ,append(TV,[(NombreFuncion,ValorSalida,FunOmet)],TVact).
 
-evalua('param',[NombreParametro,TipoParametro],TV,TVact) :- !, append(TV,[(NombreParametro,TipoParametro,'')], TVact).
+evalua('param',[_=NombreParametro,_=TipoParametro],TV,TVact) :- !, append(TV,[(NombreParametro,TipoParametro,'')], TVact).
 
 evalua('body',_,TV,TV) :- ! .
 
-evalua('asignacion',[Nombre,Valor],TV,TVact) :- !, actualizaVariable(TV,(Nombre,Valor), [], TVact).
+evalua('asignacion',[_=Nombre,_=Valor],TV,TVact) :- !, actualizaVariable(TV,(Nombre,Valor), [], TVact).
 
 evalua(_,_,TV,TV).
 
@@ -65,6 +65,8 @@ actualizaVariable([(Nombre1,Tipo,Valor)|TV],(Nombre2,V),TVaux, TVact):-
 	append(TVaux,[(Nombre1,Tipo,Valor)],TVactAux),
 	actualizaVariable(TV, (Nombre2,V), TVactAux, TVact).
 
+funcionOMetodo('void','metodo'):-!.
+funcionOMetodo(_,'funcion').
 
 /*
 
