@@ -3,7 +3,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interprete :- 
-	cd('../PFC-Navidades'),
+	cd('../PFC'),
 	use_module(library(sgml)),
 	load_xml_file('plantilla.xml', Xs),
 	%write(Xs),
@@ -50,18 +50,15 @@ evalua('asignacion',[_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo) :- !, actualizaVa
 
 evalua('declaracionAsignacion',[_=Tipo,_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable(TV,(Tipo,Nombre,Valor), TVact).
 
-evalua('if',_,TV,TV,[Condicion,Then,Else],[Condicion,Then,Else]):- !,
-	write('\nCondicion:'),write(Condicion),write('\n'),
-	write('\nThen:'),write(Then),write('\n'),
-	write('\nElse:'),write(Else),write('\n').
+evalua('if',_,TV,TVact,Cuerpo,Cuerpo):- !, sentenciaIF(Cuerpo,TV,TVact).
 
-evalua('operadorBinario',_,TV,TV,Cuerpo,Cuerpo):-!, write('\npasamos por OperadorBinario\n').
+evalua('operadorBinario',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por OperadorBinario\n').
 
-evalua('operando',_,TV,TV,Cuerpo,Cuerpo):-!, write('\npasamos por Operando\n').
+evalua('operando',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por Operando\n').
 
-evalua('then',_,TV,TV,Cuerpo,Cuerpo):-!, write('\npasamos por then\n').
+evalua('then',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por then\n').
 
-evalua('else',_,TV,TV,Cuerpo,Cuerpo):-!, write('\npasamos por else\n').
+evalua('else',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por else\n').
 
 evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 
@@ -102,6 +99,63 @@ noEstaVariable([_|Resto],Nombre1) :-
 	%Nombre =\= Nombre1,
 	noEstaVariable(Resto,Nombre1).
 noEstaVariable(_,_):-true.
+
+%--- sentenciaIF ---%
+
+% THEN
+sentenciaIF([_,Condicion,_,Then,_,_,_],TV,TV):-
+	condicion(Condicion,TV), !,
+	write('\nThen:'),write(Then),write('\n').
+
+% ELSE
+sentenciaIF([_,_,_,_,_,Else,_],TV,TV):-
+	write('\nElse:'),write(Else),write('\n').
+
+%--- condicion ---%
+
+condicion(element(_,[_,_= (Op)],[_,element(_,[_=Operando1],_),_,element(_,[_=Operando2],_),_]),TV):-
+	dameVariable(TV, Operando1, (_,Nombre1,Valor1)),
+	dameVariable(TV, Operando2, (_,Nombre2,Valor2)),
+	write('\n'), write(Op), write('\n'),
+	write('\n'), write(Nombre1), write('\n'),
+	write('\n'), write(Nombre2), write('\n'),
+	atom_number(Valor1,V1),
+	atom_number(Valor2,V2),
+	resuelve(Op, V1, V2).
+
+%--- resuelve ---%
+
+resuelve('=<', Op1,Op2):- Op1 =< Op2, !.
+resuelve('=<', _,_):- !, false.
+
+resuelve('<', Op1,Op2):- Op1 < Op2, !.
+resuelve('<', _,_):- !, false.
+
+resuelve('>=', Op1,Op2):- Op1 >= Op2, !.
+resuelve('>=', _,_):- !, false.
+
+resuelve('>', Op1,Op2):- Op1 > Op2, !.
+resuelve('>', _,_):- !, false.
+
+resuelve('=', Op1,Op2):- Op1 = Op2, !.
+resuelve('=', _,_):- !, false.
+
+resuelve('\=', Op1,Op2):- Op1 \= Op2, !.
+resuelve('\=', _,_):- !, false.
+
+%--- dameVariable ---%
+
+dameVariable([(Tipo,Nombre,Valor)|_],Nombre,(Tipo,Nombre,Valor)):- !.
+
+dameVariable([_|Resto],Nombre,ValorDevuelto):-
+	dameVariable(Resto,Nombre,ValorDevuelto).
+
+
+
+
+
+
+
 
 
 /*
