@@ -3,11 +3,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interprete :- 
-	cd('../PFC'),
+	cd('../PFC-Navidades'),
 	use_module(library(sgml)),
 	load_xml_file('plantilla.xml', Xs),
+	%write(Xs),
 	ejecuta(Xs,[],TVact),
-	write('Tabla de Valores:\n'),
+	write('\nTabla de Valores:\n'),
 	write(TVact).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -29,8 +30,8 @@ execute(element(Nombre,Atributos,Resto),TV,TVactTotal) :-
 	%write('Atributos :'), write(Atributos), write('\n'),
 	%write('Resto :'), write(Resto), write('\n'),
 	
-	evalua(Nombre,Atributos,TV,TVact),
-	ejecuta(Resto,TVact,TVactTotal).
+	evalua(Nombre,Atributos,TV,TVact,Resto,NuevoResto),
+	ejecuta(NuevoResto,TVact,TVactTotal).
 	
 execute(_,TV,TV).
 
@@ -39,34 +40,69 @@ execute(_,TV,TV).
 %		EVALUA			  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-evalua('funcion',[_=NombreFuncion,_=ValorSalida],TV,TVact) :- !,funcionOMetodo(ValorSalida,FunOmet) ,append(TV,[(NombreFuncion,ValorSalida,FunOmet)],TVact).
+evalua('funcion',[_=NombreFuncion,_=ValorSalida],TV,TVact,Cuerpo,Cuerpo) :- !,funcionOMetodo(ValorSalida,FunOmet) ,append(TV,[(NombreFuncion,ValorSalida,FunOmet)],TVact).
 
-evalua('param',[_=NombreParametro,_=TipoParametro],TV,TVact) :- !, append(TV,[(NombreParametro,TipoParametro,'')], TVact).
+evalua('param',[_=TipoParametro,_=NombreParametro],TV,TVact,Cuerpo,Cuerpo) :- !, append(TV,[(TipoParametro,NombreParametro,'')], TVact).
 
-evalua('body',_,TV,TV) :- ! .
+evalua('body',_,TV,TV,Cuerpo,Cuerpo) :- ! .
 
-evalua('asignacion',[_=Nombre,_=Valor],TV,TVact) :- !, actualizaVariable(TV,(Nombre,Valor), [], TVact).
+evalua('asignacion',[_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo) :- !, actualizaVariable(TV,(Nombre,Valor), [], TVact).
 
-evalua(_,_,TV,TV).
+evalua('declaracionAsignacion',[_=Tipo,_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable(TV,(Tipo,Nombre,Valor), TVact).
+
+evalua('if',_,TV,TV,[Condicion,Then,Else],[Condicion,Then,Else]):- !,
+	write('\nCondicion:'),write(Condicion),write('\n'),
+	write('\nThen:'),write(Then),write('\n'),
+	write('\nElse:'),write(Else),write('\n').
+
+evalua('operadorBinario',_,TV,TV,Cuerpo,Cuerpo):-!, write('\npasamos por OperadorBinario\n').
+
+evalua('operando',_,TV,TV,Cuerpo,Cuerpo):-!, write('\npasamos por Operando\n').
+
+evalua('then',_,TV,TV,Cuerpo,Cuerpo):-!, write('\npasamos por then\n').
+
+evalua('else',_,TV,TV,Cuerpo,Cuerpo):-!, write('\npasamos por else\n').
+
+evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	FUNCIONES AUXILIARES  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%--- actualizaVariable ---%
+
 actualizaVariable([],_,TVaux,TVaux) .
 
-actualizaVariable([(Nombre,Tipo,_)|TV],(Nombre,Valor),TVaux, TVresul):-
+actualizaVariable([(Tipo,Nombre,_)|TV],(Nombre,Valor),TVaux, TVresul):-
 	!,
-	append(TVaux,[(Nombre,Tipo,Valor)],TVactAux),
+	append(TVaux,[(Tipo,Nombre,Valor)],TVactAux),
 	append(TVactAux,TV,TVresul).
 
-actualizaVariable([(Nombre1,Tipo,Valor)|TV],(Nombre2,V),TVaux, TVact):-
-	append(TVaux,[(Nombre1,Tipo,Valor)],TVactAux),
+actualizaVariable([(Tipo,Nombre1,Valor)|TV],(Nombre2,V),TVaux, TVact):-
+	append(TVaux,[(Tipo,Nombre1,Valor)],TVactAux),
 	actualizaVariable(TV, (Nombre2,V), TVactAux, TVact).
+
+%--- meteVariable ---%
+
+meteVariable(TV,(Tipo,Nombre,Valor), TVact):-
+	noEstaVariable(TV,Nombre),
+	append(TV,[(Tipo,Nombre,Valor)],TVact).
+
+%--- funcionOMetodo ---%
 
 funcionOMetodo('void','metodo'):-!.
 funcionOMetodo(_,'funcion').
+
+%--- noEstaVariable ---%
+
+noEstaVariable([(_,Nombre,_)|_],Nombre) :- !, false.
+noEstaVariable([_|Resto],Nombre1) :-
+	!,
+	%Nombre =\= Nombre1,
+	noEstaVariable(Resto,Nombre1).
+noEstaVariable(_,_):-true.
+
 
 /*
 

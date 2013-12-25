@@ -1,23 +1,48 @@
 
 <?xml version="1.0"?>
 
-<funcion nombre="main" tipo="void">
-	<param nombre="x" tipo="int"/>
-	<param nombre="y" tipo="int"/>
+<funcion tipo="void" nombre="main">
+	<param tipo="int" nombre="x"/>
 	<body>
 		<asignacion nombre="x" valor="1"/>
-		<asignacion nombre="y" valor="2"/>
-		<asignacion nombre="x" valor="3"/>
+		<declaracionAsignacion tipo="int" nombre="y" valor="2"/>
+		<declaracionAsignacion tipo="int" nombre="z" valor="3"/>
+		<if>
+			<operadorBinario tipo="bool" operador="<">
+				<operando nombre="x"></operando>
+				<operando nombre="y"></operando>
+			</operadorBinario>
+			<then>
+			    <operadorBinario tipo="int" operador="=">
+			    	<operando nombre="x"></operando>
+					<operando nombre="y"></operando>				    	
+			    </operadorBinario>
+			</then>
+			<else>
+				<operadorBinario tipo="int" operador="=">
+			    	<operando nombre="y"></operando>
+					<operando nombre="x"></operando>				    	
+			    </operadorBinario>
+			</else>
+		</if>
 	</body>
 </funcion>
 
-
 <!-- 
 
-void main(int x, int y){
+void main(int x){
 	x = 1;
-	y = 2;
-	x = 3;
+	int y = 2;
+	int z = 3;
+
+	if (x<y) {
+		x = y;
+	}else{
+		y = x;
+	}
+
+	z = z + 1;	// falta
+
 }
 
 -->
