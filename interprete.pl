@@ -50,7 +50,7 @@ evalua('asignacion',[_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo) :- !, actualizaVa
 
 evalua('declaracionAsignacion',[_=Tipo,_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable(TV,(Tipo,Nombre,Valor), TVact).
 
-evalua('if',_,TV,TVact,Cuerpo,Cuerpo):- !, sentenciaIF(Cuerpo,TV,TVact).
+evalua('if',_,TV,TVact,Cuerpo,Cuerpo):- !, eliminaVacios(Cuerpo,Cuerpo1), sentenciaIF(Cuerpo1,TV,TVact).
 
 evalua('operadorBinario',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por OperadorBinario\n').
 
@@ -103,22 +103,25 @@ noEstaVariable(_,_):-true.
 %--- sentenciaIF ---%
 
 % THEN
-sentenciaIF([_,Condicion,_,Then,_,_,_],TV,TV):-
+sentenciaIF([Condicion,Then,_],TV,TV):-
+	write('\nCondicion:\n'),write(Condicion),write('\n'),
 	condicion(Condicion,TV), !,
-	write('\nThen:'),write(Then),write('\n').
+	write('\nThen:\n'),write(Then),write('\n').
 
 % ELSE
-sentenciaIF([_,_,_,_,_,Else,_],TV,TV):-
-	write('\nElse:'),write(Else),write('\n').
+sentenciaIF([_,_,Else],TV,TV):-
+	write('\nElse:\n'),write(Else),write('\n').
 
 %--- condicion ---%
 
-condicion(element(_,[_,_= (Op)],[_,element(_,[_=Operando1],_),_,element(_,[_=Operando2],_),_]),TV):-
-	dameVariable(TV, Operando1, (_,Nombre1,Valor1)),
-	dameVariable(TV, Operando2, (_,Nombre2,Valor2)),
-	write('\n'), write(Op), write('\n'),
-	write('\n'), write(Nombre1), write('\n'),
-	write('\n'), write(Nombre2), write('\n'),
+condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
+	dameVariable(TV, Operando1, (_,_,Valor1)),
+	dameVariable(TV, Operando2, (_,_,Valor2)),
+	/*write('--------------------'),
+	write('\nOp:  '), write(Op), write('\n'),
+	write('\nNombre1:  '), write(Nombre1), write('\n'),
+	write('\nNombre2:  '), write(Nombre2), write('\n'),
+	write('--------------------'),*/
 	atom_number(Valor1,V1),
 	atom_number(Valor2,V2),
 	resuelve(Op, V1, V2).
@@ -140,8 +143,8 @@ resuelve('>', _,_):- !, false.
 resuelve('=', Op1,Op2):- Op1 = Op2, !.
 resuelve('=', _,_):- !, false.
 
-resuelve('\=', Op1,Op2):- Op1 \= Op2, !.
-resuelve('\=', _,_):- !, false.
+resuelve('!=', Op1,Op2):- Op1 \= Op2, !.
+resuelve('!=', _,_):- !, false.
 
 %--- dameVariable ---%
 
@@ -151,11 +154,19 @@ dameVariable([_|Resto],Nombre,ValorDevuelto):-
 	dameVariable(Resto,Nombre,ValorDevuelto).
 
 
+%--- eliminaVacios ---%
+eliminaVacios(Xs,Ys):-
+	eliminaVaciosAux(Xs,[],Ys).
 
+eliminaVaciosAux([],Ac,Ac).
 
+eliminaVaciosAux([element(X,Y,Z)|Xs],Ac,Ys):- !,
+	eliminaVacios(Z,Z1),
+	append(Ac,[(X,Y,Z1)],Acc),
+	eliminaVaciosAux(Xs,Acc,Ys).
 
-
-
+eliminaVaciosAux([_|Xs],Ac,Ys):-
+	eliminaVaciosAux(Xs,Ac,Ys).
 
 
 /*
