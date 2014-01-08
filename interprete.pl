@@ -6,8 +6,10 @@ interprete :-
 	cd('../PFC'),
 	use_module(library(sgml)),
 	load_xml_file('plantilla.xml', Xs),
-	%write(Xs),
-	ejecuta(Xs,[],TVact),
+	%write('\n'),write(Xs), write('\n'),
+	eliminaVacios(Xs,Xs1),
+	%write(Xs1), write('\n'),
+	ejecuta(Xs1,[],TVact),
 	write('\nTabla de Valores:\n'),
 	write(TVact).
 
@@ -23,7 +25,7 @@ ejecuta([X|Xs],TV,TVactT) :-	% TV = Tabla de Variables, TVact = Tabla de Variabl
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %		EXECUTE			  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-execute(element(Nombre,Atributos,Resto),TV,TVactTotal) :-
+execute((Nombre,Atributos,Resto),TV,TVactTotal) :-
 	!, 
 	%write('\n'),
 	%write('Nombre :'), write(Nombre), write('\n'),
@@ -50,7 +52,7 @@ evalua('asignacion',[_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo) :- !, actualizaVa
 
 evalua('declaracionAsignacion',[_=Tipo,_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable(TV,(Tipo,Nombre,Valor), TVact).
 
-evalua('if',_,TV,TVact,Cuerpo,Cuerpo):- !, eliminaVacios(Cuerpo,Cuerpo1), sentenciaIF(Cuerpo1,TV,TVact).
+evalua('if',_,TV,TVact,Cuerpo,Cuerpo):- !, sentenciaIF(Cuerpo,TV,TVact).
 
 evalua('operadorBinario',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por OperadorBinario\n').
 
@@ -60,60 +62,22 @@ evalua('then',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por then\n').
 
 evalua('else',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por else\n').
 
+evalua('operadorBinario',[_,_= (Op)],TV,TVact,Cuerpo,[]):-!,
+	resuelve(element([],[_,_= (Op)],Cuerpo),TV,TVact).
+
 evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%	FUNCIONES AUXILIARES  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					%	FUNCIONES AUXILIARES  %
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%--- actualizaVariable ---%
 
-actualizaVariable([],_,TVaux,TVaux) .
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-actualizaVariable([(Tipo,Nombre,_)|TV],(Nombre,Valor),TVaux, TVresul):-
-	!,
-	append(TVaux,[(Tipo,Nombre,Valor)],TVactAux),
-	append(TVactAux,TV,TVresul).
+					%--- sentenciaIF ---%
 
-actualizaVariable([(Tipo,Nombre1,Valor)|TV],(Nombre2,V),TVaux, TVact):-
-	append(TVaux,[(Tipo,Nombre1,Valor)],TVactAux),
-	actualizaVariable(TV, (Nombre2,V), TVactAux, TVact).
-
-%--- meteVariable ---%
-
-meteVariable(TV,(Tipo,Nombre,Valor), TVact):-
-	noEstaVariable(TV,Nombre),
-	append(TV,[(Tipo,Nombre,Valor)],TVact).
-
-%--- funcionOMetodo ---%
-
-funcionOMetodo('void','metodo'):-!.
-funcionOMetodo(_,'funcion').
-
-%--- noEstaVariable ---%
-
-noEstaVariable([(_,Nombre,_)|_],Nombre) :- !, false.
-noEstaVariable([_|Resto],Nombre1) :-
-	!,
-	%Nombre =\= Nombre1,
-	noEstaVariable(Resto,Nombre1).
-noEstaVariable(_,_):-true.
-
-%--- sentenciaIF ---%
-
-% THEN
-sentenciaIF([Condicion,Then,_],TV,TV):-
-	write('\nCondicion:\n'),write(Condicion),write('\n'),
-	condicion(Condicion,TV), !,
-	write('\nThen:\n'),write(Then),write('\n').
-
-% ELSE
-sentenciaIF([_,_,Else],TV,TV):-
-	write('\nElse:\n'),write(Else),write('\n').
-
-%--- condicion ---%
-
+% CONDICION
 condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
 	dameVariable(TV, Operando1, (_,_,Valor1)),
 	dameVariable(TV, Operando2, (_,_,Valor2)),
@@ -126,7 +90,60 @@ condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
 	atom_number(Valor2,V2),
 	resuelve(Op, V1, V2).
 
-%--- resuelve ---%
+% THEN
+sentenciaIF([Condicion,Then,_],TV,TV):-
+	write('\nCondicion:\n'),write(Condicion),write('\n'),
+	condicion(Condicion,TV), !,
+	write('\nThen:\n'),write(Then),write('\n').
+
+% ELSE
+sentenciaIF([_,_,Else],TV,TV):-
+	write('\nElse:\n'),write(Else),write('\n').
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+					%--- actualizaVariable ---%
+
+actualizaVariable([],_,TVaux,TVaux) .
+
+actualizaVariable([(Tipo,Nombre,_)|TV],(Nombre,Valor),TVaux, TVresul):-
+	!,
+	append(TVaux,[(Tipo,Nombre,Valor)],TVactAux),
+	append(TVactAux,TV,TVresul).
+
+actualizaVariable([(Tipo,Nombre1,Valor)|TV],(Nombre2,V),TVaux, TVact):-
+	append(TVaux,[(Tipo,Nombre1,Valor)],TVactAux),
+	actualizaVariable(TV, (Nombre2,V), TVactAux, TVact).
+
+%------------------------------------------------------------------------------------
+
+					%--- meteVariable ---%
+
+meteVariable(TV,(Tipo,Nombre,Valor), TVact):-
+	noEstaVariable(TV,Nombre),
+	append(TV,[(Tipo,Nombre,Valor)],TVact).
+
+%------------------------------------------------------------------------------------
+
+					%--- funcionOMetodo ---%
+
+funcionOMetodo('void','metodo'):-!.
+funcionOMetodo(_,'funcion').
+
+%------------------------------------------------------------------------------------
+
+					%--- noEstaVariable ---%
+
+noEstaVariable([(_,Nombre,_)|_],Nombre) :- !, false.
+noEstaVariable([_|Resto],Nombre1) :-
+	!,
+	%Nombre =\= Nombre1,
+	noEstaVariable(Resto,Nombre1).
+noEstaVariable(_,_):-true.
+
+%------------------------------------------------------------------------------------
+
+					%--- resuelve ---%
 
 resuelve('=<', Op1,Op2):- Op1 =< Op2, !.
 resuelve('=<', _,_):- !, false.
@@ -146,15 +163,19 @@ resuelve('=', _,_):- !, false.
 resuelve('!=', Op1,Op2):- Op1 \= Op2, !.
 resuelve('!=', _,_):- !, false.
 
-%--- dameVariable ---%
+%------------------------------------------------------------------------------------
+
+					%--- dameVariable ---%
 
 dameVariable([(Tipo,Nombre,Valor)|_],Nombre,(Tipo,Nombre,Valor)):- !.
 
 dameVariable([_|Resto],Nombre,ValorDevuelto):-
 	dameVariable(Resto,Nombre,ValorDevuelto).
 
+%------------------------------------------------------------------------------------
 
-%--- eliminaVacios ---%
+					%--- eliminaVacios ---%
+
 eliminaVacios(Xs,Ys):-
 	eliminaVaciosAux(Xs,[],Ys).
 
@@ -167,6 +188,10 @@ eliminaVaciosAux([element(X,Y,Z)|Xs],Ac,Ys):- !,
 
 eliminaVaciosAux([_|Xs],Ac,Ys):-
 	eliminaVaciosAux(Xs,Ac,Ys).
+
+%------------------------------------------------------------------------------------
+
+
 
 
 /*
