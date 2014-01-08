@@ -58,12 +58,11 @@ evalua('operadorBinario',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por Opera
 
 evalua('operando',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por Operando\n').
 
-evalua('then',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por then\n').
+%evalua('then',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por then\n').
 
-evalua('else',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por else\n').
+%evalua('else',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por else\n').
 
-evalua('operadorBinario',[_,_= (Op)],TV,TVact,Cuerpo,[]):-!,
-	resuelve(element([],[_,_= (Op)],Cuerpo),TV,TVact).
+%evalua('operadorBinario',[_,_= (Op)],TV,TVact,Cuerpo,[]):-!.
 
 evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 
@@ -88,7 +87,7 @@ condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
 	write('--------------------'),*/
 	atom_number(Valor1,V1),
 	atom_number(Valor2,V2),
-	resuelve(Op, V1, V2).
+	opera(Op, V1, V2, Resultado), Resultado.
 
 % THEN
 sentenciaIF([Condicion,Then,_],TV,TV):-
@@ -98,7 +97,9 @@ sentenciaIF([Condicion,Then,_],TV,TV):-
 
 % ELSE
 sentenciaIF([_,_,Else],TV,TV):-
-	write('\nElse:\n'),write(Else),write('\n').
+	write('\nElse:\n'),write(Else),write('\n'),
+	resuelve(Else, Resultado),
+	write('\n********************* Resultado FINAL:\n'), write(Resultado).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -143,25 +144,61 @@ noEstaVariable(_,_):-true.
 
 %------------------------------------------------------------------------------------
 
-					%--- resuelve ---%
+					%--- resuelve expresion binaria---%
 
-resuelve('=<', Op1,Op2):- Op1 =< Op2, !.
-resuelve('=<', _,_):- !, false.
+resuelve((_,_,[Cuerpo]),Resultado):-
+	resuelveAux(Cuerpo,Resultado).
 
-resuelve('<', Op1,Op2):- Op1 < Op2, !.
-resuelve('<', _,_):- !, false.
+resuelveAux((_,[_=Resultado],[]), Resultado):- !, write('\nResultado Parcial:    '),write(Resultado).
+resuelveAux((operadorBinario,Operador,[X,Y]), Resultado):- !,
+	sacaOp(Operador,Op),
+	write('\nOperadorOp:   '),write(Op),
+	write('\nOperandoX:    '),write(X),
+	write('\nOperandoY:    '),write(Y),
+	resuelveAux(X, Operando1),
+	resuelveAux(Y, Operando2),
+	write('\nOPERAMOS:'),
+	write('\nOperando1:    '),write(Operando1),
+	write('\nOperando2:    '),write(Operando2),write('\n'),
+	opera(Op, Operando1, Operando2, Resultado).
 
-resuelve('>=', Op1,Op2):- Op1 >= Op2, !.
-resuelve('>=', _,_):- !, false.
+resuelveAux(_,0):- !, write('\nNADA DE NADA:    ').
 
-resuelve('>', Op1,Op2):- Op1 > Op2, !.
-resuelve('>', _,_):- !, false.
 
-resuelve('=', Op1,Op2):- Op1 = Op2, !.
-resuelve('=', _,_):- !, false.
+sacaOp([_,_= (Op)], Op).
 
-resuelve('!=', Op1,Op2):- Op1 \= Op2, !.
-resuelve('!=', _,_):- !, false.
+% -> Boleana <-
+
+opera('=<', Op1,Op2, true):- Op1 =< Op2, !.
+opera('=<', _,_,false):- !.
+
+opera('<', Op1,Op2,true):- Op1 < Op2, !.
+opera('<', _,_,false):- !.
+
+opera('>=', Op1,Op2,true):- Op1 >= Op2, !.
+opera('>=', _,_,false):- !.
+
+opera('>', Op1,Op2,true):- Op1 > Op2, !.
+opera('>', _,_,false):- !.
+
+opera('==', Op1,Op2,true):- Op1 = Op2, !.
+opera('==', _,_,false):- !.
+
+opera('!=', Op1,Op2,true):- Op1 \= Op2, !.
+opera('!=', _,_,false):- !.
+
+
+% -> Aritmetica <-
+
+%TODO
+%opera('+', Op1,Op2,Z):- sacaValor(Op1,Val1), sacaValor(Op2,Val2), Z is Val1 + Val2, write('Operacion Aritmetica:'), write(Op1), write(' + '), write(Op2), !.
+opera('+', Op1,Op2,3):- write('Operacion Aritmetica:'), write(Op1), write(' + '), write(Op2), !.
+
+
+% -> Igualdad <-
+opera('=', Op1,Op2,'Y = 3'):- write('Operacion Igualdad:'), write(Op1), write(' = '), write(Op2), !.
+
+
 
 %------------------------------------------------------------------------------------
 
@@ -191,7 +228,13 @@ eliminaVaciosAux([_|Xs],Ac,Ys):-
 
 %------------------------------------------------------------------------------------
 
+					%--- sacaValor ---%
 
+%TODO
+%sacaValor(Valor, Resultado)
+
+
+%------------------------------------------------------------------------------------
 
 
 /*

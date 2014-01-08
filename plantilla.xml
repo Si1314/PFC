@@ -4,7 +4,7 @@
 <funcion tipo="void" nombre="main">
 	<param tipo="int" nombre="x"/>
 	<body>
-		<asignacion nombre="x" valor="1"/>
+		<asignacion nombre="x" valor="4"/>
 		<declaracionAsignacion tipo="int" nombre="y" valor="2"/>
 		<declaracionAsignacion tipo="int" nombre="z" valor="3"/>
 		<if>
@@ -13,15 +13,18 @@
 				<operando nombre="y"></operando>
 			</operadorBinario>
 			<then>
-			    <operadorBinario tipo="int" operador="=">
+			    <operadorBinario tipo="igualdad" operador="=">
 			    	<operando nombre="x"></operando>
 					<operando nombre="y"></operando>				    	
 			    </operadorBinario>
 			</then>
 			<else>
-				<operadorBinario tipo="int" operador="=">
+				<operadorBinario tipo="igualdad" operador="=">
 			    	<operando nombre="y"></operando>
-					<operando nombre="x"></operando>				    	
+					<operadorBinario tipo="aritmetico" operador="+">
+						<operando nombre="x"></operando>
+						<integer valor="1"></integer>
+					</operadorBinario>				    	
 			    </operadorBinario>
 			</else>
 		</if>
@@ -29,6 +32,18 @@
 </funcion>
 
 <!-- 
+
+<BinaryOperator 'int' '='>
+	<DeclRefExpr 'i' 'int'></DeclRefExpr>
+    <BinaryOperator 'int' '+'>
+		<ImplicitCastExpr 'int'>
+			<DeclRefExpr 'i' 'int'></DeclRefExpr>
+		</ImplicitCastExpr>	
+		<IntegerLiteral>
+			1
+		</IntegerLiteral>			    	
+    </BinaryOperator>				    	
+</BinaryOperator>
 
 void main(int x){
 	x = 1;
@@ -38,7 +53,7 @@ void main(int x){
 	if (x<y) {
 		x = y;
 	}else{
-		y = x;
+		y = x + 1;
 	}
 
 	z = z + 1;	// falta
