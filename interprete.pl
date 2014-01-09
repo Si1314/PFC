@@ -28,8 +28,8 @@ ejecuta([X|Xs],TV,TVactT) :-	% TV = Tabla de Variables, TVact = Tabla de Variabl
 execute((Nombre,Atributos,Resto),TV,TVactTotal) :-
 	!, 
 	write('\n'),
-	write('Nombre :'), write(Nombre), write('\n'),
-	write('Atributos :'), write(Atributos), write('\n'),
+	%write('Nombre :'), write(Nombre), write('\n'),
+	%write('Atributos :'), write(Atributos), write('\n'),
 	%write('Resto :'), write(Resto), write('\n'),
 	
 	evalua(Nombre,Atributos,TV,TVact,Resto,NuevoResto),
@@ -53,9 +53,9 @@ evalua('asignacion',[_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo) :- !, actualizaVa
 
 evalua('declaracionAsignacion',[_=Tipo,_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable(TV,(Tipo,Nombre,Valor), TVact).
 
-evalua('if',_,TV,TVact,Cuerpo,[]):- !, sentenciaIF(Cuerpo,TV,TVact).
+evalua('if',_,TV,TVact,Cuerpo,[]):- !,sentenciaIF(Cuerpo,TV,TVact), write('\nAntes del IF\n'), write(TV), write('\n\nDespues del IF\n'), write(TVact), write('\n').
 
-evalua('operando',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por Operando\n').
+evalua('operando',_,TV,TV,Cuerpo,Cuerpo):-!.
 
 evalua('operadorBinario',[_,_= (Op)],TV,TVact,[Op1,Op2],[]):-!, resuelve(Op,Op1,Op2,TV,TVact).
 
@@ -75,11 +75,6 @@ evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
 	dameVariable(TV, Operando1, (_,_,Valor1)),
 	dameVariable(TV, Operando2, (_,_,Valor2)),
-	/*write('--------------------'),
-	write('\nOp:  '), write(Op), write('\n'),
-	write('\nNombre1:  '), write(Nombre1), write('\n'),
-	write('\nNombre2:  '), write(Nombre2), write('\n'),
-	write('--------------------'),*/
 	atom_number(Valor1,V1),
 	atom_number(Valor2,V2),
 	opera(Op, V1, V2, Resultado), Resultado.
@@ -88,19 +83,19 @@ condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
 sentenciaIF([Condicion,('then',_,CuerpoThen),_],TV,TVact):-
 	write('\nCondicion:\n'),write(Condicion),write('\n'),
 	condicion(Condicion,TV), !,
-	ejecuta(CuerpoThen,TV,TVact).
-	%write('\nThen:\n'),write(Then),write('\n').
+	ejecuta(CuerpoThen,TV,TVact),
+	write('\nThen:\n'),write(CuerpoThen),write('\n').
 
 % ELSE
 sentenciaIF([_,_,('else',_,CuerpoElse)],TV,TVact):-
 	write('\nElse:\n'),write(CuerpoElse),write('\n'),
 	ejecuta(CuerpoElse,TV,TVact).
-	%write('\n********************* Resultado FINAL:\n'), write(Resultado).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 					%--- actualizaVariable ---%
-actualizaVariable(TV,Var, TVact):- actualizaVariableAux(TV,Var,[],TVact).
+
+actualizaVariable(TV,Var,TVact):- actualizaVariableAux(TV,Var,[],TVact).
 
 actualizaVariableAux([],_,TVaux,TVaux) .
 
@@ -144,27 +139,30 @@ noEstaVariable(_,_):-true.
 					%--- resuelve expresion binaria---%
 
 resuelve('=',Op1,Op2,TV,TVact):-
-	write('\nOp2:   '),write(Op2),
-	resuelveAux(Op2,Resultado),
-	actualizaVariable(TV,(Op1,Resultado), TVact).
+	sacaContenido(Op1,Operando1),
+	resuelveAux(Op2,TV,Resultado),
+	actualizaVariable(TV,(Operando1,Resultado),TVact).
 
-resuelveAux((_,[_=Resultado],[]), Resultado):- !, write('\nResultado Parcial:    '),write(Resultado).
-resuelveAux((operadorBinario,Operador,[X,Y]), Resultado):- !,
-	sacaOp(Operador,Op),
-	write('\nOperadorOp:   '),write(Op),
-	write('\nOperandoX:    '),write(X),
-	write('\nOperandoY:    '),write(Y),
-	resuelveAux(X, Operando1),
-	resuelveAux(Y, Operando2),
-	write('\nOPERAMOS:'),
-	write('\nOperando1:    '),write(Operando1),
-	write('\nOperando2:    '),write(Operando2),write('\n'),
+resuelveAux((_,[_,_=Resultado],[]), _ , Resultado):- !.
+
+resuelveAux(('operadorBinario',Operador,[X,Y]), TV , Resultado):- !,
+	sacaContenido(Operador,Op),
+	resuelveAux(X, TV, Operando1),
+	resuelveAux(Y, TV, Operando2),
 	opera(Op, Operando1, Operando2, Resultado).
 
-resuelveAux(_,0):- !, write('\nNADA DE NADA:    ').
+resuelveAux(('operando',[_=NombreOperando],_), TV, Resultado):- !,
+	sacaValor(TV, NombreOperando,ValorOperando),
+	atom_number(ValorOperando,Resultado).
+
+resuelveAux(('integer',[_=Valor],_), _ ,Resultado):- !,
+	atom_number(Valor,Resultado).
+
+resuelveAux(_,_,0).
 
 
-sacaOp([_,_= (Op)], Op).
+sacaContenido([_,_= (Op)], Op).
+sacaContenido((_,[_=Nombre],_), Nombre).
 
 % -> Boleana <-
 
@@ -189,13 +187,7 @@ opera('!=', _,_,false):- !.
 
 % -> Aritmetica <-
 
-%TODO
-%opera('+', Op1,Op2,Z):- sacaValor(Op1,Val1), sacaValor(Op2,Val2), Z is Val1 + Val2, write('Operacion Aritmetica:'), write(Op1), write(' + '), write(Op2), !.
-opera('+', Op1,Op2,3):- write('Operacion Aritmetica:'), write(Op1), write(' + '), write(Op2), !.
-
-
-% -> Igualdad <-
-opera('=', Op1,Op2,'Y = 3'):- write('Operacion Igualdad:'), write(Op1), write(' = '), write(Op2), !.
+opera('+', Op1,Op2,Z):- !, Z is Op1 + Op2.
 
 
 
@@ -230,8 +222,9 @@ eliminaVaciosAux([_|Xs],Ac,Ys):-
 					%--- sacaValor ---%
 
 %TODO
-%sacaValor(Valor, Resultado)
-
+sacaValor([(_,NombreOperando,Resultado)|_], NombreOperando, Resultado):- !.
+sacaValor([_|Xs], NombreOperando, Resultado):-
+	sacaValor(Xs, NombreOperando, Resultado).
 
 %------------------------------------------------------------------------------------
 

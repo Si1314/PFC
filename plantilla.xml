@@ -5,8 +5,8 @@
 	<param tipo="int" nombre="x"/>
 	<body>
 		<asignacion nombre="x" valor="4"/>
-		<declaracionAsignacion tipo="int" nombre="y" valor="2"/>
-		<declaracionAsignacion tipo="int" nombre="z" valor="3"/>
+		<declaracionAsignacion tipo="int" nombre="y" valor="1"/>
+		<declaracionAsignacion tipo="int" nombre="z" valor="6"/>
 		<if>
 			<operadorBinario tipo="bool" operador="<">
 				<operando nombre="x"></operando>
