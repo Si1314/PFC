@@ -28,6 +28,13 @@
 			    </operadorBinario>
 			</else>
 		</if>
+		<operadorBinario tipo="igualdad" operador="=">
+	    	<operando nombre="z"></operando>
+			<operadorBinario tipo="aritmetico" operador="+">
+				<operando nombre="z"></operando>
+				<integer valor="1"></integer>
+			</operadorBinario>				    	
+	    </operadorBinario>
 	</body>
 </funcion>
 
@@ -56,7 +63,7 @@ void main(int x){
 		y = x + 1;
 	}
 
-	z = z + 1;	// falta
+	z = z + 1;
 
 }
 

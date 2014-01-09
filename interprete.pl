@@ -27,12 +27,13 @@ ejecuta([X|Xs],TV,TVactT) :-	% TV = Tabla de Variables, TVact = Tabla de Variabl
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 execute((Nombre,Atributos,Resto),TV,TVactTotal) :-
 	!, 
-	%write('\n'),
-	%write('Nombre :'), write(Nombre), write('\n'),
-	%write('Atributos :'), write(Atributos), write('\n'),
+	write('\n'),
+	write('Nombre :'), write(Nombre), write('\n'),
+	write('Atributos :'), write(Atributos), write('\n'),
 	%write('Resto :'), write(Resto), write('\n'),
 	
 	evalua(Nombre,Atributos,TV,TVact,Resto,NuevoResto),
+	%write('-----\n'), write(Nombre), write('   '), write(Atributos), write('\n-----'),
 	ejecuta(NuevoResto,TVact,TVactTotal).
 	
 execute(_,TV,TV).
@@ -48,21 +49,15 @@ evalua('param',[_=TipoParametro,_=NombreParametro],TV,TVact,Cuerpo,Cuerpo) :- !,
 
 evalua('body',_,TV,TV,Cuerpo,Cuerpo) :- ! .
 
-evalua('asignacion',[_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo) :- !, actualizaVariable(TV,(Nombre,Valor), [], TVact).
+evalua('asignacion',[_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo) :- !, actualizaVariable(TV,(Nombre,Valor),TVact).
 
 evalua('declaracionAsignacion',[_=Tipo,_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable(TV,(Tipo,Nombre,Valor), TVact).
 
-evalua('if',_,TV,TVact,Cuerpo,Cuerpo):- !, sentenciaIF(Cuerpo,TV,TVact).
-
-evalua('operadorBinario',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por OperadorBinario\n').
+evalua('if',_,TV,TVact,Cuerpo,[]):- !, sentenciaIF(Cuerpo,TV,TVact).
 
 evalua('operando',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por Operando\n').
 
-%evalua('then',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por then\n').
-
-%evalua('else',_,TV,TV,Cuerpo,Cuerpo):-!.%, write('\npasamos por else\n').
-
-%evalua('operadorBinario',[_,_= (Op)],TV,TVact,Cuerpo,[]):-!.
+evalua('operadorBinario',[_,_= (Op)],TV,TVact,[Op1,Op2],[]):-!, resuelve(Op,Op1,Op2,TV,TVact).
 
 evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 
@@ -90,31 +85,33 @@ condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
 	opera(Op, V1, V2, Resultado), Resultado.
 
 % THEN
-sentenciaIF([Condicion,Then,_],TV,TV):-
+sentenciaIF([Condicion,('then',_,CuerpoThen),_],TV,TVact):-
 	write('\nCondicion:\n'),write(Condicion),write('\n'),
 	condicion(Condicion,TV), !,
-	write('\nThen:\n'),write(Then),write('\n').
+	ejecuta(CuerpoThen,TV,TVact).
+	%write('\nThen:\n'),write(Then),write('\n').
 
 % ELSE
-sentenciaIF([_,_,Else],TV,TV):-
-	write('\nElse:\n'),write(Else),write('\n'),
-	resuelve(Else, Resultado),
-	write('\n********************* Resultado FINAL:\n'), write(Resultado).
+sentenciaIF([_,_,('else',_,CuerpoElse)],TV,TVact):-
+	write('\nElse:\n'),write(CuerpoElse),write('\n'),
+	ejecuta(CuerpoElse,TV,TVact).
+	%write('\n********************* Resultado FINAL:\n'), write(Resultado).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 					%--- actualizaVariable ---%
+actualizaVariable(TV,Var, TVact):- actualizaVariableAux(TV,Var,[],TVact).
 
-actualizaVariable([],_,TVaux,TVaux) .
+actualizaVariableAux([],_,TVaux,TVaux) .
 
-actualizaVariable([(Tipo,Nombre,_)|TV],(Nombre,Valor),TVaux, TVresul):-
+actualizaVariableAux([(Tipo,Nombre,_)|TV],(Nombre,Valor),TVaux, TVresul):-
 	!,
 	append(TVaux,[(Tipo,Nombre,Valor)],TVactAux),
 	append(TVactAux,TV,TVresul).
 
-actualizaVariable([(Tipo,Nombre1,Valor)|TV],(Nombre2,V),TVaux, TVact):-
+actualizaVariableAux([(Tipo,Nombre1,Valor)|TV],(Nombre2,V),TVaux, TVact):-
 	append(TVaux,[(Tipo,Nombre1,Valor)],TVactAux),
-	actualizaVariable(TV, (Nombre2,V), TVactAux, TVact).
+	actualizaVariableAux(TV, (Nombre2,V), TVactAux, TVact).
 
 %------------------------------------------------------------------------------------
 
@@ -146,8 +143,10 @@ noEstaVariable(_,_):-true.
 
 					%--- resuelve expresion binaria---%
 
-resuelve((_,_,[Cuerpo]),Resultado):-
-	resuelveAux(Cuerpo,Resultado).
+resuelve('=',Op1,Op2,TV,TVact):-
+	write('\nOp2:   '),write(Op2),
+	resuelveAux(Op2,Resultado),
+	actualizaVariable(TV,(Op1,Resultado), TVact).
 
 resuelveAux((_,[_=Resultado],[]), Resultado):- !, write('\nResultado Parcial:    '),write(Resultado).
 resuelveAux((operadorBinario,Operador,[X,Y]), Resultado):- !,
