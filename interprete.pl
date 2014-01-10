@@ -12,7 +12,7 @@ interprete :-
 	eliminaVacios(Xs,Xs1),
 	%write(Xs1), write('\n'),
 	ejecuta(Xs1,[],TVact),
-	write('\nTabla de Valores:\n'),
+	write('\nTabla de Variables final:\n'),
 	write(TVact).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,15 +45,13 @@ evalua('funcion',[_=NombreFuncion,_=ValorSalida],TV,TVact,Cuerpo,Cuerpo) :- !,fu
 
 evalua('param',[_=TipoParametro,_=NombreParametro],TV,TVact,Cuerpo,Cuerpo) :- !, append(TV,[(TipoParametro,NombreParametro,'')], TVact).
 
-evalua('body',_,TV,TV,Cuerpo,Cuerpo) :- ! .
+evalua('body',_,TV,TV,Cuerpo,Cuerpo) :- !.
 
-evalua('asignacion',[_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo) :- !, actualizaVariable(TV,(Nombre,Valor),TVact).
+evalua('declaracion',[_=Tipo,_=Nombre],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable(TV,(Tipo,Nombre,''),TVact).
 
-evalua('declaracionAsignacion',[_=Tipo,_=Nombre,_=Valor],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable(TV,(Tipo,Nombre,Valor), TVact).
+evalua('asignacion',[_=Nombre],TV,TVact,[Cuerpo],[]) :- !, resuelve(Cuerpo,TV,Valor), actualizaVariable(TV,(Nombre,Valor),TVact).
 
 evalua('if',_,TV,TVact,Cuerpo,[]):- !, sentenciaIF(Cuerpo,TV,TVact), write('\nTV Antes del IF\n'), write(TV), write('\n\nTV Despues del IF\n'), write(TVact), write('\n').
-
-evalua('operadorBinario',[_,_= (Op)],TV,TVact,[Op1,Op2],[]):-!, resuelve(Op,Op1,Op2,TV,TVact).
 
 evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 
@@ -69,11 +67,9 @@ evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 
 % CONDICION
 condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
-	dameVariable(TV, Operando1, (_,_,Valor1)),
-	dameVariable(TV, Operando2, (_,_,Valor2)),
-	atom_number(Valor1,V1),
-	atom_number(Valor2,V2),
-	opera(Op, V1, V2, Resultado), Resultado.
+	sacaValor(TV,Operando1,Valor1),
+	sacaValor(TV,Operando2,Valor2),
+	opera(Op, Valor1, Valor2, Resultado), Resultado.
 
 % THEN
 sentenciaIF([Condicion,('then',_,CuerpoThen),_],TV,TVact):-
@@ -144,35 +140,28 @@ noEstaVariable(_,_):-true.
 
 % Resolvemos la expresion binaria del tipo X = Y, dada de la forma resuelve(=,X,Y,TV,TVact)
 
-resuelve('=',Op1,Op2,TV,TVact):-
-	sacaContenido(Op1,Operando1),
-	resuelveAux(Op2,TV,Resultado),
-	actualizaVariable(TV,(Operando1,Resultado),TVact).
-
-resuelveAux((_,[_,_=Resultado],[]), _ , Resultado):- !.
-
 % Caso en el que el operando es otra expresion binaria: X = "Y + Z"
 
-resuelveAux(('operadorBinario',Operador,[X,Y]), TV , Resultado):- !,
+resuelve(('operadorBinario',Operador,[X,Y]), TV , Resultado):- !,
 	sacaContenido(Operador,Op),
-	resuelveAux(X, TV, Operando1),
-	resuelveAux(Y, TV, Operando2),
+	resuelve(X, TV, Operando1),
+	resuelve(Y, TV, Operando2),
 	opera(Op, Operando1, Operando2, Resultado).
 
 % Caso en el que el operando es una variable: X = "y"
 
-resuelveAux(('operando',[_=NombreOperando],_), TV, Resultado):- !,
-	sacaValor(TV, NombreOperando,ValorOperando),
-	atom_number(ValorOperando,Resultado).
+resuelve(('operando',[_=NombreOperando],_), TV, ValorOperando):- !,
+	sacaValor(TV, NombreOperando,ValorOperando).
+	%atom_number(ValorOperando,Resultado).
 
 % Caso en el que el operando es un número entero: X = "1"
 
-resuelveAux(('integer',[_=Valor],_), _ ,Resultado):- !,
+resuelve(('numero',[_=Valor],_),_ ,Resultado):- !,
 	atom_number(Valor,Resultado).
 
 % Resto de casos:
 
-resuelveAux(_,_,0).
+resuelve(_,_,0).
 
 % sacamos el contenido que viene de la forma [operando, Nombre= ("y")] , [integer, Valor= ("1")] , etc.
 

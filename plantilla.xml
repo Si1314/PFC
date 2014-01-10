@@ -4,63 +4,61 @@
 <funcion tipo="void" nombre="main">
 	<param tipo="int" nombre="x"/>
 	<body>
-		<asignacion nombre="x" valor="4"/>
-		<declaracionAsignacion tipo="int" nombre="y" valor="1"/>
-		<declaracionAsignacion tipo="int" nombre="z" valor="6"/>
+		<asignacion nombre="x">
+			<numero valor="1"></numero>
+		</asignacion>
+
+		<declaracion tipo="int" nombre="y"/>
+
+		<asignacion nombre="y">
+			<numero valor="2"></numero>
+		</asignacion>
+
+		<declaracion tipo="int" nombre="z"/>
+
 		<if>
 			<operadorBinario tipo="bool" operador="<">
 				<operando nombre="x"></operando>
 				<operando nombre="y"></operando>
 			</operadorBinario>
 			<then>
-			    <operadorBinario tipo="igualdad" operador="=">
-			    	<operando nombre="x"></operando>
+			    <asignacion nombre="x">
 					<operando nombre="y"></operando>				    	
-			    </operadorBinario>
+			    </asignacion>
+			    <asignacion nombre="z">
+					<numero valor="0"></numero>			    	
+				</asignacion>
 			</then>
 			<else>
-				<operadorBinario tipo="igualdad" operador="=">
-			    	<operando nombre="y"></operando>
+				<asignacion nombre="z">
 					<operadorBinario tipo="aritmetico" operador="+">
 						<operando nombre="x"></operando>
-						<integer valor="1"></integer>
+						<operando nombre="y"></operando>
 					</operadorBinario>				    	
-			    </operadorBinario>
+			    </asignacion>
 			</else>
 		</if>
-		<operadorBinario tipo="igualdad" operador="=">
-	    	<operando nombre="z"></operando>
+		<asignacion nombre="z">
 			<operadorBinario tipo="aritmetico" operador="+">
 				<operando nombre="z"></operando>
-				<integer valor="1"></integer>
+				<numero valor="1"></numero>
 			</operadorBinario>				    	
-	    </operadorBinario>
+		</asignacion>
 	</body>
 </funcion>
 
 <!-- 
 
-<BinaryOperator 'int' '='>
-	<DeclRefExpr 'i' 'int'></DeclRefExpr>
-    <BinaryOperator 'int' '+'>
-		<ImplicitCastExpr 'int'>
-			<DeclRefExpr 'i' 'int'></DeclRefExpr>
-		</ImplicitCastExpr>	
-		<IntegerLiteral>
-			1
-		</IntegerLiteral>			    	
-    </BinaryOperator>				    	
-</BinaryOperator>
-
 void main(int x){
 	x = 1;
 	int y = 2;
-	int z = 3;
+	int z;
 
 	if (x<y) {
 		x = y;
+		z = 0;
 	}else{
-		y = x + 1;
+		z = x + y;
 	}
 
 	z = z + 1;
