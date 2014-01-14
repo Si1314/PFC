@@ -1,0 +1,18 @@
+
+<?xml version="1.0"?>
+
+<funcion tipo="void" nombre="main">
+	<param tipo="int" nombre="x"/>
+	<body>
+		
+	</body>
+</funcion>
+
+<!-- 
+
+void main(int x){
+
+}
+
+-->
+

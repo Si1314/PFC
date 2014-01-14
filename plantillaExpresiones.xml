@@ -1,0 +1,66 @@
+
+<?xml version="1.0"?>
+
+<funcion tipo="void" nombre="main">
+	<param tipo="int" nombre="x"/>
+	<body>
+
+		<!-- int y = 2; -->
+		<declaracion tipo="int" nombre="y"/>
+		<asignacion nombre="y">
+			<numero valor="2"></numero>
+		</asignacion>
+
+		<!-- int z; -->
+		<declaracion tipo="int" nombre="z"/>
+
+		<!-- z = y * 100; -->
+		<asignacion nombre="z">
+			<operadorBinario tipo="aritmetico" operador="*">
+				<operando nombre="y"></operando>
+				<numero valor="100"></numero>
+			</operadorBinario>				    	
+	    </asignacion>
+
+		<!-- y = z + 7 - 3; -->
+		<asignacion nombre="y">
+			<operadorBinario tipo="aritmetico" operador="+">
+				<operando nombre="z"></operando>
+				<operadorBinario tipo="aritmetico" operador="-">
+					<numero valor="7"></numero>
+					<numero valor="3"></numero>
+				</operadorBinario>
+			</operadorBinario>				    	
+	    </asignacion>
+
+		<!-- x = y; -->
+		<asignacion nombre="x">
+			<operando nombre="y"></operando>
+		</asignacion>
+
+		<!-- y = 0; -->
+		<asignacion nombre="y">
+			<numero valor="0"></numero>
+		</asignacion>
+	    
+	</body>
+</funcion>
+
+<!--  -->
+
+<!-- 
+
+void main(int x){
+	int y = 2;		// y = 2
+	int z;
+	z = y * 100;	// z = 2 * 100 = 200
+	y = z + 7 - 3;	// y = 200 + 7 - 3 = 204
+	x = y;			// x = 204
+	y = 0;			// y = 0
+}
+
+Tabla de variables que debería de salir;
+[(void,main,funcion),(int,x,204),(int,y,0),(int,z,200)]
+
+-->
+

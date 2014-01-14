@@ -4,32 +4,47 @@
 <funcion tipo="void" nombre="main">
 	<param tipo="int" nombre="x"/>
 	<body>
+
+		<!-- x = 1; -->
 		<asignacion nombre="x">
 			<numero valor="1"></numero>
 		</asignacion>
 
+		<!-- int y = 2; -->
 		<declaracion tipo="int" nombre="y"/>
-
 		<asignacion nombre="y">
 			<numero valor="2"></numero>
 		</asignacion>
 
+		<!-- int z; -->
 		<declaracion tipo="int" nombre="z"/>
 
+		<!-- if -->
 		<if>
+			<!-- (x<y) -->
 			<operadorBinario tipo="bool" operador="<">
 				<operando nombre="x"></operando>
 				<operando nombre="y"></operando>
 			</operadorBinario>
+
+			<!-- then -->
 			<then>
+
+				<!-- x = y; -->
 			    <asignacion nombre="x">
 					<operando nombre="y"></operando>				    	
 			    </asignacion>
+
+			    <!-- z = 0; -->
 			    <asignacion nombre="z">
 					<numero valor="0"></numero>			    	
 				</asignacion>
 			</then>
+
+			<!-- else -->
 			<else>
+
+				<!-- z = x + y; -->
 				<asignacion nombre="z">
 					<operadorBinario tipo="aritmetico" operador="+">
 						<operando nombre="x"></operando>
@@ -38,6 +53,8 @@
 			    </asignacion>
 			</else>
 		</if>
+
+		<!-- z = z + 1; -->
 		<asignacion nombre="z">
 			<operadorBinario tipo="aritmetico" operador="+">
 				<operando nombre="z"></operando>
@@ -50,20 +67,23 @@
 <!-- 
 
 void main(int x){
-	x = 1;
-	int y = 2;
+	x = 1;			// x = 1
+	int y = 2;		// y = 2
 	int z;
 
-	if (x<y) {
-		x = y;
-		z = 0;
-	}else{
-		z = x + y;
+	if (x<y) {		// 1 < 2 -> true
+		x = y;		// x = 2
+		z = 0;		// z = 0
+	}else{			// 1 >= 2 -> false
+		z = x + y;	// z = 1 + 2 = 3
 	}
 
-	z = z + 1;
+	z = z + 1;		// z = 0 + 1 = 1
 
 }
+
+Tabla de valores que me tiene que salir:
+[ (void,main,funcion), (int,x,2), (int,y,2), (int,z,1)]
 
 -->
 

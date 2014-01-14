@@ -7,7 +7,7 @@
 interprete :- 
 	cd('../PFC'),
 	use_module(library(sgml)),
-	load_xml_file('plantilla.xml', Xs),
+	load_xml_file('plantillaExpresiones.xml', Xs),
 	%write('\n'),write(Xs), write('\n'),
 	eliminaVacios(Xs,Xs1),
 	%write(Xs1), write('\n'),
