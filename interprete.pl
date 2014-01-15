@@ -7,10 +7,15 @@
 interprete :- 
 	cd('../PFC'),
 	use_module(library(sgml)),
-	load_xml_file('plantillaWhile.xml', Xs),
-	%write('\n'),write(Xs), write('\n'),
+
+	% Elegir una de las plantillas para ejecutarlas:
+
+	%load_xml_file('plantillaExpresiones.xml', Xs),
+	%load_xml_file('plantillaIF.xml', Xs),
+	%load_xml_file('plantillaFOR.xml', Xs),
+	load_xml_file('plantillaWHILE.xml', Xs),
+
 	eliminaVacios(Xs,Xs1),
-	%write(Xs1), write('\n'),
 	ejecuta(Xs1,[],TVact),
 	write('\nTabla de Variables final:\n'),
 	write(TVact).
@@ -51,7 +56,7 @@ evalua('declaracion',[_=Tipo,_=Nombre],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable
 
 evalua('asignacion',[_=Nombre],TV,TVact,[Cuerpo],[]) :- !, resuelve(Cuerpo,TV,Valor), actualizaVariable(TV,(Nombre,Valor),TVact).
 
-evalua('if',_,TV,TVact,Cuerpo,[]):- !, sentenciaIF(Cuerpo,TV,TVact), write('\nTV Antes del IF\n'), write(TV), write('\n\nTV Despues del IF\n'), write(TVact), write('\n').
+evalua('if',_,TV,TVact,Cuerpo,[]):- !, sentenciaIF(Cuerpo,TV,TVact).
 
 evalua('while',_,TV,TVact,Cuerpo,[]):- !, sentenciaWhile(Cuerpo,TV,TVact).
 
@@ -75,14 +80,11 @@ condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
 
 % THEN
 sentenciaIF([Condicion,('then',_,CuerpoThen),_],TV,TVact):-
-	write('\nCondicion:\n'),write(Condicion),write('\n'),
 	condicion(Condicion,TV), !,
-	ejecuta(CuerpoThen,TV,TVact),
-	write('\nThen:\n'),write(CuerpoThen),write('\n').
+	ejecuta(CuerpoThen,TV,TVact).
 
 % ELSE
 sentenciaIF([_,_,('else',_,CuerpoElse)],TV,TVact):-
-	write('\nElse:\n'),write(CuerpoElse),write('\n'),
 	ejecuta(CuerpoElse,TV,TVact).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
