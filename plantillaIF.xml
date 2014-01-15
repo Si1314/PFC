@@ -21,7 +21,7 @@
 
 		<!-- if -->
 		<if>
-			<!-- (x<y) -->
+			<!-- (x < y) -->
 			<operadorBinario tipo="bool" operador="<">
 				<operando nombre="x"></operando>
 				<operando nombre="y"></operando>
@@ -39,6 +39,7 @@
 			    <asignacion nombre="z">
 					<numero valor="0"></numero>			    	
 				</asignacion>
+				
 			</then>
 
 			<!-- else -->
@@ -51,6 +52,7 @@
 						<operando nombre="y"></operando>
 					</operadorBinario>				    	
 			    </asignacion>
+
 			</else>
 		</if>
 
@@ -61,6 +63,7 @@
 				<numero valor="1"></numero>
 			</operadorBinario>				    	
 		</asignacion>
+
 	</body>
 </funcion>
 

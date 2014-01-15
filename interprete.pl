@@ -7,7 +7,7 @@
 interprete :- 
 	cd('../PFC'),
 	use_module(library(sgml)),
-	load_xml_file('plantillaExpresiones.xml', Xs),
+	load_xml_file('plantillaWhile.xml', Xs),
 	%write('\n'),write(Xs), write('\n'),
 	eliminaVacios(Xs,Xs1),
 	%write(Xs1), write('\n'),
@@ -53,6 +53,8 @@ evalua('asignacion',[_=Nombre],TV,TVact,[Cuerpo],[]) :- !, resuelve(Cuerpo,TV,Va
 
 evalua('if',_,TV,TVact,Cuerpo,[]):- !, sentenciaIF(Cuerpo,TV,TVact), write('\nTV Antes del IF\n'), write(TV), write('\n\nTV Despues del IF\n'), write(TVact), write('\n').
 
+evalua('while',_,TV,TVact,Cuerpo,[]):- !, sentenciaWhile(Cuerpo,TV,TVact).
+
 evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 
 
@@ -82,6 +84,17 @@ sentenciaIF([Condicion,('then',_,CuerpoThen),_],TV,TVact):-
 sentenciaIF([_,_,('else',_,CuerpoElse)],TV,TVact):-
 	write('\nElse:\n'),write(CuerpoElse),write('\n'),
 	ejecuta(CuerpoElse,TV,TVact).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+					%--- sentenciaWhile ---%
+
+sentenciaWhile([Condicion,('cuerpo',_,CuerpoWhile)],TV,TVact2):-
+	condicion(Condicion,TV), !,
+	ejecuta(CuerpoWhile,TV,TVact1),
+	sentenciaWhile([Condicion,('cuerpo',_,CuerpoWhile)],TVact1,TVact2).
+
+sentenciaWhile(_,TV,TV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

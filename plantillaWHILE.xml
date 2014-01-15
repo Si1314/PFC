@@ -1,0 +1,73 @@
+
+<?xml version="1.0"?>
+
+<funcion tipo="void" nombre="main">
+	<param tipo="int" nombre="x"/>
+	<body>
+
+		<!-- x = 1; -->
+		<asignacion nombre="x">
+			<numero valor="1"></numero>
+		</asignacion>
+
+		<!-- int y = 3; -->
+		<declaracion tipo="int" nombre="y"/>
+		<asignacion nombre="y">
+			<numero valor="3"></numero>
+		</asignacion>
+
+		<!-- int z = 0; -->
+		<declaracion tipo="int" nombre="z"/>
+		<asignacion nombre="z">
+			<numero valor="0"></numero>
+		</asignacion>
+
+		<while>
+
+			<!-- (x < y) -->
+			<operadorBinario tipo="bool" operador="<">
+				<operando nombre="x"></operando>
+				<operando nombre="y"></operando>
+			</operadorBinario>
+
+			<cuerpo> <!-- cuerpo del While -->
+
+				<!-- z = z + 1; -->
+				<asignacion nombre="z">
+					<operadorBinario tipo="aritmetico" operador="+">
+						<operando nombre="z"></operando>
+						<numero valor="1"></numero>
+					</operadorBinario>				    	
+			    </asignacion>
+
+			    <!-- x = x + 1; -->
+				<asignacion nombre="x">
+					<operadorBinario tipo="aritmetico" operador="+">
+						<operando nombre="x"></operando>
+						<numero valor="1"></numero>
+					</operadorBinario>				    	
+			    </asignacion>
+
+			</cuerpo>
+
+		</while>
+
+	</body>
+</funcion>
+
+<!-- 
+
+void main(int x){
+	x = 1;			// x = 1
+	int y = 3;		// y = 3
+	int z = 0;
+
+	while(x < y){	// 1 < 3 true en la primera vuelta (sólo tendría que dar dos vueltas: "1 < 3" y "2 < 3")
+		z = z + 1;	// z lleva el recuento de las vueltas que damos
+		x = x + 1;	// avanzamos la x
+	}
+
+}
+
+-->
+
