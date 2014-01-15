@@ -4,15 +4,78 @@
 <funcion tipo="void" nombre="main">
 	<param tipo="int" nombre="x"/>
 	<body>
-		
+
+		<!-- x = 0; -->
+		<asignacion nombre="x">
+			<numero valor="0"></numero>
+		</asignacion>
+
+		<!-- int n = 3; -->
+		<declaracion tipo="int" nombre="n"/>
+		<asignacion nombre="n">
+			<numero valor="3"></numero>
+		</asignacion>
+
+		<for>
+
+			<!-- variable -->
+			<campoVariable>
+
+				<!-- int i = 0; -->
+				<declaracion tipo="int" nombre="i"/>
+				<asignacion nombre="i">
+					<numero valor="0"></numero>
+				</asignacion>
+
+			</campoVariable>
+
+			<!-- condicion -->
+			<!-- i < n -->
+			<operadorBinario tipo="bool" operador="<">
+				<operando nombre="i"></operando>
+				<operando nombre="n"></operando>
+			</operadorBinario>
+
+			<!-- avance -->
+			<!-- i++ -->
+			<asignacion nombre="i">
+				<operadorBinario tipo="aritmetico" operador="+">
+					<operando nombre="i"></operando>
+					<numero valor="1"></numero>
+				</operadorBinario>				    	
+		    </asignacion>
+
+		    <!-- cuerpo del for -->
+			<cuerpo>
+
+ 				<!-- x = x + 1; -->
+				<asignacion nombre="x">
+					<operadorBinario tipo="aritmetico" operador="+">
+						<operando nombre="x"></operando>
+						<numero valor="1"></numero>
+					</operadorBinario>				    	
+			    </asignacion>
+
+			</cuerpo>
+		</for>
+
 	</body>
 </funcion>
 
 <!-- 
 
 void main(int x){
+	x = 0;
+	int n = 3;
+
+	for(int i = 0; i < n; i++){	// tiene que dar 3 vueltas
+		x = x + 1;	// llevamos el recuento de las vueltas que damos
+	}
 
 }
+
+Tabla de valores que me tiene que salir:
+[ (void,main,funcion), (int,x,3), (int,n,3), (int,i,3)]
 
 -->
 

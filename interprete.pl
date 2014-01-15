@@ -12,8 +12,8 @@ interprete :-
 
 	%load_xml_file('plantillaExpresiones.xml', Xs),
 	%load_xml_file('plantillaIF.xml', Xs),
-	%load_xml_file('plantillaFOR.xml', Xs),
-	load_xml_file('plantillaWHILE.xml', Xs),
+	%load_xml_file('plantillaWHILE.xml', Xs),
+	load_xml_file('plantillaFOR.xml', Xs),
 
 	eliminaVacios(Xs,Xs1),
 	ejecuta(Xs1,[],TVact),
@@ -46,7 +46,7 @@ execute(_,TV,TV).
 
 % evaluamos cada clausula individualmente:
 
-evalua('funcion',[_=NombreFuncion,_=ValorSalida],TV,TVact,Cuerpo,Cuerpo) :- !,funcionOMetodo(ValorSalida,FunOmet) ,append(TV,[(NombreFuncion,ValorSalida,FunOmet)],TVact).
+evalua('funcion',[_=ValorSalida,_=NombreFuncion],TV,TVact,Cuerpo,Cuerpo) :- !,funcionOMetodo(ValorSalida,FunOmet) ,append(TV,[(ValorSalida,NombreFuncion,FunOmet)],TVact).
 
 evalua('param',[_=TipoParametro,_=NombreParametro],TV,TVact,Cuerpo,Cuerpo) :- !, append(TV,[(TipoParametro,NombreParametro,'')], TVact).
 
@@ -59,6 +59,8 @@ evalua('asignacion',[_=Nombre],TV,TVact,[Cuerpo],[]) :- !, resuelve(Cuerpo,TV,Va
 evalua('if',_,TV,TVact,Cuerpo,[]):- !, sentenciaIF(Cuerpo,TV,TVact).
 
 evalua('while',_,TV,TVact,Cuerpo,[]):- !, sentenciaWhile(Cuerpo,TV,TVact).
+
+evalua('for',_,TV,TVact,Cuerpo,[]):- !, sentenciaFor(Cuerpo,TV,TVact).
 
 evalua(_,_,TV,TV,Cuerpo,Cuerpo).
 
@@ -100,6 +102,19 @@ sentenciaWhile(_,TV,TV).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+					%--- sentenciaFor ---%
+
+sentenciaFor([Variable,Condicion,Avance,('cuerpo',_,CuerpoFor)],TV,TVact3):-
+	analizaVariableAvance(Variable,TV,TVact,VariableAvance),
+	condicion(Condicion,TVact), !,
+	ejecuta(CuerpoFor,TVact,TVact1),
+	ejecuta([Avance], TVact1, TVact2),
+	sentenciaFor([VariableAvance,Condicion,Avance,('cuerpo',_,CuerpoFor)],TVact2,TVact3).
+
+sentenciaFor(_,TV,TV).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 					%--- actualizaVariable ---%
 
 % Dada una variable Var, actualizamos el valor de la variable.
@@ -119,6 +134,16 @@ actualizaVariableAux([(Tipo,Nombre1,Valor)|TV],(Nombre2,V),TVaux, TVact):-
 
 %------------------------------------------------------------------------------------
 
+					%--- analizaVariableAvance ---%
+
+analizaVariableAvance(('campoVariable',_,Variable),TV,TVact,NombreVar):-
+	sacaContenido(Variable,NombreVar), !,
+	ejecuta(Variable,TV,TVact).
+
+analizaVariableAvance(Variable,TV,TV,Variable).
+
+%------------------------------------------------------------------------------------
+
 					%--- meteVariable ---%
 
 % Dada una variable Var, metemos la variable en la tabla de variables TV.
@@ -133,7 +158,7 @@ meteVariable(TV,(Tipo,Nombre,Valor), TVact):-
 
 % Diferenciamos una funcion de un metodo.
 
-funcionOMetodo('void','metodo'):-!.
+funcionOMetodo(void,'metodo'):- !.
 funcionOMetodo(_,'funcion').
 
 %------------------------------------------------------------------------------------
@@ -145,15 +170,12 @@ funcionOMetodo(_,'funcion').
 noEstaVariable([(_,Nombre,_)|_],Nombre) :- !, false.
 noEstaVariable([_|Resto],Nombre1) :-
 	!,
-	%Nombre =\= Nombre1,
 	noEstaVariable(Resto,Nombre1).
 noEstaVariable(_,_):-true.
 
 %------------------------------------------------------------------------------------
 
 					%--- resuelve expresion binaria---%
-
-% Resolvemos la expresion binaria del tipo X = Y, dada de la forma resuelve(=,X,Y,TV,TVact)
 
 % Caso en el que el operando es otra expresion binaria: X = "Y + Z"
 
@@ -180,8 +202,9 @@ resuelve(_,_,0).
 
 % sacamos el contenido que viene de la forma [operando, Nombre= ("y")] , [integer, Valor= ("1")] , etc.
 
-sacaContenido([_,_= (Op)], Op).
-sacaContenido((_,[_=Nombre],_), Nombre).
+sacaContenido([_,_= (Op)], Op):- !.
+sacaContenido((_,[_=Nombre],_), Nombre):- !.
+sacaContenido([('declaracion',[_,_=NombreVariable],_), _] , NombreVariable):- !.
 
 
 % ---> Booleana <---		Resolvemos expresiones booleanas
