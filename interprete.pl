@@ -1,279 +1,263 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		INTERPRETE		  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					%		INTERPRETER		  %
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Escribir "interprete." para probarlo
+use_module(library(sgml)).
 
-interprete :- 
+% First you have to keep this file in a folder called "PFC"
+% Then open swi Prolog and write "interpreter." to taste it
+
+% Carga el arbol dado por xml en 'Program'
+
+interpreter :- 
 	cd('../PFC'),
-	use_module(library(sgml)),
+	% Choose one to execute:
+	load_xml_file('plantillaExpresiones.xml', Program),
+	%load_xml_file('plantillaIF.xml', Program),
+	%load_xml_file('plantillaWHILE.xml', Program),
+	%load_xml_file('plantillaFOR.xml', Program),
 
-	% Elegir una de las plantillas para ejecutarlas:
+	removeEmpty(Program,GoodProgram),
+	execute(GoodProgram,[],TV),
 
-	%load_xml_file('plantillaExpresiones.xml', Xs),
-	%load_xml_file('plantillaIF.xml', Xs),
-	%load_xml_file('plantillaWHILE.xml', Xs),
-	load_xml_file('plantillaFOR.xml', Xs),
+	write('\nVariables final list:\n'),
+	write(TV).
 
-	eliminaVacios(Xs,Xs1),
-	ejecuta(Xs1,[],TVact),
-	write('\nTabla de Variables final:\n'),
-	write(TVact).
+					%%%%%%%%%%%
+					% execute %
+					%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		EJECUTA			  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Vamos a ejecutar con "execute" cada elemento que tengamos en la lista de entrada. TV es la Tabla de variables y TVact la Tabla actualizada despues de la ejecucion
-
-ejecuta([],TV,TV) :- !.
-ejecuta([X|Xs],TV,TVactT) :-
+execute([],TV,TV).
+execute([Instruction|RestInstructios],TV,TVupdated2) :-
 	!,
-	execute(X,TV,TVact),
-	ejecuta(Xs,TVact,TVactT).
+	step(Instruction,TV,TVupdated1),
+	execute(RestInstructios,TVupdated1,TVupdated2).
 
-execute((Nombre,Atributos,Resto),TV,TVactTotal) :-
-	!, 
-	evalua(Nombre,Atributos,TV,TVact,Resto,NuevoResto),
-	ejecuta(NuevoResto,TVact,TVactTotal).
+
+					%%%%%%%%
+					% STEP %
+					%%%%%%%%
+
+step(('function',[_=ExitValue,_=FunctionName],FuncionBody),TV,TVupdated1) :- !,
+	functionOrMethod(ExitValue,FunOrMet),
+	append(TV,[(ExitValue,FunctionName,FunOrMet)],TVupdated),
+	execute(FuncionBody,TVupdated,TVupdated1).
+
+step(('param',[_=ParamType,_=ParamName],ParamBody),TV,TVupdated2) :- !,
+	add(TV,(ParamType,ParamName,''),TVupdated1),
+	execute(ParamBody,TVupdated1,TVupdated2).
+
+step(('body',_,Body),TV,TVupdated) :- !,
+	execute(Body,TV,TVupdated).
+
+step(('declaration',[_=Type,_=Name],DecBody),TV,TVupdated2):- !,
+	add(TV,(Type,Name,''),TVupdated1),
+	execute(DecBody,TVupdated1,TVupdated2).
+
+step(('assignment',[_=Name],[AssigBody]),TV,TVupdated) :- !,
+	resolveExpression(AssigBody,TV,Value),
+	update(TV,(Name,Value),TVupdated).
+
+% IF -> THEN
+step(('if',_,[Condition,('then',_,Then),_]),TV,TVupdated):- !,
+	evaluate(Condition,TV), !,
+	execute(Then,TV,TVupdated).
+
+% IF -> ELSE
+step(('if',_,[_,_,('else',_,Else)]),TV,TVupdated):- !,
+	execute(Else,TV,TVupdated).
+
+% WHILE -> TRUE
+step(('while',_,[Condition,('body',_,WhileBody)]),TV,TVupdated2):-
+	evaluate(Condition,TV), !,
+	execute(WhileBody,TV,TVupdated1),
+	step(('while',_,[Condition,('body',_,WhileBody)]),TVupdated1,TVupdated2).
+
+% WHILE -> FALSE
+step(('while',_,_),TVupdated1,TVupdated1):-!.
+
+% FOR
+step(('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),TV,TVupdated3):-
+	variableAdvance(Variable,TV,TVupdated,VariableName),
+	evaluate(Condition,TVupdated), !,
+	execute(ForBody,TVupdated,TVupdated1),
+	execute([Advance], TVupdated1, TVupdated2),
+	step(('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),TVupdated2,TVupdated3).
+
+% FOR -> WE GO OUT
+step(('for',_,_),TV,TV):-!.
+
+step(_,TV,TV).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+						%%%%%%%%%%%%%%%%%%
+						%	EXPRESSIONS  %
+						%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+					%--- resolveExpression ---%
+
+resolveExpression(('binaryOperator',Operator,[X,Y]), TV , Result):- !,
+	getContent(Operator,Op),
+	resolveExpression(X, TV, Operand1),
+	resolveExpression(Y, TV, Operand2),
+	work(Op, Operand1, Operand2, Result).
+
+resolveExpression(('variable',[_=OperandName],_), TV, OperandValue):- !,
+	getValue(TV, OperandName,OperandValue).
+
+resolveExpression(('constant',[_=Value],_),_ ,Result):- !,
+	atom_number(Value,Result).
+
+resolveExpression(_,_,0).
+
+%					-----------------
+%					---> Boolean <---
+%					-----------------
+
+work('=<', Op1,Op2, true):- Op1 =< Op2, !.
+work('=<', _,_,false):- !.
+
+work('<', Op1,Op2,true):- Op1 < Op2, !.
+work('<', _,_,false):- !.
+
+work('>=', Op1,Op2,true):- Op1 >= Op2, !.
+work('>=', _,_,false):- !.
+
+work('>', Op1,Op2,true):- Op1 > Op2, !.
+work('>', _,_,false):- !.
+
+work('==', Op1,Op2,true):- Op1 = Op2, !.
+work('==', _,_,false):- !.
+
+work('!=', Op1,Op2,true):- Op1 \= Op2, !.
+work('!=', _,_,false):- !.
+
+%					--------------------
+%					---> arithmetic <---		
+%					--------------------
+
+work('+', Op1,Op2,Z):- !, Z is Op1 + Op2.
+work('-', Op1,Op2,Z):- !, Z is Op1 - Op2.
+work('*', Op1,Op2,Z):- !, Z is Op1 * Op2.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					%	VARIABLES TABLE FUNCTIONS  %
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+					%--- update ---%
+
+update(TV,Var,TVupdated):- updateAux(TV,Var,[],TVupdated).
+
+updateAux([],_,TVaux,TVaux) .
+
+updateAux([(Type,Name,_)|TV],(Name,Value),TVaux, TVresult):-
+	!,
+	append(TVaux,[(Type,Name,Value)],TVupdatedAux),
+	append(TVupdatedAux,TV,TVresult).
+
+updateAux([(Type,Name1,Value)|TV],(Name2,V),TVaux, TVupdated):-
+	append(TVaux,[(Type,Name1,Value)],TVupdatedAux),
+	updateAux(TV, (Name2,V), TVupdatedAux, TVupdated).
 	
-execute(_,TV,TV).
+%------------------------------------------------------------------------------------
 
+					%--- add ---%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%		EVALUA			  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
+add(TV,(Type,Name,Value),TVupdated):-
+	notInTable(TV,Name),
+	append(TV,[(Type,Name,Value)],TVupdated).
 
-% evaluamos cada clausula individualmente:
+%------------------------------------------------------------------------------------
 
-evalua('funcion',[_=ValorSalida,_=NombreFuncion],TV,TVact,Cuerpo,Cuerpo) :- !,funcionOMetodo(ValorSalida,FunOmet) ,append(TV,[(ValorSalida,NombreFuncion,FunOmet)],TVact).
+					%--- notInTable ---%
 
-evalua('param',[_=TipoParametro,_=NombreParametro],TV,TVact,Cuerpo,Cuerpo) :- !, append(TV,[(TipoParametro,NombreParametro,'')], TVact).
+notInTable([(_,Name,_)|_],Name) :- !, false.
+notInTable([_|Rest],Name1) :-!,
+	notInTable(Rest,Name1).
+notInTable(_,_):-true.
 
-evalua('body',_,TV,TV,Cuerpo,Cuerpo) :- !.
+%------------------------------------------------------------------------------------
 
-evalua('declaracion',[_=Tipo,_=Nombre],TV,TVact,Cuerpo,Cuerpo):- !, meteVariable(TV,(Tipo,Nombre,''),TVact).
+					%--- getVariable ---%
 
-evalua('asignacion',[_=Nombre],TV,TVact,[Cuerpo],[]) :- !, resuelve(Cuerpo,TV,Valor), actualizaVariable(TV,(Nombre,Valor),TVact).
+getVariable([(Type,Name,Value)|_],Name,(Type,Name,Value)):- !.
 
-evalua('if',_,TV,TVact,Cuerpo,[]):- !, sentenciaIF(Cuerpo,TV,TVact).
+getVariable([_|Rest],Name,ValueReturned):-
+	getVariable(Rest,Name,ValueReturned).
 
-evalua('while',_,TV,TVact,Cuerpo,[]):- !, sentenciaWhile(Cuerpo,TV,TVact).
+%------------------------------------------------------------------------------------
 
-evalua('for',_,TV,TVact,Cuerpo,[]):- !, sentenciaFor(Cuerpo,TV,TVact).
+					%--- getValue ---%
 
-evalua(_,_,TV,TV,Cuerpo,Cuerpo).
+getValue([(_,OperandName,Result)|_], OperandName, Result):- !.
+getValue([_|Rest], OperandName, Result):-
+	getValue(Rest, OperandName, Result).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%
 					%	FUNCIONES AUXILIARES  %
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					
+					%--- evaluate ---%
 
-					%--- sentenciaIF ---%
-
-% CONDICION
-condicion((_, [_, _= (Op)], [(_,[_=Operando1],_),(_,[_=Operando2],_)]), TV):-
-	sacaValor(TV,Operando1,Valor1),
-	sacaValor(TV,Operando2,Valor2),
-	opera(Op, Valor1, Valor2, Resultado), Resultado.
-
-% THEN
-sentenciaIF([Condicion,('then',_,CuerpoThen),_],TV,TVact):-
-	condicion(Condicion,TV), !,
-	ejecuta(CuerpoThen,TV,TVact).
-
-% ELSE
-sentenciaIF([_,_,('else',_,CuerpoElse)],TV,TVact):-
-	ejecuta(CuerpoElse,TV,TVact).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-					%--- sentenciaWhile ---%
-
-sentenciaWhile([Condicion,('cuerpo',_,CuerpoWhile)],TV,TVact2):-
-	condicion(Condicion,TV), !,
-	ejecuta(CuerpoWhile,TV,TVact1),
-	sentenciaWhile([Condicion,('cuerpo',_,CuerpoWhile)],TVact1,TVact2).
-
-sentenciaWhile(_,TV,TV).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-					%--- sentenciaFor ---%
-
-sentenciaFor([Variable,Condicion,Avance,('cuerpo',_,CuerpoFor)],TV,TVact3):-
-	analizaVariableAvance(Variable,TV,TVact,VariableAvance),
-	condicion(Condicion,TVact), !,
-	ejecuta(CuerpoFor,TVact,TVact1),
-	ejecuta([Avance], TVact1, TVact2),
-	sentenciaFor([VariableAvance,Condicion,Avance,('cuerpo',_,CuerpoFor)],TVact2,TVact3).
-
-sentenciaFor(_,TV,TV).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-					%--- actualizaVariable ---%
-
-% Dada una variable Var, actualizamos el valor de la variable.
-
-actualizaVariable(TV,Var,TVact):- actualizaVariableAux(TV,Var,[],TVact).
-
-actualizaVariableAux([],_,TVaux,TVaux) .
-
-actualizaVariableAux([(Tipo,Nombre,_)|TV],(Nombre,Valor),TVaux, TVresul):-
-	!,
-	append(TVaux,[(Tipo,Nombre,Valor)],TVactAux),
-	append(TVactAux,TV,TVresul).
-
-actualizaVariableAux([(Tipo,Nombre1,Valor)|TV],(Nombre2,V),TVaux, TVact):-
-	append(TVaux,[(Tipo,Nombre1,Valor)],TVactAux),
-	actualizaVariableAux(TV, (Nombre2,V), TVactAux, TVact).
+evaluate((_, [_, _= (Op)], [(_,[_=Operand1],_),(_,[_=Operand2],_)]), TV):-
+	getValue(TV,Operand1,Value1),
+	getValue(TV,Operand2,Value2),
+	work(Op, Value1, Value2, Result), Result.
 
 %------------------------------------------------------------------------------------
 
-					%--- analizaVariableAvance ---%
+					%--- variableAdvance ---%
 
-analizaVariableAvance(('campoVariable',_,Variable),TV,TVact,NombreVar):-
-	sacaContenido(Variable,NombreVar), !,
-	ejecuta(Variable,TV,TVact).
+variableAdvance(('variableField',_,Variable),TV,TVupdated,VarName):-
+	getContent(Variable,VarName), !,
+	execute(Variable,TV,TVupdated).
 
-analizaVariableAvance(Variable,TV,TV,Variable).
-
-%------------------------------------------------------------------------------------
-
-					%--- meteVariable ---%
-
-% Dada una variable Var, metemos la variable en la tabla de variables TV.
-
-meteVariable(TV,(Tipo,Nombre,Valor), TVact):-
-	noEstaVariable(TV,Nombre),
-	append(TV,[(Tipo,Nombre,Valor)],TVact).
+variableAdvance(Variable,TV,TV,Variable).
 
 %------------------------------------------------------------------------------------
 
-					%--- funcionOMetodo ---%
+					%--- functionOrMethod ---%
 
 % Diferenciamos una funcion de un metodo.
 
-funcionOMetodo(void,'metodo'):- !.
-funcionOMetodo(_,'funcion').
+functionOrMethod(void,'method'):- !.
+functionOrMethod(_,'function').
 
 %------------------------------------------------------------------------------------
 
-					%--- noEstaVariable ---%
+					%--- getContent ---%
 
-% True si la variable no está en la tabla de variables
-
-noEstaVariable([(_,Nombre,_)|_],Nombre) :- !, false.
-noEstaVariable([_|Resto],Nombre1) :-
-	!,
-	noEstaVariable(Resto,Nombre1).
-noEstaVariable(_,_):-true.
+getContent([_,_= (Op)], Op):- !.
+getContent((_,[_=Name],_), Name):- !.
+getContent([('declaration',[_,_=VariableName],_), _] , VariableName):- !.
 
 %------------------------------------------------------------------------------------
 
-					%--- resuelve expresion binaria---%
+					%--- removeEmpty ---%
 
-% Caso en el que el operando es otra expresion binaria: X = "Y + Z"
+removeEmpty(List,ReturnedList):-
+	removeEmptyAux(List,[],ReturnedList).
 
-resuelve(('operadorBinario',Operador,[X,Y]), TV , Resultado):- !,
-	sacaContenido(Operador,Op),
-	resuelve(X, TV, Operando1),
-	resuelve(Y, TV, Operando2),
-	opera(Op, Operando1, Operando2, Resultado).
+removeEmptyAux([],Ac,Ac).
 
-% Caso en el que el operando es una variable: X = "y"
-
-resuelve(('operando',[_=NombreOperando],_), TV, ValorOperando):- !,
-	sacaValor(TV, NombreOperando,ValorOperando).
-	%atom_number(ValorOperando,Resultado).
-
-% Caso en el que el operando es un número entero: X = "1"
-
-resuelve(('numero',[_=Valor],_),_ ,Resultado):- !,
-	atom_number(Valor,Resultado).
-
-% Resto de casos:
-
-resuelve(_,_,0).
-
-% sacamos el contenido que viene de la forma [operando, Nombre= ("y")] , [integer, Valor= ("1")] , etc.
-
-sacaContenido([_,_= (Op)], Op):- !.
-sacaContenido((_,[_=Nombre],_), Nombre):- !.
-sacaContenido([('declaracion',[_,_=NombreVariable],_), _] , NombreVariable):- !.
-
-
-% ---> Booleana <---		Resolvemos expresiones booleanas
-
-opera('=<', Op1,Op2, true):- Op1 =< Op2, !.
-opera('=<', _,_,false):- !.
-
-opera('<', Op1,Op2,true):- Op1 < Op2, !.
-opera('<', _,_,false):- !.
-
-opera('>=', Op1,Op2,true):- Op1 >= Op2, !.
-opera('>=', _,_,false):- !.
-
-opera('>', Op1,Op2,true):- Op1 > Op2, !.
-opera('>', _,_,false):- !.
-
-opera('==', Op1,Op2,true):- Op1 = Op2, !.
-opera('==', _,_,false):- !.
-
-opera('!=', Op1,Op2,true):- Op1 \= Op2, !.
-opera('!=', _,_,false):- !.
-
-
-% ---> Aritmetica <---		Resolvemos expresiones aritmeticas (FALTAN MUCHAS MAS) "TODO"
-
-opera('+', Op1,Op2,Z):- !, Z is Op1 + Op2.
-opera('-', Op1,Op2,Z):- !, Z is Op1 - Op2.
-opera('*', Op1,Op2,Z):- !, Z is Op1 * Op2.
-
-
-
-%------------------------------------------------------------------------------------
-
-					%--- dameVariable ---%
-
-% Devuelve la variable con nombre "Nombre" de la tabla de valores
-
-dameVariable([(Tipo,Nombre,Valor)|_],Nombre,(Tipo,Nombre,Valor)):- !.
-
-dameVariable([_|Resto],Nombre,ValorDevuelto):-
-	dameVariable(Resto,Nombre,ValorDevuelto).
-
-%------------------------------------------------------------------------------------
-
-					%--- eliminaVacios ---%
-
-% Elimina los elementos vacios que haya en la lista Xs y deja en Ys la lista limpia
-
-eliminaVacios(Xs,Ys):-
-	eliminaVaciosAux(Xs,[],Ys).
-
-eliminaVaciosAux([],Ac,Ac).
-
-eliminaVaciosAux([element(X,Y,Z)|Xs],Ac,Ys):- !,
-	eliminaVacios(Z,Z1),
+removeEmptyAux([element(X,Y,Z)|List],Ac,ReturnedList):- !,
+	removeEmpty(Z,Z1),
 	append(Ac,[(X,Y,Z1)],Acc),
-	eliminaVaciosAux(Xs,Acc,Ys).
+	removeEmptyAux(List,Acc,ReturnedList).
 
-eliminaVaciosAux([_|Xs],Ac,Ys):-
-	eliminaVaciosAux(Xs,Ac,Ys).
-
-%------------------------------------------------------------------------------------
-
-					%--- sacaValor ---%
-
-% Saca el valor de la variable "NombreOperando" y devuelve en "Resultado" su valor
-
-sacaValor([(_,NombreOperando,Resultado)|_], NombreOperando, Resultado):- !.
-sacaValor([_|Xs], NombreOperando, Resultado):-
-	sacaValor(Xs, NombreOperando, Resultado).
+removeEmptyAux([_|List],Ac,ReturnedList):-
+	removeEmptyAux(List,Ac,ReturnedList).
 
 %------------------------------------------------------------------------------------

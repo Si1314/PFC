@@ -1,50 +1,50 @@
 
 <?xml version="1.0"?>
 
-<funcion tipo="void" nombre="main">
-	<param tipo="int" nombre="x"/>
+<function type="void" name="main">
+	<param type="int" name="x"/>
 	<body>
 
 		<!-- int y = 2; -->
-		<declaracion tipo="int" nombre="y"/>
-		<asignacion nombre="y">
-			<numero valor="2"></numero>
-		</asignacion>
+		<declaration type="int" name="y"/>
+		<assignment name="y">
+			<constant value="2"></constant>
+		</assignment>
 
 		<!-- int z; -->
-		<declaracion tipo="int" nombre="z"/>
+		<declaration type="int" name="z"/>
 
 		<!-- z = y * 100; -->
-		<asignacion nombre="z">
-			<operadorBinario tipo="aritmetico" operador="*">
-				<operando nombre="y"></operando>
-				<numero valor="100"></numero>
-			</operadorBinario>				    	
-	    </asignacion>
+		<assignment name="z">
+			<binaryOperator type="arithmetic" operator="*">
+				<variable name="y"></variable>
+				<constant value="100"></constant>
+			</binaryOperator>				    	
+	    </assignment>
 
 		<!-- y = z + 7 - 3; -->
-		<asignacion nombre="y">
-			<operadorBinario tipo="aritmetico" operador="+">
-				<operando nombre="z"></operando>
-				<operadorBinario tipo="aritmetico" operador="-">
-					<numero valor="7"></numero>
-					<numero valor="3"></numero>
-				</operadorBinario>
-			</operadorBinario>				    	
-	    </asignacion>
+		<assignment name="y">
+			<binaryOperator type="arithmetic" operator="+">
+				<variable name="z"></variable>
+				<binaryOperator type="arithmetic" operator="-">
+					<constant value="7"></constant>
+					<constant value="3"></constant>
+				</binaryOperator>
+			</binaryOperator>				    	
+	    </assignment>
 
 		<!-- x = y; -->
-		<asignacion nombre="x">
-			<operando nombre="y"></operando>
-		</asignacion>
+		<assignment name="x">
+			<variable name="y"></variable>
+		</assignment>
 
 		<!-- y = 0; -->
-		<asignacion nombre="y">
-			<numero valor="0"></numero>
-		</asignacion>
+		<assignment name="y">
+			<constant value="0"></constant>
+		</assignment>
 	    
 	</body>
-</funcion>
+</function>
 
 <!--  -->
 

@@ -1,44 +1,44 @@
 
 <?xml version="1.0"?>
 
-<funcion tipo="void" nombre="main">
-	<param tipo="int" nombre="x"/>
+<function type="void" name="main">
+	<param type="int" name="x"/>
 	<body>
 
 		<!-- x = 1; -->
-		<asignacion nombre="x">
-			<numero valor="1"></numero>
-		</asignacion>
+		<assignment name="x">
+			<constant value="1"></constant>
+		</assignment>
 
 		<!-- int y = 2; -->
-		<declaracion tipo="int" nombre="y"/>
-		<asignacion nombre="y">
-			<numero valor="2"></numero>
-		</asignacion>
+		<declaration type="int" name="y"/>
+		<assignment name="y">
+			<constant value="2"></constant>
+		</assignment>
 
 		<!-- int z; -->
-		<declaracion tipo="int" nombre="z"/>
+		<declaration type="int" name="z"/>
 
 		<!-- if -->
 		<if>
 			<!-- (x < y) -->
-			<operadorBinario tipo="bool" operador="<">
-				<operando nombre="x"></operando>
-				<operando nombre="y"></operando>
-			</operadorBinario>
+			<binaryOperator type="bool" operator="<">
+				<variable name="x"></variable>
+				<variable name="y"></variable>
+			</binaryOperator>
 
 			<!-- then -->
 			<then>
 
 				<!-- x = y; -->
-			    <asignacion nombre="x">
-					<operando nombre="y"></operando>				    	
-			    </asignacion>
+			    <assignment name="x">
+					<variable name="y"></variable>				    	
+			    </assignment>
 
 			    <!-- z = 0; -->
-			    <asignacion nombre="z">
-					<numero valor="0"></numero>			    	
-				</asignacion>
+			    <assignment name="z">
+					<constant value="0"></constant>			    	
+				</assignment>
 				
 			</then>
 
@@ -46,26 +46,26 @@
 			<else>
 
 				<!-- z = x + y; -->
-				<asignacion nombre="z">
-					<operadorBinario tipo="aritmetico" operador="+">
-						<operando nombre="x"></operando>
-						<operando nombre="y"></operando>
-					</operadorBinario>				    	
-			    </asignacion>
+				<assignment name="z">
+					<binaryOperator type="arithmetic" operator="+">
+						<variable name="x"></variable>
+						<variable name="y"></variable>
+					</binaryOperator>				    	
+			    </assignment>
 
 			</else>
 		</if>
 
 		<!-- z = z + 1; -->
-		<asignacion nombre="z">
-			<operadorBinario tipo="aritmetico" operador="+">
-				<operando nombre="z"></operando>
-				<numero valor="1"></numero>
-			</operadorBinario>				    	
-		</asignacion>
+		<assignment name="z">
+			<binaryOperator type="arithmetic" operator="+">
+				<variable name="z"></variable>
+				<constant value="1"></constant>
+			</binaryOperator>				    	
+		</assignment>
 
 	</body>
-</funcion>
+</function>
 
 <!-- 
 
@@ -85,7 +85,7 @@ void main(int x){
 
 }
 
-Tabla de valores que me tiene que salir:
+Tabla de valuees que me tiene que salir:
 [ (void,main,funcion), (int,x,2), (int,y,2), (int,z,1)]
 
 -->

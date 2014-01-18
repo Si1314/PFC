@@ -1,59 +1,59 @@
 
 <?xml version="1.0"?>
 
-<funcion tipo="void" nombre="main">
-	<param tipo="int" nombre="x"/>
+<function type="void" name="main">
+	<param type="int" name="x"/>
 	<body>
 
 		<!-- x = 1; -->
-		<asignacion nombre="x">
-			<numero valor="1"></numero>
-		</asignacion>
+		<assignment name="x">
+			<constant value="1"></constant>
+		</assignment>
 
 		<!-- int y = 3; -->
-		<declaracion tipo="int" nombre="y"/>
-		<asignacion nombre="y">
-			<numero valor="3"></numero>
-		</asignacion>
+		<declaration type="int" name="y"/>
+		<assignment name="y">
+			<constant value="3"></constant>
+		</assignment>
 
 		<!-- int z = 0; -->
-		<declaracion tipo="int" nombre="z"/>
-		<asignacion nombre="z">
-			<numero valor="0"></numero>
-		</asignacion>
+		<declaration type="int" name="z"/>
+		<assignment name="z">
+			<constant value="0"></constant>
+		</assignment>
 
 		<while>
 
 			<!-- (x < y) -->
-			<operadorBinario tipo="bool" operador="<">
-				<operando nombre="x"></operando>
-				<operando nombre="y"></operando>
-			</operadorBinario>
+			<binaryOperator type="bool" operator="<">
+				<variable name="x"></variable>
+				<variable name="y"></variable>
+			</binaryOperator>
 
-			<cuerpo> <!-- cuerpo del While -->
+			<body> <!-- While's body -->
 
 				<!-- z = z + 1; -->
-				<asignacion nombre="z">
-					<operadorBinario tipo="aritmetico" operador="+">
-						<operando nombre="z"></operando>
-						<numero valor="1"></numero>
-					</operadorBinario>				    	
-			    </asignacion>
+				<assignment name="z">
+					<binaryOperator type="arithmetic" operator="+">
+						<variable name="z"></variable>
+						<constant value="1"></constant>
+					</binaryOperator>				    	
+			    </assignment>
 
 			    <!-- x = x + 1; -->
-				<asignacion nombre="x">
-					<operadorBinario tipo="aritmetico" operador="+">
-						<operando nombre="x"></operando>
-						<numero valor="1"></numero>
-					</operadorBinario>				    	
-			    </asignacion>
+				<assignment name="x">
+					<binaryOperator type="arithmetic" operator="+">
+						<variable name="x"></variable>
+						<constant value="1"></constant>
+					</binaryOperator>				    	
+			    </assignment>
 
-			</cuerpo>
+			</body>
 
 		</while>
 
 	</body>
-</funcion>
+</function>
 
 <!-- 
 
@@ -69,7 +69,7 @@ void main(int x){
 
 }
 
-Tabla de valores que me tiene que salir:
+Tabla de valuees que me tiene que salir:
 [ (void,main,funcion), (int,x,3), (int,y,3), (int,z,2)]
 
 -->
