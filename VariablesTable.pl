@@ -4,13 +4,13 @@
 
 use_module(library(sgml)).
 
-% createTable, add, getTV, getVariable, getValue, update, notInTable
+% createTable, add, getTV, getVariable, getValue, update, updateTV, notInTable
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 					%--- create and remove Table ---%
 
-updateTable(TV):-
+updateTV(TV):-
 	retractall(tv(_)),
 	assert(tv(TV)).
 
@@ -20,17 +20,11 @@ removeTable:- retractall(tv(_)).
 
 					%--- add ---%
 
-add((Type,Name,Value),TVupdated):-
+add((Type,Name,Value)):-
+	notInTable(Name),!,
 	tv(TV),
-	notInTable(TV,Name),!,
 	append(TV,[(Type,Name,Value)],TVupdated),
-	updateTable(TVupdated).
-
-/*
-add(TV,(Type,Name,Value),TVupdated):-
-        notInTable(TV,Name),
-        append(TV,[(Type,Name,Value)],TVupdated).
-*/
+	updateTV(TVupdated).
 
 %------------------------------------------------------------------------------------
 
@@ -42,26 +36,35 @@ getTV(Table):- tv(Table).
 
 					%--- getVariable ---%
 
-getVariable([(Type,Name,Value)|_],Name,(Type,Name,Value)):- !.
+getVariable(Name,Variable):-
+	getTV(TV),
+	getVariableAux(TV,Name,Variable). 
 
-getVariable([_|Rest],Name,ValueReturned):-
-	getVariable(Rest,Name,ValueReturned).
+getVariableAux([(Type,Name,Value)|_],Name,(Type,Name,Value)):- !.
+
+getVariableAux([_|Rest],Name,ValueReturned):-
+	getVariableAux(Rest,Name,ValueReturned).
 
 %------------------------------------------------------------------------------------
 
 					%--- getValue ---%
 
-getValue([(_,OperandName,Result)|_], OperandName, Result):- !.
-getValue([_|Rest], OperandName, Result):-
-	getValue(Rest, OperandName, Result).
+getValue(OperandName,Value):-
+	getTV(TV),
+	getValueAux(TV,OperandName,Value).
+
+getValueAux([(_,OperandName,Value)|_], OperandName, Value):- !.
+getValueAux([_|Rest], OperandName, Value):-
+	getValueAux(Rest, OperandName, Value).
 
 %------------------------------------------------------------------------------------
 
 					%--- update ---%
 
-update(Var,TVupdated):-
+update(Var):-
 	tv(TV),
-	updateAux(TV,Var,[],TVupdated).
+	updateAux(TV,Var,[],TVupdated),
+	updateTV(TVupdated).
 
 updateAux([],_,TVaux,TVaux).
 
@@ -69,33 +72,23 @@ updateAux([(Type,Name,_)|TV],(Name,Value),TVaux, TVresult):-
 	!,
 	append(TVaux,[(Type,Name,Value)],TVupdatedAux),
 	append(TVupdatedAux,TV,TVresult),
-	updateTable(TVresult).
+	updateTV(TVresult).
 
 updateAux([(Type,Name1,Value)|TV],(Name2,V),TVaux, TVupdated):-
 	append(TVaux,[(Type,Name1,Value)],TVupdatedAux),
 	updateAux(TV, (Name2,V), TVupdatedAux, TVupdated).
 
-/*
-update(TV,Var,TVupdated):- updateAux(TV,Var,[],TVupdated).
-
-updateAux([],_,TVaux,TVaux) .
-
-updateAux([(Type,Name,_)|TV],(Name,Value),TVaux, TVresult):-
-	!,
-	append(TVaux,[(Type,Name,Value)],TVupdatedAux),
-	append(TVupdatedAux,TV,TVresult).
-
-updateAux([(Type,Name1,Value)|TV],(Name2,V),TVaux, TVupdated):-
-	append(TVaux,[(Type,Name1,Value)],TVupdatedAux),
-	updateAux(TV, (Name2,V), TVupdatedAux, TVupdated).
-*/
 %------------------------------------------------------------------------------------
 
 					%--- notInTable ---%
 
-notInTable([(_,Name,_)|_],Name) :- !, false.
-notInTable([_|Rest],Name1) :-!,
-	notInTable(Rest,Name1).
-notInTable(_,_):-true.
+notInTable(Variable):-
+	getTV(TV),
+	notInTableAux(TV,Variable).
+
+notInTableAux([(_,Name,_)|_],Name) :- !, false.
+notInTableAux([_|Rest],Name1) :-!,
+	notInTableAux(Rest,Name1).
+notInTableAux(_,_):-true.
 
 %------------------------------------------------------------------------------------
