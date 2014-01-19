@@ -1,5 +1,5 @@
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%
-					%		INTERPRETER		  %
+					%       INTERPRETER       %
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :-use_module(library(sgml)).
@@ -27,9 +27,8 @@ interpreter :-
 	removeEmpty(Program,GoodProgram),
 	execute(GoodProgram),
 
-	getTV(TV),
 	write('\nVariables final list:\n'),
-	write(TV),
+	printPant,
 	removeTable.
 
 					%%%%%%%%%%%
@@ -49,9 +48,7 @@ execute([Instruction|RestInstructios]) :-
 
 step(('function',[_=ExitValue,_=FunctionName],FuncionBody)) :- !,
 	functionOrMethod(ExitValue,FunOrMet),
-	getTV(TV),
-	append(TV,[(ExitValue,FunctionName,FunOrMet)],TVupdated),
-	updateTV(TVupdated),
+	add((ExitValue,FunctionName,FunOrMet)),
 	execute(FuncionBody).
 
 step(('param',[_=ParamType,_=ParamName],ParamBody)) :- !,
@@ -102,9 +99,9 @@ step(_).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-						%%%%%%%%%%%%%%%%%%
-						%	EXPRESSIONS  %
-						%%%%%%%%%%%%%%%%%%
+						%%%%%%%%%%%%%%%%%%%
+						%   EXPRESSIONS   %
+						%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -156,9 +153,9 @@ work('*', Op1,Op2,Z):- !, Z is Op1 * Op2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%%%%%%%%%%%%%%%%%%%%%%%%%%%
-					%	FUNCIONES AUXILIARES  %
-					%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					%   FUNCIONES AUXILIARES   %
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 					

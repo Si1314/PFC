@@ -1,5 +1,5 @@
 					%%%%%%%%%%%%%%%%%%%%%%%%%
-					%	 VARIABLES TABLE	%
+					%    VARIABLES TABLE    %
 					%%%%%%%%%%%%%%%%%%%%%%%%%
 
 use_module(library(sgml)).
@@ -91,4 +91,11 @@ notInTableAux([_|Rest],Name1) :-!,
 	notInTableAux(Rest,Name1).
 notInTableAux(_,_):-true.
 
+%------------------------------------------------------------------------------------
+
+					%--- notInTable ---%
+
+printPant:-
+	getTV(TV),
+	write(TV).
 %------------------------------------------------------------------------------------
