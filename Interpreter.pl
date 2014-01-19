@@ -15,19 +15,24 @@
 
 % Carga el arbol dado por xml en 'Program'
 
-interpreter :- 
+interpreter :-
 	cd('../PFC'),
 	% Choose one to execute:
-	load_xml_file('plantillaExpresiones.xml', Program),
-	%load_xml_file('plantillaIF.xml', Program),
+	%load_xml_file('plantillaExpresiones.xml', Program),
+	load_xml_file('plantillaIF.xml', Program),
 	%load_xml_file('plantillaWHILE.xml', Program),
 	%load_xml_file('plantillaFOR.xml', Program),
 
+	updateTable([]),!,
 	removeEmpty(Program,GoodProgram),
 	execute(GoodProgram,[],TV),
 
+	getTV(Table),
+	write('Tabla en la nube:\n'), write(Table),
+
 	write('\nVariables final list:\n'),
-	write(TV).
+	write(TV),
+	removeTable.
 
 					%%%%%%%%%%%
 					% execute %
@@ -49,20 +54,20 @@ step(('function',[_=ExitValue,_=FunctionName],FuncionBody),TV,TVupdated1) :- !,
 	append(TV,[(ExitValue,FunctionName,FunOrMet)],TVupdated),
 	execute(FuncionBody,TVupdated,TVupdated1).
 
-step(('param',[_=ParamType,_=ParamName],ParamBody),TV,TVupdated2) :- !,
-	add(TV,(ParamType,ParamName,''),TVupdated1),
+step(('param',[_=ParamType,_=ParamName],ParamBody),_,TVupdated2) :- !,
+	add((ParamType,ParamName,''),TVupdated1),
 	execute(ParamBody,TVupdated1,TVupdated2).
 
 step(('body',_,Body),TV,TVupdated) :- !,
 	execute(Body,TV,TVupdated).
 
-step(('declaration',[_=Type,_=Name],DecBody),TV,TVupdated2):- !,
-	add(TV,(Type,Name,''),TVupdated1),
+step(('declaration',[_=Type,_=Name],DecBody),_,TVupdated2):- !,
+	add((Type,Name,''),TVupdated1),
 	execute(DecBody,TVupdated1,TVupdated2).
 
 step(('assignment',[_=Name],[AssigBody]),TV,TVupdated) :- !,
 	resolveExpression(AssigBody,TV,Value),
-	update(TV,(Name,Value),TVupdated).
+	update((Name,Value),TVupdated).
 
 % IF -> THEN
 step(('if',_,[Condition,('then',_,Then),_]),TV,TVupdated):- !,
