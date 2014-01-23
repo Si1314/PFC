@@ -22,9 +22,21 @@ removeTable:- retractall(tv(_)).
 
 add((Type,Name,Value)):-
 	notInTable(Name),!,
-	tv(TV),
+	getTV([TV|TVs]),
 	append(TV,[(Type,Name,Value)],TVupdated),
-	updateTV(TVupdated).
+	updateTV([TVupdated|TVs]).
+
+%------------------------------------------------------------------------------------
+
+					%--- apila / desapila ---%
+
+apila:-
+	getTV(TV),
+	updateTV([[]|TV]).
+
+desapila:-
+	getTV([_|TV]),
+	updateTV(TV).
 
 %------------------------------------------------------------------------------------
 
@@ -37,65 +49,95 @@ getTV(Table):- tv(Table).
 					%--- getVariable ---%
 
 getVariable(Name,Variable):-
-	getTV(TV),
-	getVariableAux(TV,Name,Variable). 
+	getTV(TVs),
+	getVariableListaDeListas(TVs,Name,Variable).
 
-getVariableAux([(Type,Name,Value)|_],Name,(Type,Name,Value)):- !.
+getVariableListaDeListas([TV|_],Name,Variable):-
+	isThere(TV,Name,Variable),!.
 
-getVariableAux([_|Rest],Name,ValueReturned):-
-	getVariableAux(Rest,Name,ValueReturned).
+getVariableListaDeListas([_|TVs],Name,Variable):-
+	getVariableListaDeListas(TVs,Name,Variable).
+
+isThere([],_,_):- false.
+isThere([(Type,Name,Value)|_],Name,(Type,Name,Value)):- !, true.
+isThere([_|Rest],Name,ValueReturned):-
+	isThere(Rest,Name,ValueReturned).
 
 %------------------------------------------------------------------------------------
 
 					%--- getValue ---%
 
-getValue(OperandName,Value):-
-	getTV(TV),
-	getValueAux(TV,OperandName,Value).
+getValue(Name,Value):-
+	getTV(TVs),
+	getValueListaDeListas(TVs,Name,Value).
 
-getValueAux([(_,OperandName,Value)|_], OperandName, Value):- !.
-getValueAux([_|Rest], OperandName, Value):-
-	getValueAux(Rest, OperandName, Value).
+getValueListaDeListas([TV|_],Name,Value):-
+	getValueLista(TV,Name,Value), !.
+
+getValueListaDeListas([_|TVs],Name,Value):-
+	getValueListaDeListas(TVs,Name,Value).
+
+getValueLista([],_,_):- !, false.
+getValueLista([(_,Name,Value)|_], Name, Value):- !,true.
+getValueLista([_|Rest], Name, Value):-
+	getValueLista(Rest, Name, Value).
 
 %------------------------------------------------------------------------------------
 
 					%--- update ---%
 
 update(Var):-
-	tv(TV),
-	updateAux(TV,Var,[],TVupdated),
+	getTV(TVs),
+	updateListaDeListas(TVs,Var,[],TVupdated),
 	updateTV(TVupdated).
 
-updateAux([],_,TVaux,TVaux).
 
-updateAux([(Type,Name,_)|TV],(Name,Value),TVaux, TVresult):-
+updateListaDeListas([],_,TVsAc,TVsAc).
+updateListaDeListas([TV|TVs],Var,TVsAc,Result):-
+	updateLista(TV,Var,[],TVupdated),!,
+	append(TVsAc,[TVupdated],ResultAux),
+	append(ResultAux,TVs,Result).
+
+updateListaDeListas([TV|TVs],Var,TVsAc,Result):-
+	append(TVsAc,[TV],ResultAux),
+	updateListaDeListas(TVs,Var,ResultAux,Result).
+
+updateLista([],_,TVac,TVac):- false.
+
+updateLista([(Type,Name,_)|TV],(Name,Value),TVac,TVresult):-
 	!,
-	append(TVaux,[(Type,Name,Value)],TVupdatedAux),
+	append(TVac,[(Type,Name,Value)],TVupdatedAux),
 	append(TVupdatedAux,TV,TVresult),
-	updateTV(TVresult).
+	true.
 
-updateAux([(Type,Name1,Value)|TV],(Name2,V),TVaux, TVupdated):-
-	append(TVaux,[(Type,Name1,Value)],TVupdatedAux),
-	updateAux(TV, (Name2,V), TVupdatedAux, TVupdated).
+updateLista([(Type,Name1,Value)|TV],(Name2,V),TVac, TVupdated):-
+	append(TVac,[(Type,Name1,Value)],TVupdatedAux),
+	updateLista(TV,(Name2,V),TVupdatedAux,TVupdated).
 
 %------------------------------------------------------------------------------------
 
 					%--- notInTable ---%
 
 notInTable(Variable):-
-	getTV(TV),
-	notInTableAux(TV,Variable).
+	getTV(TVs),
+	notInTableListaDeListas(TVs,Variable).
 
-notInTableAux([(_,Name,_)|_],Name) :- !, false.
-notInTableAux([_|Rest],Name1) :-!,
-	notInTableAux(Rest,Name1).
-notInTableAux(_,_):-true.
+notInTableListaDeListas([TV|TVs],Variable):-
+	notInTableLista(TV,Variable),!,
+	notInTableListaDeListas(TVs,Variable).
+
+notInTableListaDeListas(_,_):- true.
+
+notInTableLista([],_):-true.
+notInTableLista([(_,Name,_)|_],Name) :- !, false.
+notInTableLista([_|Rest],Name1) :-!,
+	notInTableLista(Rest,Name1).
 
 %------------------------------------------------------------------------------------
 
-					%--- notInTable ---%
+					%--- printPant ---%
 
-printPant:-
+printTable:-
 	getTV(TV),
 	write(TV).
 %------------------------------------------------------------------------------------

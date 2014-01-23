@@ -28,7 +28,7 @@ interpreter :-
 	execute(GoodProgram),
 
 	write('\nVariables final list:\n'),
-	printPant,
+	printTable,
 	removeTable.
 
 					%%%%%%%%%%%
@@ -47,16 +47,20 @@ execute([Instruction|RestInstructios]) :-
 					%%%%%%%%
 
 step(('function',[_=ExitValue,_=FunctionName],FuncionBody)) :- !,
+	apila,
 	functionOrMethod(ExitValue,FunOrMet),
 	add((ExitValue,FunctionName,FunOrMet)),
 	execute(FuncionBody).
+	%desapila.
 
 step(('param',[_=ParamType,_=ParamName],ParamBody)) :- !,
 	add((ParamType,ParamName,'')),
 	execute(ParamBody).
 
 step(('body',_,Body)) :- !,
-	execute(Body).
+	apila,
+	execute(Body),
+	desapila.
 
 step(('declaration',[_=Type,_=Name],DecBody)):- !,
 	add((Type,Name,'')),
@@ -69,16 +73,22 @@ step(('assignment',[_=Name],[AssigBody])) :- !,
 % IF -> THEN
 step(('if',_,[Condition,('then',_,Then),_])):- !,
 	evaluate(Condition), !,
-	execute(Then).
+	apila,
+	execute(Then),
+	desapila.
 
 % IF -> ELSE
 step(('if',_,[_,_,('else',_,Else)])):- !,
-	execute(Else).
+	apila,
+	execute(Else),
+	desapila.
 
 % WHILE -> TRUE
 step(('while',_,[Condition,('body',_,WhileBody)])):-
 	evaluate(Condition), !,
+	apila,
 	execute(WhileBody),
+	desapila,
 	step(('while',_,[Condition,('body',_,WhileBody)])).
 
 % WHILE -> FALSE
@@ -88,12 +98,14 @@ step(('while',_,_)):-!.
 step(('for',_,[Variable,Condition,Advance,('body',_,ForBody)])):-
 	variableAdvance(Variable,VariableName),
 	evaluate(Condition), !,
+	apila,
 	execute(ForBody),
+	desapila,
 	execute([Advance]),
 	step(('for',_,[VariableName,Condition,Advance,('body',_,ForBody)])).
 
 % FOR -> WE GO OUT
-step(('for',_,_)):-!.
+step(('for',_,_)):-!,write('\n'), printTable, write('\n'), desapila.
 
 step(_).
 
@@ -172,6 +184,7 @@ evaluate((_, [_, _= (Op)], [(_,[_=Operand1],_),(_,[_=Operand2],_)])):-
 
 variableAdvance(('variableField',_,Variable),VarName):-
 	getContent(Variable,VarName), !,
+	apila,
 	execute(Variable).
 
 variableAdvance(Variable,Variable).
