@@ -1,0 +1,56 @@
+
+<?xml version="1.0"?>
+
+<function type="void" name="main">
+	<param type="int" name="x"/>
+	<body>
+
+		<!-- x = mult(3,5); -->
+		<assignment name="x">
+			<functionCall name="mult">
+				<constant value="3"></constant>
+				<constant value="5"></constant>
+			</functionCall>
+		</assignment>
+
+	</body>
+</function>
+
+<function type="int" name="mult">
+	<param type="int" name="x"/>
+	<param type="int" name="y"/>
+	<body>
+
+		<!-- z = z + 1; -->
+		<declaration type="int" name="z"/>
+		<assignment name="z">
+			<binaryOperator type="arithmetic" operator="*">
+				<variable name="x"></variable>
+				<variable name="y"></variable>
+			</binaryOperator>				    	
+		</assignment>
+
+		<return>
+			<variable name="z"></variable>
+		</return>
+
+	</body>
+</function>
+
+
+<!-- 
+
+void main(int x){
+	x = mult(3,5);
+}
+
+int mult(int x, int y){
+	int z = x * y;
+	return z;
+}
+
+Tabla de valores que me tiene que salir:
+[ (void,main,method), (int,x,15)]
+
+-->
+
