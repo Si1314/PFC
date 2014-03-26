@@ -141,3 +141,11 @@ printTable:-
 	getTV(TV),
 	write(TV).
 %------------------------------------------------------------------------------------
+
+labelList(Sol):-
+	getTV([[_|TV]]),
+	labelAux(TV,[],Sol).
+
+labelAux([],Ac,Ac).
+labelAux([(_,_,Value)|TV],Ac,Sol):-
+	labelAux(TV,[Value|Ac],Sol).
