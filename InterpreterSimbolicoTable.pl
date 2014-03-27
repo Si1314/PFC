@@ -72,13 +72,13 @@ step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
 	add(Entry,(int,Name,Value),Out1),
 	execute(Out1,DecBody,Out).
 
-step(Entry,('declaration',[_=Type,_=Name],DecBody)):- !,
-	add((Type,Name,_)),
-	execute(DecBody).
+step(Entry,('declaration',[_=Type,_=Name],DecBody),Out):- !,
+	add(Entry,(Type,Name,_),Entry1),
+	execute(Entry1,DecBody,Out).
 
 step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
-	resolveExpression(Entry,AssigBody,Value,Out1),
-	update(Out1,(Name,Value),Out).
+	resolveExpression(Entry,AssigBody,Value),
+	update(Entry,(Name,Value),Out).
 
 % IF -> THEN
 %step(('if',_,[Condition,('then',_,Then),_])):- !,
@@ -129,19 +129,19 @@ step(_).
 
 					%--- resolveExpression ---%
 
-resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result,Out):- !,
-	getContent(Entry,Operator,Op,Entry1),
-	resolveExpression(Entry1,X, Operand1,Out1),
-	resolveExpression(Out1,Y, Operand2,Out),
-	work(Op, Operand1, Operand2, Result).
+resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):- !,
+	getContent(Operator,Op),
+	resolveExpression(Entry,X, Operand1),
+	resolveExpression(Entry,Y, Operand2),
+	work(Op, Operand1, Operand2,Result).
 
-resolveExpression(Entry,('variable',[_=OperandName],_), OperandValue,Out):- !,
-	getValue(Entry,OperandName,OperandValue,Out).
+resolveExpression(Entry,('variable',[_=OperandName],_), OperandValue):- !,
+	getValue(Entry,OperandName,OperandValue).
 
-resolveExpression(Entry,('constant',[_=Value],_),Result,Out):- !,
-	atom_number(Entry,Value,Result,Out).
+resolveExpression(_,('constant',[_=Value],_),Result):- !,
+	atom_number(Value,Result).
 
-resolveExpression(Entry,_,0,Entry).
+resolveExpression(_,_,0).
 
 %					-----------------
 %					---> Boolean <---
@@ -183,9 +183,9 @@ work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 					
 					%--- evaluate ---%
 
-evaluate(Entry,(_, [_, _= (Op)], [(_,[_=Operand1],_),(_,[_=Operand2],_)]),Out):-
-	getValue(Entry,Operand1,Value1,Entry1),
-	getValue(Entry1,Operand2,Value2,Out),
+evaluate(Entry,(_, [_, _= (Op)], [(_,[_=Operand1],_),(_,[_=Operand2],_)])):-
+	getValue(Entry,Operand1,Value1),
+	getValue(Entry1,Operand2,Value2),
 	work(Op, Value1, Value2, Result), Result.
 
 %------------------------------------------------------------------------------------
