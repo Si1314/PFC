@@ -13,9 +13,9 @@ use_module(library(sgml)).
 %------------------------------------------------------------------------------------
 
 					%--- add ---%
-
-add([TV|TVs],(Type,Name,Value),[[(Type,Name,Value)|TV]|TVs]):-
-	notInTable(Name,TV),!.
+add([TV|TVs],(Type,Name,Value),[TVupdated|TVs]):-
+ 	notInTable([TV|TVs],Name),!,
+ 	append(TV,[(Type,Name,Value)],TVupdated).
 
 %------------------------------------------------------------------------------------
 
@@ -110,3 +110,9 @@ notInTableLista([_|Rest],Name1) :-!,
 
 
 %------------------------------------------------------------------------------------
+labelList([[_|TV]],Sol):-
+ 	labelAux(TV,[],Sol).
+ 
+labelAux([],Ac,Ac).
+labelAux([(_,_,Value)|TV],Ac,Sol):-
+ 	labelAux(TV,[Value|Ac],Sol).

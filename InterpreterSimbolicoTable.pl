@@ -5,8 +5,7 @@
 :-use_module(library(sgml)).
 :-use_module(library(clpfd)).
 
-
-:- include('VariablesTable.pl').
+:- include('VariablesTableSimbolico.pl').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,6 +25,7 @@ interpreter :-
 
 	removeEmpty(Program,GoodProgram),
 	execute([],GoodProgram,ExitTable),
+	write(ExitTable),write('\n'),
 	labelList(ExitTable,LabelTable),
 	label(LabelTable),
 	write(LabelTable), write('\n').
@@ -185,19 +185,19 @@ work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 
 evaluate(Entry,(_, [_, _= (Op)], [(_,[_=Operand1],_),(_,[_=Operand2],_)])):-
 	getValue(Entry,Operand1,Value1),
-	getValue(Entry1,Operand2,Value2),
+	getValue(Entry,Operand2,Value2),
 	work(Op, Value1, Value2, Result), Result.
 
 %------------------------------------------------------------------------------------
 
 					%--- variableAdvance ---%
 
-variableAdvance(('variableField',_,Variable),VarName):-
-	getContent(Variable,VarName), !,
-	apila,
-	execute(Variable).
+%variableAdvance(('variableField',_,Variable),VarName):-
+%	getContent(Variable,VarName), !,
+%	apila,
+%	execute(Variable).
 
-variableAdvance(Variable,Variable).
+%variableAdvance(Variable,Variable).
 
 %------------------------------------------------------------------------------------
 
@@ -220,17 +220,17 @@ getContent([('declaration',[_,_=VariableName],_), _] , VariableName):- !.
 
 					%--- removeEmpty ---%
 
-removeEmpty(Entry,List,ReturnedList,Out):-
-	removeEmptyAux(Entry,List,[],ReturnedList,Out).
+removeEmpty(List,ReturnedList):-
+	removeEmptyAux(List,[],ReturnedList).
 
-removeEmptyAux(Entry,[],Ac,Ac,Entry).
+removeEmptyAux([],Ac,Ac).
 
-removeEmptyAux(Entry,[element(X,Y,Z)|List],Ac,ReturnedList,Out):- !,
-	removeEmpty(Entry,Z,Z1,Entry1),
-	append(Entry1,Ac,[(X,Y,Z1)],Acc,Out1),
-	removeEmptyAux(Out1,List,Acc,ReturnedList,Out).
+removeEmptyAux([element(X,Y,Z)|List],Ac,ReturnedList):- !,
+	removeEmpty(Z,Z1),
+	append(Ac,[(X,Y,Z1)],Acc),
+	removeEmptyAux(List,Acc,ReturnedList).
 
-removeEmptyAux(Entry,[_|List],Ac,ReturnedList,Out):-
-	removeEmptyAux(Entry,List,Ac,ReturnedList,Out).
+removeEmptyAux([_|List],Ac,ReturnedList):-
+	removeEmptyAux(List,Ac,ReturnedList).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
