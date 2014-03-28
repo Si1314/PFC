@@ -35,7 +35,7 @@ interpreter :-
 	write(LabelTableNames), write('\n'),
 	write(LabelTableValues), write('\n'),
 
-	open('output.txt', write, Stream, [encoding(utf8)]), 
+	open('output.xml', write, Stream, [encoding(utf8)]), 
     writeInXML(Stream,LabelTableNames,LabelTableValues).
 
 					%%%%%%%%%%%
