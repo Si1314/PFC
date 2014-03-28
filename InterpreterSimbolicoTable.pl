@@ -4,6 +4,7 @@
 
 :-use_module(library(sgml)).
 :-use_module(library(clpfd)).
+:-use_module(library(sgml_write)).
 
 :- include('VariablesTableSimbolico.pl').
 
@@ -20,6 +21,7 @@ interpreter :-
 
 	% Choose one to execute:
 	load_xml_file('plantillaExpresionesSim.xml', Program),
+	
 	%load_xml_file('plantillaExpresiones.xml', Program),
 	%load_xml_file('plantillaIF.xml', Program),
 	%load_xml_file('plantillaWHILE.xml', Program),
@@ -28,9 +30,13 @@ interpreter :-
 	removeEmpty(Program,GoodProgram),
 	execute([],GoodProgram,ExitTable),
 	write(ExitTable),write('\n'),
-	labelList(ExitTable,LabelTable),
-	label(LabelTable),
-	write(LabelTable), write('\n').
+	labelList(ExitTable,LabelTableNames,LabelTableValues),
+	once(label(LabelTableValues)),!,
+	write(LabelTableNames), write('\n'),
+	write(LabelTableValues), write('\n'),
+
+	open('output.txt', write, Stream, [encoding(utf8)]), 
+    writeInXML(Stream,LabelTableNames,LabelTableValues).
 
 					%%%%%%%%%%%
 					% execute %
@@ -236,3 +242,15 @@ removeEmptyAux([_|List],Ac,ReturnedList):-
 	removeEmptyAux(List,Ac,ReturnedList).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+writeInXML(Stream,_,[]):-!, close(Stream).
+writeInXML(Stream,[],_):-!, close(Stream).
+writeInXML(Stream, [N|Ns],[V|Vs]):-
+	xml_write(Stream,element(variable,[name=N,value=V],[]),[header(false)]),
+	xml_write(Stream,'\n',[header(false)]),
+	writeInXML(Stream, Ns, Vs). 
+
+	% Possible future useful code:
+	% xml_write(Stream,element(aap,[],[noot]),[]), 
+	% Possible Options: [layout(false),doctype(xml),header(true)]
+	

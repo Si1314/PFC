@@ -110,12 +110,13 @@ notInTableLista([_|Rest],Name1) :-!,
 
 					%--- labelList ---%
 
-labelList([[_|TV]],Sol):-
- 	labelAux(TV,[],Sol).
+labelList([[_|TV]],SolNames,SolValues):-
+ 	labelAux(TV,[],[],SolNames,SolValues).
  
-labelAux([],Ac,Ac).
-labelAux([(_,_,Value)|TV],Ac,Sol):-
-	append(Ac,[Value],Ac1),
- 	labelAux(TV,Ac1,Sol).
+labelAux([],AcNames,AcValues,AcNames,AcValues).
+labelAux([(_,Name,Value)|TV],AcNames,AcValues,SolNames,SolValues):-
+	append(AcNames,[Name],AcNames1),
+	append(AcValues,[Value],AcValues1),
+ 	labelAux(TV,AcNames1,AcValues1,SolNames,SolValues).
  	
 %------------------------------------------------------------------------------------

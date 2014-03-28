@@ -1,0 +1,3 @@
+<variable name="x" value="1"/>
+<variable name="y" value="0"/>
+<variable name="z" value="2"/>
