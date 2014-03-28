@@ -3,25 +3,56 @@
 
 <function type="void" name="main">
 	<param type="int" name="x"/>
+	<param type="int" name="y"/>
+	<param type="int" name="z"/>
 	<body>
 
-		<!-- int y = 2; -->
-		<declaration type="int" name="y"/>
-		<assignment name="y">
-			<variable name="x"></variable>
-		</assignment>
-	    
+		<!-- if -->
+		<if>
+			<!-- (x > y) -->
+			<binaryOperator type="bool" operator=">">
+				<variable name="x"></variable>
+				<variable name="y"></variable>
+			</binaryOperator>
+
+			<!-- then -->
+			<then>
+
+				<!-- int z = 2 * x; -->
+				<assignment name="z">
+					<binaryOperator type="arithmetic" operator="*">
+						<constant value="2"></constant>
+						<variable name="x"></variable>
+					</binaryOperator>
+				</assignment>
+				
+			</then>
+
+			<!-- else -->
+			<else>
+
+				<!-- int z = 2 * y; -->
+				<assignment name="z">
+					<binaryOperator type="arithmetic" operator="*">
+						<constant value="2"></constant>
+						<variable name="y"></variable>
+					</binaryOperator>
+				</assignment>
+
+			</else>
+		</if>
+
 	</body>
 </function>
 
-<!--  -->
-
 <!-- 
 
-void main(int x){
-	int y = x;
+void main(int x, int y, int z){
+	if(x > y)
+		z = 2 * x;
+	else
+		z = 2 * y;
 }
-
 
 -->
 

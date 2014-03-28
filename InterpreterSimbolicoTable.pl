@@ -17,8 +17,10 @@
 
 interpreter :-
 	cd('../PFC'),
+
 	% Choose one to execute:
 	load_xml_file('plantillaExpresionesSim.xml', Program),
+	%load_xml_file('plantillaExpresiones.xml', Program),
 	%load_xml_file('plantillaIF.xml', Program),
 	%load_xml_file('plantillaWHILE.xml', Program),
 	%load_xml_file('plantillaFOR.xml', Program),
@@ -81,43 +83,43 @@ step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
 	update(Entry,(Name,Value),Out).
 
 % IF -> THEN
-%step(('if',_,[Condition,('then',_,Then),_])):- !,
-	%evaluate(Condition), !,
-	%apila(),
-	%execute(Then),
-	%desapila().
+step(Entry,('if',_,[Condition,('then',_,Then),_]),Out):- !,
+	evaluate(Entry,Condition), !,
+	apila(Entry,Out1),
+	execute(Out1,Then,Out2),
+	desapila(Out2, Out).
 
 % IF -> ELSE
-%step(('if',_,[_,_,('else',_,Else)])):- !,
-	%apila,
-	%execute(Else),
-	%desapila.
+step(Entry,('if',_,[_,_,('else',_,Else)]),Out):- !,
+	apila(Entry,Out1),
+	execute(Out1,Else,Out2),
+	desapila(Out2, Out).
 
 % WHILE -> TRUE
-%step(('while',_,[Condition,('body',_,WhileBody)])):-
-	%evaluate(Condition), !,
-	%apila,
-	%execute(WhileBody),
-	%desapila,
-	%step(('while',_,[Condition,('body',_,WhileBody)])).
+step(Entry,('while',_,[Condition,('body',_,WhileBody)]),Out):-
+	evaluate(Entry,Condition), !,
+	apila(Entry,Out1),
+	execute(Out1,WhileBody,Out2),
+	desapila(Out2,Out3),
+	step(Out3,('while',_,[Condition,('body',_,WhileBody)]),Out).
 
 % WHILE -> FALSE
-%step(('while',_,_)):-!.
+step(Entry,('while',_,_),Entry):-!.
 
 % FOR
-%step(('for',_,[Variable,Condition,Advance,('body',_,ForBody)])):-
-	%variableAdvance(Variable,VariableName),
-	%evaluate(Condition), !,
-	%apila,
-	%execute(ForBody),
-	%desapila,
-	%execute([Advance]),
-	%step(('for',_,[VariableName,Condition,Advance,('body',_,ForBody)])).
+step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),Out):-
+	variableAdvance(Entry,Variable,VariableName,Entry1), 													
+	evaluate(Entry1,Condition), !,
+	apila(Entry1,Out1),
+	execute(Out1,ForBody,Out2),
+	desapila(Out2,Out3),
+	execute(Out3,[Advance],Out4),
+	step(Out4,('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),Out).
 
 % FOR -> WE GO OUT
-%step(('for',_,_)):-!,write('\n'), printTable, write('\n'), desapila.
+step(Entry,('for',_,_),Out):-!,write('\n'), write(Entry), write('\n'), desapila(Entry,Out).
 
-step(_).
+step(Entry,_,Entry).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -192,12 +194,12 @@ evaluate(Entry,(_, [_, _= (Op)], [(_,[_=Operand1],_),(_,[_=Operand2],_)])):-
 
 					%--- variableAdvance ---%
 
-%variableAdvance(('variableField',_,Variable),VarName):-
-%	getContent(Variable,VarName), !,
-%	apila,
-%	execute(Variable).
+variableAdvance(Entry,('variableField',_,Variable),VarName,Out):-
+	getContent(Variable,VarName), !,
+	apila(Entry, Out1),
+	execute(Out1,Variable,Out).
 
-%variableAdvance(Variable,Variable).
+variableAdvance(Entry,Variable,Variable,Entry).
 
 %------------------------------------------------------------------------------------
 

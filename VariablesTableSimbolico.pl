@@ -2,10 +2,6 @@
 					%    VARIABLES TABLE    %
 					%%%%%%%%%%%%%%%%%%%%%%%%%
 
-use_module(library(sgml)).
-
-% createTable, add, getTV, getVariable, getValue, update, updateTV, notInTable
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 					%--- create and remove Table ---%
@@ -13,6 +9,7 @@ use_module(library(sgml)).
 %------------------------------------------------------------------------------------
 
 					%--- add ---%
+
 add([TV|TVs],(Type,Name,Value),[TVupdated|TVs]):-
  	notInTable([TV|TVs],Name),!,
  	append(TV,[(Type,Name,Value)],TVupdated).
@@ -110,9 +107,15 @@ notInTableLista([_|Rest],Name1) :-!,
 
 
 %------------------------------------------------------------------------------------
+
+					%--- labelList ---%
+
 labelList([[_|TV]],Sol):-
  	labelAux(TV,[],Sol).
  
 labelAux([],Ac,Ac).
 labelAux([(_,_,Value)|TV],Ac,Sol):-
- 	labelAux(TV,[Value|Ac],Sol).
+	append(Ac,[Value],Ac1),
+ 	labelAux(TV,Ac1,Sol).
+ 	
+%------------------------------------------------------------------------------------
