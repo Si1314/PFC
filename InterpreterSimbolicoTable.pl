@@ -30,13 +30,19 @@ interpreter :-
 	removeEmpty(Program,GoodProgram),
 	execute([],GoodProgram,ExitTable),
 	write(ExitTable),write('\n'),
-	labelList(ExitTable,LabelTableNames,LabelTableValues),
-	once(label(LabelTableValues)),!,
-	write(LabelTableNames), write('\n'),
-	write(LabelTableValues), write('\n'),
 
-	open('output.xml', write, Stream, [encoding(utf8)]), 
-    writeInXML(Stream,LabelTableNames,LabelTableValues).
+	open('output.xml', write, Stream, []),
+
+	labelList(ExitTable,LabelTableNames,LabelTableValues),
+	callLabel(LabelTableValues,3,[],Sol),!,
+    
+    xml_write(Stream,element(table,[],[]),[header(false)]),
+    xml_write(Stream,'\n',[header(false)]),
+    writeInXML(Stream,LabelTableNames,Sol),
+    
+    %write(LabelTableNames), write('\n'),
+	%write(LabelTableValues),
+	write('\n').
 
 					%%%%%%%%%%%
 					% execute %
@@ -243,14 +249,31 @@ removeEmptyAux([_|List],Ac,ReturnedList):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-writeInXML(Stream,_,[]):-!, close(Stream).
-writeInXML(Stream,[],_):-!, close(Stream).
+writeInXML(Stream,_,[]):-!,
+    xml_write(Stream,element(table,[],[]),[header(false)]),
+    xml_write(Stream,'\n',[header(false)]),
+    close(Stream).
+
+writeInXML(Stream,[],_):-!,
+    xml_write(Stream,element(table,[],[]),[header(false)]),
+    xml_write(Stream,'\n',[header(false)]),
+    close(Stream).
+
 writeInXML(Stream, [N|Ns],[V|Vs]):-
-	xml_write(Stream,element(variable,[name=N,value=V],[]),[header(false)]),
+
+    xml_write(Stream,element(variable,[name=N,value=V],[]),[header(false)]),
 	xml_write(Stream,'\n',[header(false)]),
 	writeInXML(Stream, Ns, Vs). 
 
 	% Possible future useful code:
 	% xml_write(Stream,element(aap,[],[noot]),[]), 
 	% Possible Options: [layout(false),doctype(xml),header(true)]
-	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+
+callLabel(_,0,Ac,Ac):-!.
+callLabel(LabelTableValues,Nivel,Ac,Sol1):-
+	label(LabelTableValues), 
+	append(Ac,[LabelTableValues],Sol),
+	Nivel1 is Nivel - 1,
+	callLabel(LabelTableValues,Nivel1,Sol,Sol1).
