@@ -1,5 +1,13 @@
 <table/>
-<variable name="x" value="1 0 2"/>
-<variable name="y" value="1 0 2"/>
-<variable name="z" value="1 0 2"/>
+<variable name="x" value="1"/>
+<variable name="y" value="0"/>
+<variable name="z" value="2"/>
+<table/>
+<variable name="x" value="1"/>
+<variable name="y" value="0"/>
+<variable name="z" value="2"/>
+<table/>
+<variable name="x" value="1"/>
+<variable name="y" value="0"/>
+<variable name="z" value="2"/>
 <table/>

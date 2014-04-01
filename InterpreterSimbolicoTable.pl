@@ -29,20 +29,16 @@ interpreter :-
 
 	removeEmpty(Program,GoodProgram),
 	execute([],GoodProgram,ExitTable),
-	write(ExitTable),write('\n'),
-
-	open('output.xml', write, Stream, []),
 
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
 	callLabel(LabelTableValues,3,[],Sol),!,
-    
+
+	open('output.xml', write, Stream, []),
+
     xml_write(Stream,element(table,[],[]),[header(false)]),
     xml_write(Stream,'\n',[header(false)]),
-    writeInXML(Stream,LabelTableNames,Sol),
-    
-    %write(LabelTableNames), write('\n'),
-	%write(LabelTableValues),
-	write('\n').
+    writeList(Stream,LabelTableNames,Sol),
+    close(Stream).
 
 					%%%%%%%%%%%
 					% execute %
@@ -251,13 +247,11 @@ removeEmptyAux([_|List],Ac,ReturnedList):-
 
 writeInXML(Stream,_,[]):-!,
     xml_write(Stream,element(table,[],[]),[header(false)]),
-    xml_write(Stream,'\n',[header(false)]),
-    close(Stream).
+    xml_write(Stream,'\n',[header(false)]).
 
 writeInXML(Stream,[],_):-!,
     xml_write(Stream,element(table,[],[]),[header(false)]),
-    xml_write(Stream,'\n',[header(false)]),
-    close(Stream).
+    xml_write(Stream,'\n',[header(false)]).
 
 writeInXML(Stream, [N|Ns],[V|Vs]):-
 
@@ -273,7 +267,14 @@ writeInXML(Stream, [N|Ns],[V|Vs]):-
 
 callLabel(_,0,Ac,Ac):-!.
 callLabel(LabelTableValues,Nivel,Ac,Sol1):-
-	label(LabelTableValues), 
+	label(LabelTableValues),
 	append(Ac,[LabelTableValues],Sol),
 	Nivel1 is Nivel - 1,
 	callLabel(LabelTableValues,Nivel1,Sol,Sol1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+writeList(_,_,[]):- !.
+writeList(Stream,LabelTableNames,[X|Xs]):- !,
+	writeInXML(Stream,LabelTableNames,X),
+	writeList(Stream,LabelTableNames,Xs).
