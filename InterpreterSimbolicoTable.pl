@@ -31,13 +31,16 @@ interpreter :-
 	execute([],GoodProgram,ExitTable),
 
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
-	callLabel(LabelTableValues,3,[],Sol),!,
+
+	%findall(LabelTableValues,(callLabel(LabelTableValues,0,[],Sol)),Solution),!,
+	findall(LabelTableValues,label(LabelTableValues),Solution),!,
+	%write(Solution), write('\n'),
 
 	open('output.xml', write, Stream, []),
 
     xml_write(Stream,element(table,[],[]),[header(false)]),
     xml_write(Stream,'\n',[header(false)]),
-    writeList(Stream,LabelTableNames,Sol),
+    writeList(Stream,LabelTableNames,Solution,10),	% 10 = que solo escriba 10 resultados
     close(Stream).
 
 					%%%%%%%%%%%
@@ -274,7 +277,9 @@ callLabel(LabelTableValues,Nivel,Ac,Sol1):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-writeList(_,_,[]):- !.
-writeList(Stream,LabelTableNames,[X|Xs]):- !,
+writeList(_,_,[],_):- !.
+writeList(_,_,_,0):- !.
+writeList(Stream,LabelTableNames,[X|Xs],Nivel):- !,
+	Nivel1 is Nivel - 1,
 	writeInXML(Stream,LabelTableNames,X),
-	writeList(Stream,LabelTableNames,Xs).
+	writeList(Stream,LabelTableNames,Xs,Nivel1).

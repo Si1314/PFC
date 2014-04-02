@@ -3,11 +3,39 @@
 <variable name="y" value="0"/>
 <variable name="z" value="2"/>
 <table/>
-<variable name="x" value="1"/>
+<variable name="x" value="2"/>
 <variable name="y" value="0"/>
-<variable name="z" value="2"/>
+<variable name="z" value="4"/>
 <table/>
-<variable name="x" value="1"/>
+<variable name="x" value="2"/>
+<variable name="y" value="1"/>
+<variable name="z" value="4"/>
+<table/>
+<variable name="x" value="3"/>
 <variable name="y" value="0"/>
-<variable name="z" value="2"/>
+<variable name="z" value="6"/>
+<table/>
+<variable name="x" value="3"/>
+<variable name="y" value="1"/>
+<variable name="z" value="6"/>
+<table/>
+<variable name="x" value="3"/>
+<variable name="y" value="2"/>
+<variable name="z" value="6"/>
+<table/>
+<variable name="x" value="4"/>
+<variable name="y" value="0"/>
+<variable name="z" value="8"/>
+<table/>
+<variable name="x" value="4"/>
+<variable name="y" value="1"/>
+<variable name="z" value="8"/>
+<table/>
+<variable name="x" value="4"/>
+<variable name="y" value="2"/>
+<variable name="z" value="8"/>
+<table/>
+<variable name="x" value="4"/>
+<variable name="y" value="3"/>
+<variable name="z" value="8"/>
 <table/>
