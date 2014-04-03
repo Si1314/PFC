@@ -16,11 +16,21 @@
 
 % Carga el arbol dado por xml en 'Program'
 
-interpreter :-
+i:-
+	findall((N,L),interpreterAux(N,L),V),
+	write(V),
+	open('output.xml', write, Stream, []),
+
+    %xml_write(Stream,element(table,[],[]),[header(false)]),
+    %xml_write(Stream,'\n',[header(false)]),
+    %writeList(Stream,N,V),
+    close(Stream).
+
+interpreterAux(LabelTableNames,LabelTableValues):-
 	cd('../PFC'),
 
 	% Choose one to execute:
-	load_xml_file('plantillaExpresionesSim.xml', Program),
+	load_xml_file('salida.xml', Program),
 	
 	%load_xml_file('plantillaExpresiones.xml', Program),
 	%load_xml_file('plantillaIF.xml', Program),
@@ -31,17 +41,11 @@ interpreter :-
 	execute([],GoodProgram,ExitTable),
 
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
-
+	write('LabelTableNames: '), write(LabelTableNames), write('\n'),
 	%findall(LabelTableValues,(callLabel(LabelTableValues,0,[],Sol)),Solution),!,
-	findall(LabelTableValues,label(LabelTableValues),Solution),!,
-	%write(Solution), write('\n'),
-
-	open('output.xml', write, Stream, []),
-
-    xml_write(Stream,element(table,[],[]),[header(false)]),
-    xml_write(Stream,'\n',[header(false)]),
-    writeList(Stream,LabelTableNames,Solution,10),	% 10 = que solo escriba 10 resultados
-    close(Stream).
+	%findall(LabelTableValues,label(LabelTableValues),Solution),!,
+	once(label(LabelTableValues)).
+	%write(Solution), write('\n').
 
 					%%%%%%%%%%%
 					% execute %
@@ -66,7 +70,7 @@ step(Entry,('function',[_=ExitValue,_=FunctionName],FuncionBody),Out) :- !,
 	%desapila.
 
 step(Entry,('param',[_=int,_=ParamName],ParamBody),Out) :- !,
-	[Value] ins 0..256,
+	[Value] ins -255..256,
 	add(Entry,(int,ParamName,Value),Out1),
 	execute(Out1,ParamBody,Out).
 
@@ -81,7 +85,7 @@ step(Entry,('body',_,Body),Out) :- !,
 
 step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
 	
-	[Value] ins 0..256,
+	[Value] ins -255..256,
 	add(Entry,(int,Name,Value),Out1),
 	execute(Out1,DecBody,Out).
 
@@ -94,8 +98,8 @@ step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
 	update(Entry,(Name,Value),Out).
 
 % IF -> THEN
-step(Entry,('if',_,[Condition,('then',_,Then),_]),Out):- !,
-	evaluate(Entry,Condition), !,
+step(Entry,('if',_,[Condition,('then',_,Then),_]),Out):-
+	evaluate(Entry,Condition),
 	apila(Entry,Out1),
 	execute(Out1,Then,Out2),
 	desapila(Out2, Out).
@@ -277,9 +281,9 @@ callLabel(LabelTableValues,Nivel,Ac,Sol1):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-writeList(_,_,[],_):- !.
-writeList(_,_,_,0):- !.
-writeList(Stream,LabelTableNames,[X|Xs],Nivel):- !,
-	Nivel1 is Nivel - 1,
+writeList(_,_,[]):- !.
+writeList(Stream,LabelTableNames,[X|Xs]):- !, 
+	%Nivel1 is Nivel - 1,
 	writeInXML(Stream,LabelTableNames,X),
-	writeList(Stream,LabelTableNames,Xs,Nivel1).
+	%write(LabelTableNames), write('\n'), write(X), write('\n'),
+	writeList(Stream,LabelTableNames,Xs).

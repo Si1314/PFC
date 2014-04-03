@@ -1,0 +1,61 @@
+<function name="deco2" type="void">
+    <param type="int" name="a"/>
+    <param type="int" name="b"/>
+    <body>
+        <declaration type="int" name="z"/>
+        <if>
+            <binaryOperator type="bool" operator=">">
+                <variable name="a"/>
+                <const value="0"/>
+            </binaryOperator>
+            <then>
+                <body>
+                    <if>
+                        <binaryOperator type="bool" operator=">">
+                            <variable name="b"/>
+                            <const value="0"/>
+                        </binaryOperator>
+                        <then>
+                            <body>
+                                <assignment name="z">
+                                    <const value="3"/>
+                                </assignment>
+                            </body>
+                        </then>
+                        <else>
+                            <body>
+                                <assignment name="z">
+                                    <const value="3"/>
+                                </assignment>
+                            </body>
+                        </else>
+                    </if>
+                </body>
+            </then>
+            <else>
+                <body>
+                    <if>
+                        <binaryOperator type="bool" operator=">">
+                            <variable name="b"/>
+                            <const value="0"/>
+                        </binaryOperator>
+                        <then>
+                            <body>
+                                <assignment name="z">
+                                    <const value="3"/>
+                                </assignment>
+                            </body>
+                        </then>
+                        <else>
+                            <body>
+                                <assignment name="z">
+                                    <const value="3"/>
+                                </assignment>
+                            </body>
+                        </else>
+                    </if>
+                </body>
+            </else>
+        </if>
+    </body>
+</function>
