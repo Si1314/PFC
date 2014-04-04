@@ -1,9 +1,7 @@
 <table/>
-<variable name="x" value="1"/>
-<variable name="y" value="0"/>
-<variable name="z" value="2"/>
+<variable name="a" value="1"/>
+<variable name="b" value="1"/>
 <table/>
-<variable name="x" value="0"/>
-<variable name="y" value="0"/>
-<variable name="z" value="0"/>
+<variable name="a" value="-255"/>
+<variable name="b" value="2"/>
 <table/>

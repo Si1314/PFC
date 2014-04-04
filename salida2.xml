@@ -1,0 +1,40 @@
+<function name="deco2" type="void">
+    <param type="int" name="a"/>
+    <param type="int" name="b"/>
+    <body>
+        <declaration type="int" name="z"/>
+        <if>
+            <binaryOperator type="bool" operator=">">
+                <variable name="a"/>
+                <const value="0"/>
+            </binaryOperator>
+            <then>
+                <body>
+                    <assignment name="b">
+                        <const value="1"/>
+                    </assignment>
+                </body>
+            </then>
+            <else>
+                <body>
+                    <assignment name="b">
+                        <const value="2"/>
+                    </assignment>
+                </body>
+            </else>
+        </if>
+    </body>
+</function>
+
+<!--
+
+void deco2(int a){
+    int z;
+    if(a > 0){
+        z = 3;
+    }else{ 
+        z = 4;
+    }
+}
+    <const value="0"/>
+-->

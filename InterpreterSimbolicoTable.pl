@@ -18,8 +18,7 @@
 
 i:- 
 	findall((N,L),interpreterAux(N,L),V),
-	%findall(L,interpreterAux(L),V),
-	%write(V), write('\n'),
+	write(V), write('\n'),
 	open('output.xml', write, Stream, []),
 
     xml_write(Stream,element(table,[],[]),[header(false)]),
@@ -32,7 +31,8 @@ interpreterAux(LabelTableNames, LabelTableValues):-
 
 	% Choose one to execute:
 	%load_xml_file('salida.xml', Program),
-	load_xml_file('plantillaExpresionesSim.xml', Program),
+	load_xml_file('salida2.xml', Program),
+	%load_xml_file('plantillaExpresionesSim.xml', Program),
 	%load_xml_file('plantillaExpresiones.xml', Program),
 	%load_xml_file('plantillaIF.xml', Program),
 	%load_xml_file('plantillaWHILE.xml', Program),
@@ -62,14 +62,14 @@ execute(Entry,[Instruction|RestInstructios],Out) :-
 					% STEP %
 					%%%%%%%%
 
-step(Entry,('function',[_=ExitValue,_=FunctionName],FuncionBody),Out) :- !,
+step(Entry,('function',[_=FunctionName,_=ExitValue],FuncionBody),Out) :- !,
 	apila(Entry,Entry1),
 	functionOrMethod(ExitValue,FunOrMet),
 	add(Entry1,(ExitValue,FunctionName,FunOrMet),Out1),
 	execute(Out1,FuncionBody,Out).
 
 step(Entry,('param',[_=int,_=ParamName],ParamBody),Out) :- !,
-	[Value] ins 0..256, %[Value] ins -255..256,
+	[Value] ins -255..256,
 	add(Entry,(int,ParamName,Value),Out1),
 	execute(Out1,ParamBody,Out).
 
@@ -83,7 +83,7 @@ step(Entry,('body',_,Body),Out) :- !,
 	desapila(Out2, Out).
 
 step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
-	[Value] ins 0..256, [Value] ins 0..256, %[Value] ins -255..256, 
+	[Value] ins -255..256, 
 	add(Entry,(int,Name,Value),Out1),
 	execute(Out1,DecBody,Out).
 
@@ -97,7 +97,8 @@ step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
 
 % IF -> THEN
 step(Entry,('if',_,[Condition,('then',_,Then),_]),Out):-
-	evaluate(Entry,Condition),
+	resolveExpression(Entry,Condition,'true'),
+	%evaluate(Entry,Condition),
 	apila(Entry,Out1),
 	execute(Out1,Then,Out2),
 	desapila(Out2, Out).
@@ -110,7 +111,8 @@ step(Entry,('if',_,[_,_,('else',_,Else)]),Out):- !,
 
 % WHILE -> TRUE
 step(Entry,('while',_,[Condition,('body',_,WhileBody)]),Out):-
-	evaluate(Entry,Condition), !,
+	resolveExpression(Entry,Condition,'true'),
+	%evaluate(Entry,Condition), !,
 	apila(Entry,Out1),
 	execute(Out1,WhileBody,Out2),
 	desapila(Out2,Out3),
@@ -122,7 +124,8 @@ step(Entry,('while',_,_),Entry):-!.
 % FOR
 step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),Out):-
 	variableAdvance(Entry,Variable,VariableName,Entry1), 													
-	evaluate(Entry1,Condition), !,
+	resolveExpression(Entry,Condition,'true'),
+	%evaluate(Entry1,Condition), !,
 	apila(Entry1,Out1),
 	execute(Out1,ForBody,Out2),
 	desapila(Out2,Out3),
@@ -144,41 +147,41 @@ step(Entry,_,Entry).
 
 					%--- resolveExpression ---%
 
-resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):- !,
+resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 	getContent(Operator,Op),
 	resolveExpression(Entry,X, Operand1),
 	resolveExpression(Entry,Y, Operand2),
 	work(Op, Operand1, Operand2,Result).
 
-resolveExpression(Entry,('variable',[_=OperandName],_), OperandValue):- !,
+resolveExpression(Entry,('variable',[_=OperandName],_), OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
 
-resolveExpression(_,('constant',[_=Value],_),Result):- !,
+resolveExpression(_,('const',[_=Value],_),Result):- 
 	atom_number(Value,Result).
 
-resolveExpression(_,_,0).
+%resolveExpression(_,_,0).
 
 %					-----------------
 %					---> Boolean <---
 %					-----------------
 
 work('=<', Op1,Op2, true):- Op1 #=< Op2.
-work('=<', _,_,false):- !.
+work('=<', _,_,false).
 
 work('<', Op1,Op2,true):- Op1 #< Op2.
-work('<', _,_,false):- !.
+work('<', _,_,false).
 
 work('>=', Op1,Op2,true):- Op1 #>= Op2.
-work('>=', _,_,false):- !.
+work('>=', _,_,false).
 
 work('>', Op1,Op2,true):- Op1 #> Op2.
-work('>', _,_,false):- !.
+work('>', _,_,false).
 
 work('==', Op1,Op2,true):- Op1 #= Op2.
-work('==', _,_,false):- !.
+work('==', _,_,false).
 
 work('!=', Op1,Op2,true):- Op1 #\= Op2.
-work('!=', _,_,false):- !.
+work('!=', _,_,false).
 
 %					--------------------
 %					---> arithmetic <---		
@@ -195,15 +198,6 @@ work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-					
-					%--- evaluate ---%
-
-evaluate(Entry,(_, [_, _= (Op)], [(_,[_=Operand1],_),(_,[_=Operand2],_)])):-
-	getValue(Entry,Operand1,Value1),
-	getValue(Entry,Operand2,Value2),
-	work(Op, Value1, Value2, Result), Result.
-
-%------------------------------------------------------------------------------------
 
 					%--- variableAdvance ---%
 
@@ -285,3 +279,5 @@ writeList(Stream,[(N,V)|Xs]):- !,
 	writeInXML(Stream,N,V),
 	%write(LabelTableNames), write('\n'), write(X), write('\n'),
 	writeList(Stream,Xs).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

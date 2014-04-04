@@ -1,7 +1,4 @@
-
-<?xml version="1.0"?>
-
-<function type="void" name="main">
+<function name="main" type="void">
 	<param type="int" name="x"/>
 	<param type="int" name="y"/>
 	<param type="int" name="z"/>
@@ -11,34 +8,28 @@
 		<if>
 			<!-- (x > y) -->
 			<binaryOperator type="bool" operator=">">
-				<variable name="x"></variable>
-				<variable name="y"></variable>
+				<variable name="x"/>
+				<variable name="y"/>
 			</binaryOperator>
 
 			<!-- then -->
 			<then>
-
-				<!-- int z = 2 * x; -->
-				<assignment name="z">
-					<binaryOperator type="arithmetic" operator="*">
-						<constant value="2"></constant>
-						<variable name="x"></variable>
-					</binaryOperator>
-				</assignment>
-				
+				<body>
+					<!-- int z = 1; -->
+					<assignment name="z">
+						<const value="1"/>
+					</assignment>
+				</body>
 			</then>
 
 			<!-- else -->
 			<else>
-
-				<!-- int z = 2 * y; -->
-				<assignment name="z">
-					<binaryOperator type="arithmetic" operator="*">
-						<constant value="2"></constant>
-						<variable name="y"></variable>
-					</binaryOperator>
-				</assignment>
-
+				<body>
+					<!-- int z = 2; -->
+					<assignment name="z">
+						<const value="2"/>
+					</assignment>
+				</body>
 			</else>
 		</if>
 
