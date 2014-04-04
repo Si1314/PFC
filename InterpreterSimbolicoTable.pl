@@ -16,18 +16,18 @@
 
 % Carga el arbol dado por xml en 'Program'
 
-i:-
-	%findall((N,L),interpreterAux(N,L),V),
-	findall(L,interpreterAux(L),V),
-	write(V),
+i:- 
+	findall((N,L),interpreterAux(N,L),V),
+	%findall(L,interpreterAux(L),V),
+	%write(V), write('\n'),
 	open('output.xml', write, Stream, []),
 
-    %xml_write(Stream,element(table,[],[]),[header(false)]),
-    %xml_write(Stream,'\n',[header(false)]),
-    %writeList(Stream,N,V),
+    xml_write(Stream,element(table,[],[]),[header(false)]),
+    xml_write(Stream,'\n',[header(false)]),
+    writeList(Stream,V),
     close(Stream).
 
-interpreterAux(LabelTableValues):-
+interpreterAux(LabelTableNames, LabelTableValues):-
 	cd('../PFC'),
 
 	% Choose one to execute:
@@ -42,7 +42,6 @@ interpreterAux(LabelTableValues):-
 	execute([],GoodProgram,ExitTable),
 
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
-	write('LabelTableNames: '), write(LabelTableNames), write('\n'),
 	%findall(LabelTableValues,(callLabel(LabelTableValues,0,[],Sol)),Solution),!,
 	%findall(LabelTableValues,label(LabelTableValues),Solution),!,
 	once(label(LabelTableValues)).
@@ -68,7 +67,6 @@ step(Entry,('function',[_=ExitValue,_=FunctionName],FuncionBody),Out) :- !,
 	functionOrMethod(ExitValue,FunOrMet),
 	add(Entry1,(ExitValue,FunctionName,FunOrMet),Out1),
 	execute(Out1,FuncionBody,Out).
-	%desapila.
 
 step(Entry,('param',[_=int,_=ParamName],ParamBody),Out) :- !,
 	[Value] ins 0..256, %[Value] ins -255..256,
@@ -281,9 +279,9 @@ callLabel(LabelTableValues,Nivel,Ac,Sol1):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-writeList(_,_,[]):- !.
-writeList(Stream,LabelTableNames,[X|Xs]):- !, 
+writeList(_,[]):- !.
+writeList(Stream,[(N,V)|Xs]):- !, 
 	%Nivel1 is Nivel - 1,
-	writeInXML(Stream,LabelTableNames,X),
+	writeInXML(Stream,N,V),
 	%write(LabelTableNames), write('\n'), write(X), write('\n'),
-	writeList(Stream,LabelTableNames,Xs).
+	writeList(Stream,Xs).
