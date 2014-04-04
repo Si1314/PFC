@@ -7,8 +7,6 @@ PFC
 
  - Ponerle un tope de profundidad.
 
- - Añadir el return para que haya procedimientos y funciones.
-
  - Conseguir que escriba bien el fichero de salida, por ahora tenemos:
  	
 	 	<table/>

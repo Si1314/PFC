@@ -18,7 +18,8 @@
 
 i:- 
 	findall((N,L),interpreterAux(N,L),V),
-	write(V), write('\n'),
+	%interpreterAux(N,L),
+	%write(V), write('\n')
 	open('output.xml', write, Stream, []),
 
     xml_write(Stream,element(table,[],[]),[header(false)]),
@@ -41,21 +42,28 @@ interpreterAux(LabelTableNames, LabelTableValues):-
 
 	removeEmpty(Program,GoodProgram),
 	execute([],GoodProgram,ExitTable),
-
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
 
 	%findall(LabelTableValues,(callLabel(LabelTableValues,0,[],Sol)),Solution),!,
 	%findall(LabelTableValues,label(LabelTableValues),Solution),!,
-	once(label(LabelTableValues)).
+	%once(label(LabelTableValues)).
+	label(LabelTableValues).
 	%write(Solution), write('\n').
 
 					%%%%%%%%%%%
 					% execute %
 					%%%%%%%%%%%
 
-execute(Entry,[],Entry).
+execute(Entry,[],Entry):-!.
+
+execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out) :-!,
+	retractall(nivel(_)),
+	assert(nivel(3)),
+	step(Entry,('while',_,[C,('body',_,B)]),Out1),
+	%execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out),
+	execute(Out1,RestInstructios,Out).
+
 execute(Entry,[Instruction|RestInstructios],Out) :-
-	!,
 	step(Entry,Instruction,Out1),
 	execute(Out1,RestInstructios,Out).
 
@@ -75,7 +83,7 @@ step(Entry,('function',[_,_=ExitValue],FuncionBody),Out) :- !,
 	execute(Out1,FuncionBody,Out).
 
 step(Entry,('param',[_=int,_=ParamName],ParamBody),Out) :- !,
-	[Value] ins -255..256,
+	[Value] ins -3..3,
 	add(Entry,(int,ParamName,Value),Out1),
 	execute(Out1,ParamBody,Out).
 
@@ -92,7 +100,7 @@ step(Entry,('declarations',_,Body),Out) :- !,
 	execute(Entry,Body,Out).
 
 step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
-	[Value] ins -255..256, 
+	[Value] ins -3..3, 
 	add(Entry,(int,Name,Value),Out1),
 	execute(Out1,DecBody,Out).
 
@@ -119,16 +127,23 @@ step(Entry,('if',_,[_,_,('else',_,Else)]),Out):- !,
 	desapila(Out2, Out).
 
 % WHILE -> TRUE
+step(Entry,('while',_,_),Entry):-
+	nivel(0),!.
+
 step(Entry,('while',_,[Condition,('body',_,WhileBody)]),Out):-
-	resolveExpression(Entry,Condition,'true'),
-	%evaluate(Entry,Condition), !,
+	nivel(N),
+	N1 is N - 1,
+	retractall(nivel(N)),
+	assert(nivel(N1)),
+
+	resolveExpression(Entry,Condition,true),!,
 	apila(Entry,Out1),
 	execute(Out1,WhileBody,Out2),
 	desapila(Out2,Out3),
 	step(Out3,('while',_,[Condition,('body',_,WhileBody)]),Out).
 
 % WHILE -> FALSE
-step(Entry,('while',_,_),Entry):-!.
+step(Entry,('while',_,_),Entry):-!.%:-resolveExpression(Entry,Condition,false),!.
 
 % FOR
 step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),Out):-
@@ -288,7 +303,7 @@ writeList(Stream,[(N,V)|Xs]):- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 getTuple(int,(int,ret,Value)):-
-	Value in -255..255.
+	Value in -3..3.
 
 getTuple(bool,(int,ret,Value)):-
 	Value in true\/false.

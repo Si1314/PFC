@@ -1,5 +1,33 @@
 <function name="foo" type="int">
     <param type="int" name="x"/>
+    <body>
+        <declarations>
+            <declaration type="int" name="w">
+                <const value="0"/>
+            </declaration>
+        </declarations>
+    <while>
+        <binaryOperator type="bool" operator=">">
+            <variable name="w"/>
+            <variable name="x"/>
+        </binaryOperator>
+        <body>
+            <assignment name="w">
+                <binaryOperator type="arithmetic" operator="+">
+                    <variable name="w"/>
+                    <const value="1"/>
+                </binaryOperator>
+            </assignment>
+        </body>
+    </while>
+       <return>
+            <variable name="w"/>
+        </return>
+    </body>
+</function>
+
+<!--<function name="foo" type="int">
+    <param type="int" name="x"/>
     <param type="int" name="y"/>
     <param type="int" name="z"/>
     <body>
@@ -33,7 +61,7 @@
         </return>
     </body>
 </function>
-<!--
+
 <function name="andfun" type="_Bool">
     <param type="_Bool" name="x"/>
     <param type="_Bool" name="y"/>
