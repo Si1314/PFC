@@ -17,7 +17,8 @@
 % Carga el arbol dado por xml en 'Program'
 
 i:-
-	findall((N,L),interpreterAux(N,L),V),
+	%findall((N,L),interpreterAux(N,L),V),
+	findall(L,interpreterAux(L),V),
 	write(V),
 	open('output.xml', write, Stream, []),
 
@@ -26,12 +27,12 @@ i:-
     %writeList(Stream,N,V),
     close(Stream).
 
-interpreterAux(LabelTableNames,LabelTableValues):-
+interpreterAux(LabelTableValues):-
 	cd('../PFC'),
 
 	% Choose one to execute:
-	load_xml_file('salida.xml', Program),
-	
+	%load_xml_file('salida.xml', Program),
+	load_xml_file('plantillaExpresionesSim.xml', Program),
 	%load_xml_file('plantillaExpresiones.xml', Program),
 	%load_xml_file('plantillaIF.xml', Program),
 	%load_xml_file('plantillaWHILE.xml', Program),
@@ -70,7 +71,7 @@ step(Entry,('function',[_=ExitValue,_=FunctionName],FuncionBody),Out) :- !,
 	%desapila.
 
 step(Entry,('param',[_=int,_=ParamName],ParamBody),Out) :- !,
-	[Value] ins -255..256,
+	[Value] ins 0..256, %[Value] ins -255..256,
 	add(Entry,(int,ParamName,Value),Out1),
 	execute(Out1,ParamBody,Out).
 
@@ -84,8 +85,7 @@ step(Entry,('body',_,Body),Out) :- !,
 	desapila(Out2, Out).
 
 step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
-	
-	[Value] ins -255..256,
+	[Value] ins 0..256, [Value] ins 0..256, %[Value] ins -255..256, 
 	add(Entry,(int,Name,Value),Out1),
 	execute(Out1,DecBody,Out).
 
