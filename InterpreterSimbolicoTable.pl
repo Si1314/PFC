@@ -18,7 +18,7 @@
 
 i:- 
 	findall((N,L),interpreterAux(N,L),V),
-	%write(V), write('\n'),
+	write(V), write('\n'),
 	open('output.xml', write, Stream, []),
 
     xml_write(Stream,element(table,[],[]),[header(false)]),
@@ -43,6 +43,7 @@ interpreterAux(LabelTableNames, LabelTableValues):-
 	execute([],GoodProgram,ExitTable),
 
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
+
 	%findall(LabelTableValues,(callLabel(LabelTableValues,0,[],Sol)),Solution),!,
 	%findall(LabelTableValues,label(LabelTableValues),Solution),!,
 	once(label(LabelTableValues)).
@@ -63,10 +64,14 @@ execute(Entry,[Instruction|RestInstructios],Out) :-
 					% STEP %
 					%%%%%%%%
 
-step(Entry,('function',[_=FunctionName,_=ExitValue],FuncionBody),Out) :- !,
+step(Entry,('function',[_,_=void],FuncionBody),Out) :- !,
 	apila(Entry,Entry1),
-	functionOrMethod(ExitValue,FunOrMet),
-	add(Entry1,(ExitValue,FunctionName,FunOrMet),Out1),
+	execute(Entry1,FuncionBody,Out).
+
+step(Entry,('function',[_,_=ExitValue],FuncionBody),Out) :- !,
+	apila(Entry,Entry1),
+	getTuple(ExitValue,Tuple),
+	add(Entry1,Tuple,Out1),
 	execute(Out1,FuncionBody,Out).
 
 step(Entry,('param',[_=int,_=ParamName],ParamBody),Out) :- !,
@@ -139,14 +144,9 @@ step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),Out):-
 % FOR -> WE GO OUT
 step(Entry,('for',_,_),Out):-!,write('\n'), write(Entry), write('\n'), desapila(Entry,Out).
 
-step(Entry,('return',_,Body),Out):-!,
-	%write('Antes de: resolveExpression\n'),
-	write(Entry), write('\n'),% write(Body), write('\n'),
+step(Entry,('return',_,[Body]),Out):-!,
 	resolveExpression(Entry,Body,Result),
-	write('Despues de: resolveExpression\n'),
-	%write(Entry), write('\n'), write(Result), write('\n'),
-	addValueReturn(Entry,Result,Out).
-	%write('Despues de: addValueReturn\n').
+	update(Entry,(ret,Result),Out).
 
 step(Entry,_,Entry).
 
@@ -163,19 +163,14 @@ step(Entry,_,Entry).
 resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 	getContent(Operator,Op),
 	resolveExpression(Entry,X, Operand1),
-	%write('\n\n2 Operand1:\n'), write(Operand1),
 	resolveExpression(Entry,Y, Operand2),
-	%write('\n\n3 Operand2:\n'), write(Operand2),
 	work(Op, Operand1, Operand2,Result).
-	%write('\n\n4 Result:\n'), write(Result),write('\n\n').
 
 resolveExpression(Entry,('variable',[_=OperandName],_), OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
-	%write('\n\n Operand value:\n'), write(OperandValue).
 
 resolveExpression(_,('const',[_=Value],_),Result):- 
 	atom_number(Value,Result).
-	%write('\n\n Operand Const:\n'), write(Result).
 
 %resolveExpression(_,_,0).
 
@@ -226,14 +221,6 @@ variableAdvance(Entry,('declarations',_,Variable),VarName,Out):-
 
 variableAdvance(Entry,Variable,Variable,Entry).
 
-%------------------------------------------------------------------------------------
-
-					%--- functionOrMethod ---%
-
-% Diferenciamos una funcion de un metodo.
-
-functionOrMethod(void,'method'):- !.
-functionOrMethod(_,'function').
 
 %------------------------------------------------------------------------------------
 
@@ -299,3 +286,9 @@ writeList(Stream,[(N,V)|Xs]):- !,
 	writeList(Stream,Xs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+getTuple(int,(int,ret,Value)):-
+	Value in -255..255.
+
+getTuple(bool,(int,ret,Value)):-
+	Value in true\/false.
