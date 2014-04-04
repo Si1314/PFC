@@ -110,7 +110,13 @@ notInTableLista([_|Rest],Name1) :-!,
 
 					%--- labelList ---%
 
-labelList([[_|TV]],SolNames,SolValues):-
+labelList([[(_,_,'function')|TV]],SolNames,SolValues):- !, write('\n----\n'),
+ 	labelAux(TV,[],[],SolNames,SolValues).
+
+labelList([[(_,_,'method')|TV]],SolNames,SolValues):- !, write('\n----\n'),
+ 	labelAux(TV,[],[],SolNames,SolValues).
+
+labelList([TV],SolNames,SolValues):- write('\n****\n'), write(TV), write('\n'),
  	labelAux(TV,[],[],SolNames,SolValues).
  
 labelAux([],AcNames,AcValues,AcNames,AcValues).
@@ -120,3 +126,16 @@ labelAux([(_,Name,Value)|TV],AcNames,AcValues,SolNames,SolValues):-
  	labelAux(TV,AcNames1,AcValues1,SolNames,SolValues).
  	
 %------------------------------------------------------------------------------------
+
+					%--- addValueReturn ---%
+
+addValueReturn(Xs,Result,Zs):-
+	addValueReturnAux(Xs,Result,[],Zs).
+
+
+addValueReturnAux([[(T,_,_)|Xs]|[]],Result,Ac,Zs):-
+	append([[(T,'returnVariable',Result)|Xs]],Ac,Zs).
+
+addValueReturnAux([X|Xs],Result,Ac,Zs):-
+	append([X],Ac,Ac1),
+	addValueReturnAux(Xs,Result,Ac1,Zs).

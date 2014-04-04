@@ -1,0 +1,126 @@
+<function name="foo" type="int">
+    <param type="int" name="x"/>
+    <param type="int" name="y"/>
+    <param type="int" name="z"/>
+    <body>
+        <declarations>
+            <declaration type="int" name="w"/>
+            <declaration type="int" name="q"/>
+            <declaration type="int" name="l"/>
+        </declarations>
+        <declarations>
+            <declaration type="int" name="j">
+                <const value="0"/>
+            </declaration>
+        </declarations>
+        <assignment name="w">
+            <binaryOperator type="arithmetic" operator="+">
+                <binaryOperator type="arithmetic" operator="+">
+                    <binaryOperator type="arithmetic" operator="+">
+                        <variable name="x"/>
+                        <variable name="y"/>
+                    </binaryOperator>
+                    <const value="1"/>
+                </binaryOperator>
+                <variable name="z"/>
+            </binaryOperator>
+        </assignment>
+        <return>
+            <binaryOperator type="arithmetic" operator="+">
+                <variable name="w"/>
+                <variable name="y"/>
+            </binaryOperator>
+        </return>
+    </body>
+</function>
+<!--
+<function name="andfun" type="_Bool">
+    <param type="_Bool" name="x"/>
+    <param type="_Bool" name="y"/>
+    <body>
+        <return>
+            <binaryOperator type="default" operator="&&">
+                <variable name="x"/>
+                <variable name="y"/>
+            </binaryOperator>
+        </return>
+    </body>
+</function>
+
+<function name="bucle" type="int">
+    <param type="int" name="x"/>
+    <param type="int" name="y"/>
+    <body>
+        <if>
+            <binaryOperator type="bool" operator="<">
+                <variable name="x"/>
+                <variable name="y"/>
+            </binaryOperator>
+            <then>
+                <body>
+                    <while>
+                        <binaryOperator type="bool" operator="<">
+                            <variable name="x"/>
+                            <variable name="y"/>
+                        </binaryOperator>
+                        <body>
+                            <assignment name="x">
+                                <binaryOperator type="arithmetic" operator="+">
+                                    <variable name="x"/>
+                                    <const value="1"/>
+                                </binaryOperator>
+                            </assignment>
+                        </body>
+                    </while>
+                </body>
+            </then>
+            <else>
+                <body/>
+            </else>
+        </if>
+        <return>
+            <variable name="x"/>
+        </return>
+    </body>
+</function>
+
+<function name="eso" type="int">
+    <param type="int" name="x"/>
+    <body>
+        <declarations>
+            <declaration type="int" name="y"/>
+        </declarations>
+        <for>
+            <declarations>
+                <declaration type="int" name="i">
+                    <const value="0"/>
+                </declaration>
+            </declarations>
+            <binaryOperator type="bool" operator="<">
+                <variable name="i"/>
+                <const value="5"/>
+            </binaryOperator>
+            <assignment name="i">
+                <binaryOperator type="arithmetic" operator="+">
+                    <variable name="i"/>
+                    <const value="1"/>
+                </binaryOperator>
+            </assignment>
+            <body>
+                <assignment name="y">
+                    <binaryOperator type="arithmetic" operator="+">
+                        <binaryOperator type="arithmetic" operator="+">
+                            <variable name="y"/>
+                            <variable name="x"/>
+                        </binaryOperator>
+                        <variable name="i"/>
+                    </binaryOperator>
+                </assignment>
+            </body>
+        </for>
+        <return>
+            <variable name="y"/>
+        </return>
+    </body>
+</function>
+-->

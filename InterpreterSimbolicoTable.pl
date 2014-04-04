@@ -18,7 +18,7 @@
 
 i:- 
 	findall((N,L),interpreterAux(N,L),V),
-	write(V), write('\n'),
+	%write(V), write('\n'),
 	open('output.xml', write, Stream, []),
 
     xml_write(Stream,element(table,[],[]),[header(false)]),
@@ -30,8 +30,9 @@ interpreterAux(LabelTableNames, LabelTableValues):-
 	cd('../PFC'),
 
 	% Choose one to execute:
-	load_xml_file('salida.xml', Program),
+	%load_xml_file('salida.xml', Program),
 	%load_xml_file('salida2.xml', Program),
+	load_xml_file('salida3.xml', Program),
 	%load_xml_file('plantillaExpresionesSim.xml', Program),
 	%load_xml_file('plantillaExpresiones.xml', Program),
 	%load_xml_file('plantillaIF.xml', Program),
@@ -81,6 +82,9 @@ step(Entry,('body',_,Body),Out) :- !,
 	apila(Entry, Out1),
 	execute(Out1,Body,Out2),
 	desapila(Out2, Out).
+
+step(Entry,('declarations',_,Body),Out) :- !,
+	execute(Entry,Body,Out).
 
 step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
 	[Value] ins -255..256, 
@@ -135,6 +139,15 @@ step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),Out):-
 % FOR -> WE GO OUT
 step(Entry,('for',_,_),Out):-!,write('\n'), write(Entry), write('\n'), desapila(Entry,Out).
 
+step(Entry,('return',_,Body),Out):-!,
+	%write('Antes de: resolveExpression\n'),
+	write(Entry), write('\n'),% write(Body), write('\n'),
+	resolveExpression(Entry,Body,Result),
+	write('Despues de: resolveExpression\n'),
+	%write(Entry), write('\n'), write(Result), write('\n'),
+	addValueReturn(Entry,Result,Out).
+	%write('Despues de: addValueReturn\n').
+
 step(Entry,_,Entry).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -150,14 +163,19 @@ step(Entry,_,Entry).
 resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 	getContent(Operator,Op),
 	resolveExpression(Entry,X, Operand1),
+	%write('\n\n2 Operand1:\n'), write(Operand1),
 	resolveExpression(Entry,Y, Operand2),
+	%write('\n\n3 Operand2:\n'), write(Operand2),
 	work(Op, Operand1, Operand2,Result).
+	%write('\n\n4 Result:\n'), write(Result),write('\n\n').
 
 resolveExpression(Entry,('variable',[_=OperandName],_), OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
+	%write('\n\n Operand value:\n'), write(OperandValue).
 
 resolveExpression(_,('const',[_=Value],_),Result):- 
 	atom_number(Value,Result).
+	%write('\n\n Operand Const:\n'), write(Result).
 
 %resolveExpression(_,_,0).
 
@@ -201,7 +219,7 @@ work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 
 					%--- variableAdvance ---%
 
-variableAdvance(Entry,('variableField',_,Variable),VarName,Out):-
+variableAdvance(Entry,('declarations',_,Variable),VarName,Out):-
 	getContent(Variable,VarName), !,
 	apila(Entry, Out1),
 	execute(Out1,Variable,Out).

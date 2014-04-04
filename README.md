@@ -23,7 +23,7 @@ PFC
 
 			<variable name="b" value="-255"/>
 
-			<table/>
+		<table/>
 
 			<variable name="a" value="-255"/>
 
