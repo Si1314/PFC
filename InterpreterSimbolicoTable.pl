@@ -57,9 +57,7 @@ interpreterAux(LabelTableNames, LabelTableValues):-
 execute(Entry,[],Entry):-!.
 
 execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out) :-!,
-	retractall(nivel(_)),
-	assert(nivel(3)),
-	step(Entry,('while',_,[C,('body',_,B)]),Out1),
+	step(Entry,('while',_,[C,('body',_,B)]),5,Out1),	% Nivel = 5
 	%execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out),
 	execute(Out1,RestInstructios,Out).
 
@@ -126,25 +124,6 @@ step(Entry,('if',_,[_,_,('else',_,Else)]),Out):- !,
 	execute(Out1,Else,Out2),
 	desapila(Out2, Out).
 
-% WHILE -> TRUE
-step(Entry,('while',_,_),Entry):-
-	nivel(0),!.
-
-step(Entry,('while',_,[Condition,('body',_,WhileBody)]),Out):-
-	nivel(N),
-	N1 is N - 1,
-	retractall(nivel(N)),
-	assert(nivel(N1)),
-
-	resolveExpression(Entry,Condition,true),!,
-	apila(Entry,Out1),
-	execute(Out1,WhileBody,Out2),
-	desapila(Out2,Out3),
-	step(Out3,('while',_,[Condition,('body',_,WhileBody)]),Out).
-
-% WHILE -> FALSE
-step(Entry,('while',_,_),Entry):-!.%:-resolveExpression(Entry,Condition,false),!.
-
 % FOR
 step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),Out):-
 	variableAdvance(Entry,Variable,VariableName,Entry1), 													
@@ -164,6 +143,21 @@ step(Entry,('return',_,[Body]),Out):-!,
 	update(Entry,(ret,Result),Out).
 
 step(Entry,_,Entry).
+
+% WHILE -> TRUE
+step(Entry,('while',_,_),0,Entry):-!.
+
+step(Entry,('while',_,[Condition,('body',_,WhileBody)]),N,Out):-
+	resolveExpression(Entry,Condition,true),!,
+	apila(Entry,Out1),
+	execute(Out1,WhileBody,Out2),
+	desapila(Out2,Out3),
+	N1 is N - 1,
+	step(Out3,('while',_,[Condition,('body',_,WhileBody)]),N1,Out).
+
+% WHILE -> FALSE
+step(Entry,('while',_,_),_,Entry):-!.%:-resolveExpression(Entry,Condition,false),!.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
