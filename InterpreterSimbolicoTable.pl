@@ -22,8 +22,8 @@ i:-
 	%write(V), write('\n')
 	open('output.xml', write, Stream, []),
 
-    xml_write(Stream,element(table,[],[]),[header(false)]),
-    xml_write(Stream,'\n',[header(false)]),
+    %xml_write(Stream,element(table,[],[]),[header(false)]),
+    %xml_write(Stream,'\n',[header(false)]),
     writeList(Stream,V),
     close(Stream).
 
@@ -138,17 +138,17 @@ step(Entry,_,Entry).
 step(Entry,('for',_,_),0,Entry):-!.
 
 step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),N,Out):-
-	write('*****\n'),
+	%write('*****\n'),
 	variableAdvance(Entry,Variable,VariableName,Entry1),													
-	write(Entry1),
+	%write(Entry1),
 	resolveExpression(Entry,Condition,'true'),!,
-	write('\n*****'),
+	%write('\n*****'),
 	apila(Entry1,Out1),
 	execute(Out1,ForBody,Out2),
 	desapila(Out2,Out3),
 	execute(Out3,[Advance],Out4),
 	N1 is N - 1,
-	write(N), write('\n'),
+	%write(N), write('\n'),
 	step(Out4,('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),N1,Out).
 
 %step(Entry,('for',_,_),_,Entry):-!.
@@ -275,8 +275,7 @@ writeInXML(Stream,[],_):-!,
     xml_write(Stream,element(table,[],[]),[header(false)]),
     xml_write(Stream,'\n',[header(false)]).
 
-writeInXML(Stream, [N|Ns],[V|Vs]):-
-
+writeInXML(Stream,[N|Ns],[V|Vs]):-
     xml_write(Stream,element(variable,[name=N,value=V],[]),[header(false)]),
 	xml_write(Stream,'\n',[header(false)]),
 	writeInXML(Stream, Ns, Vs). 
@@ -284,6 +283,18 @@ writeInXML(Stream, [N|Ns],[V|Vs]):-
 	% Possible future useful code:
 	% xml_write(Stream,element(aap,[],[noot]),[]), 
 	% Possible Options: [layout(false),doctype(xml),header(true)]
+
+%------------------------------------------------------------------
+writeInXML2(Stream,[N|Ns],[V|Vs]):-
+	writeInXML2Aux(Stream,[N|Ns],[V|Vs],[],Result),
+	xml_write(Stream,element(caso,[],Result),[header(false)]),
+	xml_write(Stream,'\n',[header(false)]).
+
+writeInXML2Aux(_,[],_,Ac,Ac):-!.
+writeInXML2Aux(_,_,[],Ac,Ac):-!.
+writeInXML2Aux(Stream,[N|Ns],[V|Vs],Ac,Zs):-
+	append(Ac,[element(variable,[name=N,value=V],[])],Ac1),
+	writeInXML2Aux(Stream,Ns,Vs,Ac1,Zs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 
@@ -299,7 +310,7 @@ callLabel(LabelTableValues,Nivel,Ac,Sol1):-
 writeList(_,[]):- !.
 writeList(Stream,[(N,V)|Xs]):- !, 
 	%Nivel1 is Nivel - 1,
-	writeInXML(Stream,N,V),
+	writeInXML2(Stream,N,V),
 	%write(LabelTableNames), write('\n'), write(X), write('\n'),
 	writeList(Stream,Xs).
 
