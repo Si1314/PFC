@@ -61,6 +61,10 @@ execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out) :-!,
 	%execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out),
 	execute(Out1,RestInstructios,Out).
 
+execute(Entry,[('for',_,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
+	step(Entry,('for',_,[V,C,A,('body',_,B)]),5,Out1),	% Nivel = 5
+	execute(Out1,RestInstructios,Out).
+
 execute(Entry,[Instruction|RestInstructios],Out) :-
 	step(Entry,Instruction,Out1),
 	execute(Out1,RestInstructios,Out).
@@ -124,40 +128,45 @@ step(Entry,('if',_,[_,_,('else',_,Else)]),Out):- !,
 	execute(Out1,Else,Out2),
 	desapila(Out2, Out).
 
-% FOR
-step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),Out):-
-	variableAdvance(Entry,Variable,VariableName,Entry1), 													
-	resolveExpression(Entry,Condition,'true'),
-	%evaluate(Entry1,Condition), !,
-	apila(Entry1,Out1),
-	execute(Out1,ForBody,Out2),
-	desapila(Out2,Out3),
-	execute(Out3,[Advance],Out4),
-	step(Out4,('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),Out).
-
-% FOR -> WE GO OUT
-step(Entry,('for',_,_),Out):-!,write('\n'), write(Entry), write('\n'), desapila(Entry,Out).
-
 step(Entry,('return',_,[Body]),Out):-!,
 	resolveExpression(Entry,Body,Result),
 	update(Entry,(ret,Result),Out).
 
 step(Entry,_,Entry).
 
-% WHILE -> TRUE
+% FOR
+step(Entry,('for',_,_),0,Entry):-!.
+
+step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),N,Out):-
+	write('*****\n'),
+	variableAdvance(Entry,Variable,VariableName,Entry1),													
+	write(Entry1),
+	resolveExpression(Entry,Condition,'true'),!,
+	write('\n*****'),
+	apila(Entry1,Out1),
+	execute(Out1,ForBody,Out2),
+	desapila(Out2,Out3),
+	execute(Out3,[Advance],Out4),
+	N1 is N - 1,
+	write(N), write('\n'),
+	step(Out4,('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),N1,Out).
+
+%step(Entry,('for',_,_),_,Entry):-!.
+
+% WHILE
 step(Entry,('while',_,_),0,Entry):-!.
 
 step(Entry,('while',_,[Condition,('body',_,WhileBody)]),N,Out):-
-	resolveExpression(Entry,Condition,true),!,
+	resolveExpression(Entry,Condition,true), !,
 	apila(Entry,Out1),
 	execute(Out1,WhileBody,Out2),
 	desapila(Out2,Out3),
 	N1 is N - 1,
 	step(Out3,('while',_,[Condition,('body',_,WhileBody)]),N1,Out).
 
-% WHILE -> FALSE
-step(Entry,('while',_,_),_,Entry):-!.%:-resolveExpression(Entry,Condition,false),!.
+%step(Entry,('while',_,_),_,Entry):-!.%:-resolveExpression(Entry,Condition,false),!.
 
+step(Entry,_,_,Entry).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -237,7 +246,7 @@ variableAdvance(Entry,Variable,Variable,Entry).
 
 getContent([_,_= (Op)], Op):- !.
 getContent((_,[_=Name],_), Name):- !.
-getContent([('declaration',[_,_=VariableName],_), _] , VariableName):- !.
+getContent([('declaration',[_,name=VariableName],_)],VariableName).
 
 %------------------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-<function name="foo" type="int">
+<!--<function name="foo" type="int">
     <param type="int" name="x"/>
     <body>
         <declarations>
@@ -26,7 +26,7 @@
     </body>
 </function>
 
-<!--<function name="foo" type="int">
+<function name="foo" type="int">
     <param type="int" name="x"/>
     <param type="int" name="y"/>
     <param type="int" name="z"/>
@@ -111,7 +111,7 @@
         </return>
     </body>
 </function>
-
+-->
 <function name="eso" type="int">
     <param type="int" name="x"/>
     <body>
@@ -151,4 +151,3 @@
         </return>
     </body>
 </function>
--->
