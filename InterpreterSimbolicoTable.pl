@@ -19,12 +19,13 @@
 i:- 
 	findall((N,L),interpreterAux(N,L),V),
 	%interpreterAux(N,L),
-	%write(V), write('\n')
+	%write(V), write('\n'),
 	open('output.xml', write, Stream, []),
 
     xml_write(Stream,element(table,[],[]),[header(false)]),
     xml_write(Stream,'\n',[header(false)]),
     writeList(Stream,V),
+   	%writeList(Stream,(N,L)),
     close(Stream).
 
 interpreterAux(LabelTableNames, LabelTableValues):-
@@ -42,6 +43,7 @@ interpreterAux(LabelTableNames, LabelTableValues):-
 
 	removeEmpty(Program,GoodProgram),
 	execute([],GoodProgram,ExitTable),
+	%write(ExitTable),
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
 
 	%findall(LabelTableValues,(callLabel(LabelTableValues,0,[],Sol)),Solution),!,
@@ -101,8 +103,12 @@ step(Entry,('body',_,Body),Out) :- !,
 step(Entry,('declarations',_,Body),Out) :- !,
 	execute(Entry,Body,Out).
 
+step(Entry,('declaration',[_=int,_=Name],[(const,[value=Value],_)]),Out):- !,
+	atom_number(Value,Value1),
+	add(Entry,(int,Name,Value1),Out).
+
 step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
-	[Value] ins -3..3, 
+	[Value] ins -3..3,
 	add(Entry,(int,Name,Value),Out1),
 	execute(Out1,DecBody,Out).
 
@@ -138,17 +144,13 @@ step(Entry,_,Entry).
 step(Entry,('for',_,_),0,Entry):-!.
 
 step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),N,Out):-
-	%write('*****\n'),
-	variableAdvance(Entry,Variable,VariableName,Entry1),													
-	%write(Entry1),
-	resolveExpression(Entry,Condition,'true'),!,
-	%write('\n*****'),
+	variableAdvance(Entry,Variable,VariableName,Entry1),
+	resolveExpression(Entry1,Condition,true),!,
 	apila(Entry1,Out1),
 	execute(Out1,ForBody,Out2),
 	desapila(Out2,Out3),
 	execute(Out3,[Advance],Out4),
 	N1 is N - 1,
-	%write(N), write('\n'),
 	step(Out4,('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),N1,Out).
 
 %step(Entry,('for',_,_),_,Entry):-!.
@@ -184,7 +186,7 @@ resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 	resolveExpression(Entry,Y, Operand2),
 	work(Op, Operand1, Operand2,Result).
 
-resolveExpression(Entry,('variable',[_=OperandName],_), OperandValue):-
+resolveExpression(Entry,('variable',[_=OperandName],_),OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
 
 resolveExpression(_,('const',[_=Value],_),Result):- 
@@ -235,7 +237,8 @@ work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 variableAdvance(Entry,('declarations',_,Variable),VarName,Out):-
 	getContent(Variable,VarName), !,
 	apila(Entry, Out1),
-	execute(Out1,Variable,Out).
+	execute(Out1,Variable,Out2),
+	desapila(Out2,Out).
 
 variableAdvance(Entry,Variable,Variable,Entry).
 

@@ -1,4 +1,5 @@
-<!--<function name="foo" type="int">
+<!--
+<function name="foo" type="int">
     <param type="int" name="x"/>
     <body>
         <declarations>
