@@ -2,54 +2,31 @@
 					%    VARIABLES TABLE    %
 					%%%%%%%%%%%%%%%%%%%%%%%%%
 
-use_module(library(sgml)).
-
-% createTable, add, getTV, getVariable, getValue, update, updateTV, notInTable
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 					%--- create and remove Table ---%
-
-updateTV(TV):-
-	retractall(tv(_)),
-	assert(tv(TV)).
-
-removeTable:- retractall(tv(_)).
 
 %------------------------------------------------------------------------------------
 
 					%--- add ---%
 
-add((Type,Name,Value)):-
-	notInTable(Name),!,
-	getTV([TV|TVs]),
-	append(TV,[(Type,Name,Value)],TVupdated),
-	updateTV([TVupdated|TVs]).
+add([TV|TVs],(Type,Name,Value),[TVupdated|TVs]):-
+ 	notInTable([TV|TVs],Name),!,
+ 	append(TV,[(Type,Name,Value)],TVupdated).
 
 %------------------------------------------------------------------------------------
 
 					%--- apila / desapila ---%
 
-apila:-
-	getTV(TV),
-	updateTV([[]|TV]).
+apila(TV,[[]|TV]).
 
-desapila:-
-	getTV([_|TV]),
-	updateTV(TV).
-
-%------------------------------------------------------------------------------------
-
-					%--- getTV ---%
-
-getTV(Table):- tv(Table).
+desapila([_|TV],TV).
 
 %------------------------------------------------------------------------------------
 
 					%--- getVariable ---%
 
-getVariable(Name,Variable):-
-	getTV(TVs),
+getVariable(TVs,Name,Variable):-
 	getVariableListaDeListas(TVs,Name,Variable).
 
 getVariableListaDeListas([TV|_],Name,Variable):-
@@ -67,8 +44,7 @@ isThere([_|Rest],Name,ValueReturned):-
 
 					%--- getValue ---%
 
-getValue(Name,Value):-
-	getTV(TVs),
+getValue(TVs,Name,Value):-
 	getValueListaDeListas(TVs,Name,Value).
 
 getValueListaDeListas([TV|_],Name,Value):-
@@ -86,11 +62,8 @@ getValueLista([_|Rest], Name, Value):-
 
 					%--- update ---%
 
-update(Var):-
-	getTV(TVs),
-	updateListaDeListas(TVs,Var,[],TVupdated),
-	updateTV(TVupdated).
-
+update(TVs,Var,TVupdated):-
+	updateListaDeListas(TVs,Var,[],TVupdated).
 
 updateListaDeListas([],_,TVsAc,TVsAc).
 updateListaDeListas([TV|TVs],Var,TVsAc,Result):-
@@ -118,8 +91,7 @@ updateLista([(Type,Name1,Value)|TV],(Name2,V),TVac, TVupdated):-
 
 					%--- notInTable ---%
 
-notInTable(Variable):-
-	getTV(TVs),
+notInTable(TVs,Variable):-
 	notInTableListaDeListas(TVs,Variable).
 
 notInTableListaDeListas([TV|TVs],Variable):-
@@ -133,19 +105,17 @@ notInTableLista([(_,Name,_)|_],Name) :- !, false.
 notInTableLista([_|Rest],Name1) :-!,
 	notInTableLista(Rest,Name1).
 
+
 %------------------------------------------------------------------------------------
 
-					%--- printPant ---%
+					%--- labelList ---%
 
-printTable:-
-	getTV(TV),
-	write(TV).
-%------------------------------------------------------------------------------------
+labelList([TV],SolNames,SolValues):- !,
+ 	labelAux(TV,[],[],SolNames,SolValues).
+ 
+labelAux([],AcNames,AcValues,AcNames,AcValues):-!.
 
-labelList(Sol):-
-	getTV([[_|TV]]),
-	labelAux(TV,[],Sol).
-
-labelAux([],Ac,Ac).
-labelAux([(_,_,Value)|TV],Ac,Sol):-
-	labelAux(TV,[Value|Ac],Sol).
+labelAux([(_,Name,Value)|TV],AcNames,AcValues,SolNames,SolValues):-
+	append(AcNames,[Name],AcNames1),
+	append(AcValues,[Value],AcValues1),
+ 	labelAux(TV,AcNames1,AcValues1,SolNames,SolValues).
