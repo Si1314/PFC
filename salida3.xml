@@ -75,7 +75,7 @@
         </return>
     </body>
 </function>
-
+-->
 <function name="bucle" type="int">
     <param type="int" name="x"/>
     <param type="int" name="y"/>
@@ -112,7 +112,7 @@
         </return>
     </body>
 </function>
--->
+<!--
 <function name="eso" type="int">
     <param type="int" name="x"/>
     <body>
@@ -152,3 +152,4 @@
         </return>
     </body>
 </function>
+-->

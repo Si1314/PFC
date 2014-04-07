@@ -6,7 +6,7 @@
 :-use_module(library(clpfd)).
 :-use_module(library(sgml_write)).
 
-:- include('VariablesTableSimbolico.pl').
+:- include('VariablesTable.pl').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -312,7 +312,7 @@ callLabel(LabelTableValues,Nivel,Ac,Sol1):-
 
 writeList(_,[]):- !.
 writeList(Stream,[(N,V)|Xs]):- !,
-	writeInXML2(Stream,N,V),	% quitar el "2" para guardar bien en el XML
+	writeInXML(Stream,N,V),	% quitar el "2" para guardar bien en el XML
 	writeList(Stream,Xs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
