@@ -16,6 +16,10 @@
 
 % Carga el arbol dado por xml en 'Program'
 
+inf(-3).
+sup(3).
+maxDepth(10).
+
 interpreter(EntryFile, OutFile):- 
 	findall((N,L),interpreterAux(EntryFile,N,L),V),
 	%interpreterAux(N,L),
@@ -30,28 +34,13 @@ interpreter(EntryFile, OutFile):-
 
 interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
 	cd('../PFC'),
-
-	% Choose one to execute:
-	%load_xml_file('salida.xml', Program),
-	%load_xml_file('salida2.xml', Program),
-	%load_xml_file('salida3.xml', Program),
 	load_xml_file(EntryFile, Program),
-	%load_xml_file('plantillaExpresionesSim.xml', Program),
-	%load_xml_file('plantillaExpresiones.xml', Program),
-	%load_xml_file('plantillaIF.xml', Program),
-	%load_xml_file('plantillaWHILE.xml', Program),
-	%load_xml_file('plantillaFOR.xml', Program),
 
 	removeEmpty(Program,GoodProgram),
 	execute([],GoodProgram,ExitTable),
-	%write(ExitTable),
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
-
-	%findall(LabelTableValues,(callLabel(LabelTableValues,0,[],Sol)),Solution),!,
-	%findall(LabelTableValues,label(LabelTableValues),Solution),!,
 	once(label(LabelTableValues)).
 	%label(LabelTableValues).
-	%write(Solution), write('\n').
 
 					%%%%%%%%%%%
 					% execute %
@@ -60,12 +49,14 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
 execute(Entry,[],Entry):-!.
 
 execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out) :-!,
-	step(Entry,('while',_,[C,('body',_,B)]),5,Out1),	% Nivel = 5
+	maxDepth(N),
+	step(Entry,('while',_,[C,('body',_,B)]),N,Out1),
 	%execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out),
 	execute(Out1,RestInstructios,Out).
 
 execute(Entry,[('for',_,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
-	step(Entry,('for',_,[V,C,A,('body',_,B)]),5,Out1),	% Nivel = 5
+	maxDepth(N),
+	step(Entry,('for',_,[V,C,A,('body',_,B)]),N,Out1),
 	execute(Out1,RestInstructios,Out).
 
 execute(Entry,[Instruction|RestInstructios],Out) :-
@@ -88,8 +79,8 @@ step(Entry,('function',[_,_=ExitValue],FuncionBody),Out) :- !,
 	execute(Out1,FuncionBody,Out).
 
 step(Entry,('param',[_=int,_=ParamName],ParamBody),Out) :- !,
-	%integer(Value),
-	Value in -3..3,
+	inf(X), sup(Y),
+	Value in X..Y,
 	add(Entry,(int,ParamName,Value),Out1),
 	execute(Out1,ParamBody,Out).
 
@@ -106,14 +97,12 @@ step(Entry,('declarations',_,Body),Out) :- !,
 	execute(Entry,Body,Out).
 
 step(Entry,('declaration',[_=int,_=Name],[(const,[value=Value],_)]),Out):- !,
-	%integer(Value),
-	%number_codes(Value1,Value),
 	atom_number(Value,Value1),
 	add(Entry,(int,Name,Value1),Out).
 
 step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
-	%integer(Value),
-	Value in -3..3,
+	inf(X), sup(Y),
+	Value in X..Y,
 	add(Entry,(int,Name,Value),Out1),
 	execute(Out1,DecBody,Out).
 
@@ -128,7 +117,6 @@ step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
 % IF -> THEN
 step(Entry,('if',_,[Condition,('then',_,Then),_]),Out):-
 	resolveExpression(Entry,Condition,'true'),
-	%evaluate(Entry,Condition),
 	apila(Entry,Out1),
 	execute(Out1,Then,Out2),
 	desapila(Out2, Out).
@@ -150,14 +138,11 @@ step(Entry,('for',_,_),0,Entry):-!.
 
 step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),N,Out):-
 	variableAdvance(Entry,Variable,VariableName,Entry1),
-	write(Entry1), write('\n'),
 	resolveExpression(Entry1,Condition,true),
-	%apila(Entry1,Out1),
-	execute(Entry1,ForBody,Out2),
-	%desapila(Out2,Out3),
-	execute(Out2,[Advance],Out4),
+	execute(Entry1,ForBody,Out1),
+	execute(Out1,[Advance],Out2),
 	N1 is N - 1,
-	step(Out4,('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),N1,Out).
+	step(Out2,('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),N1,Out).
 
 step(Entry,('for',_,_),_,Entry):-!.
 
@@ -165,14 +150,12 @@ step(Entry,('for',_,_),_,Entry):-!.
 step(Entry,('while',_,_),0,Entry):-!.
 
 step(Entry,('while',_,[Condition,('body',_,WhileBody)]),N,Out):-
-	resolveExpression(Entry,Condition,true),	%apila(Entry,Out1),
-	execute(Entry,WhileBody,Out2),
-	write(Entry),write('\n'),
-	%desapila(Out2,Out3),
+	resolveExpression(Entry,Condition,true),
+	execute(Entry,WhileBody,Out1),
 	N1 is N - 1,
-	step(Out2,('while',_,[Condition,('body',_,WhileBody)]),N1,Out).
+	step(Out1,('while',_,[Condition,('body',_,WhileBody)]),N1,Out).
 
-step(Entry,('while',_,_),_,Entry):-!.		%:-resolveExpression(Entry,Condition,false),!. 
+step(Entry,('while',_,_),_,Entry):-!. 
 
 step(Entry,_,_,Entry).
 
@@ -195,11 +178,8 @@ resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 resolveExpression(Entry,('variable',[_=OperandName],_),OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
 
-resolveExpression(_,('const',[_=Value],_),Result):- 
-	%number_codes(Result,Value).
+resolveExpression(_,('const',[_=Value],_),Result):-
 	atom_number(Value,Result).
-
-%resolveExpression(_,_,0).
 
 %					-----------------
 %					---> Boolean <---
@@ -243,10 +223,7 @@ work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 
 variableAdvance(Entry,('declarations',_,Variable),VarName,Out):-
 	getContent(Variable,VarName), !,
-	write('varName: '),write(VarName),write('\n'),
-	%apila(Entry, Out1),
 	execute(Entry,Variable,Out).
-	%desapila(Out2,Out).
 
 variableAdvance(Entry,Variable,Variable,Entry).
 
@@ -289,7 +266,7 @@ writeInXML2(Stream,[],_):-!,
 writeInXML2(Stream,[N|Ns],[V|Vs]):-
     xml_write(Stream,element(variable,[name=N,value=V],[]),[header(false)]),
 	xml_write(Stream,'\n',[header(false)]),
-	writeInXML2(Stream, Ns, Vs). 
+	writeInXML2(Stream, Ns, Vs).
 
 	% Possible future useful code:
 	% xml_write(Stream,element(aap,[],[noot]),[]), 
@@ -320,14 +297,14 @@ callLabel(LabelTableValues,Nivel,Ac,Sol1):-
 
 writeList(_,[]):- !.
 writeList(Stream,[(N,V)|Xs]):- !,
-	writeInXML(Stream,N,V),	% quitar el "2" para guardar bien en el XML
+	writeInXML2(Stream,N,V),	% quitar el "2" para guardar bien en el XML
 	writeList(Stream,Xs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 getTuple(int,(int,ret,Value)):-
-	%integer(Value),
-	Value in -3..3.
+	inf(X), sup(Y),
+	Value in X..Y.
 
 getTuple(bool,(int,ret,Value)):-
 	Value in true\/false.
