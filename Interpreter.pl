@@ -34,7 +34,7 @@ interpreterAux(LabelTableNames, LabelTableValues):-
 	% Choose one to execute:
 	%load_xml_file('salida.xml', Program),
 	%load_xml_file('salida2.xml', Program),
-	load_xml_file('salida3.xml', Program),
+	load_xml_file('salida4.xml', Program),
 	%load_xml_file('plantillaExpresionesSim.xml', Program),
 	%load_xml_file('plantillaExpresiones.xml', Program),
 	%load_xml_file('plantillaIF.xml', Program),
