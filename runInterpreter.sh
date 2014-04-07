@@ -1,0 +1,1 @@
+swipl --quiet -f Interpreter.pl -g "i,halt."

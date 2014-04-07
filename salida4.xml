@@ -1,0 +1,66 @@
+<function name="deco" type="int">
+    <param type="int" name="x"/>
+    <param type="int" name="y"/>
+    <body>
+        <declarations>
+            <declaration type="int" name="r"/>
+        </declarations>
+        <if>
+            <binaryOperator type="comparison" operator=">">
+                <variable name="x"/>
+                <const value="0"/>
+            </binaryOperator>
+            <then>
+                <body>
+                    <if>
+                        <binaryOperator type="comparison" operator=">">
+                            <variable name="y"/>
+                            <const value="0"/>
+                        </binaryOperator>
+                        <then>
+                            <body>
+                                <assignment name="r">
+                                    <const value="3"/>
+                                </assignment>
+                            </body>
+                        </then>
+                        <else>
+                            <body>
+                                <assignment name="r">
+                                    <const value="2"/>
+                                </assignment>
+                            </body>
+                        </else>
+                    </if>
+                </body>
+            </then>
+            <else>
+                <body>
+                    <if>
+                        <binaryOperator type="comparison" operator=">">
+                            <variable name="y"/>
+                            <const value="0"/>
+                        </binaryOperator>
+                        <then>
+                            <body>
+                                <assignment name="r">
+                                    <const value="1"/>
+                                </assignment>
+                            </body>
+                        </then>
+                        <else>
+                            <body>
+                                <assignment name="r">
+                                    <const value="0"/>
+                                </assignment>
+                            </body>
+                        </else>
+                    </if>
+                </body>
+            </else>
+        </if>
+        <return>
+            <variable name="r"/>
+        </return>
+    </body>
+</function>
