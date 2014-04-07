@@ -16,11 +16,11 @@
 
 % Carga el arbol dado por xml en 'Program'
 
-i:- 
-	findall((N,L),interpreterAux(N,L),V),
+interpreter(EntryFile, OutFile):- 
+	findall((N,L),interpreterAux(EntryFile,N,L),V),
 	%interpreterAux(N,L),
 	%write(V), write('\n'),
-	open('output.xml', write, Stream, []),
+	open(OutFile, write, Stream, []),
 
     xml_write(Stream,element(table,[],[]),[header(false)]),
     xml_write(Stream,'\n',[header(false)]),
@@ -28,13 +28,14 @@ i:-
    	%writeList(Stream,(N,L)),
     close(Stream).
 
-interpreterAux(LabelTableNames, LabelTableValues):-
+interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
 	cd('../PFC'),
 
 	% Choose one to execute:
 	%load_xml_file('salida.xml', Program),
 	%load_xml_file('salida2.xml', Program),
-	load_xml_file('salida3.xml', Program),
+	%load_xml_file('salida3.xml', Program),
+	load_xml_file(EntryFile, Program),
 	%load_xml_file('plantillaExpresionesSim.xml', Program),
 	%load_xml_file('plantillaExpresiones.xml', Program),
 	%load_xml_file('plantillaIF.xml', Program),

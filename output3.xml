@@ -1,0 +1,261 @@
+<table/>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="2"/>
+  <variable name="y" value="2"/>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="2"/>
+  <variable name="y" value="3"/>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="x" value="3"/>
+  <variable name="y" value="3"/>
+</caso>
+<caso>
+  <variable name="ret" value="-3"/>
+  <variable name="x" value="-3"/>
+  <variable name="y" value="-3"/>
+</caso>
+<caso>
+  <variable name="ret" value="-3"/>
+  <variable name="x" value="-3"/>
+  <variable name="y" value="-2"/>
+</caso>
+<caso>
+  <variable name="ret" value="-3"/>
+  <variable name="x" value="-3"/>
+  <variable name="y" value="-1"/>
+</caso>
+<caso>
+  <variable name="ret" value="-3"/>
+  <variable name="x" value="-3"/>
+  <variable name="y" value="0"/>
+</caso>
+<caso>
+  <variable name="ret" value="-3"/>
+  <variable name="x" value="-3"/>
+  <variable name="y" value="1"/>
+</caso>
+<caso>
+  <variable name="ret" value="-3"/>
+  <variable name="x" value="-3"/>
+  <variable name="y" value="2"/>
+</caso>
+<caso>
+  <variable name="ret" value="-3"/>
+  <variable name="x" value="-3"/>
+  <variable name="y" value="3"/>
+</caso>
+<caso>
+  <variable name="ret" value="-2"/>
+  <variable name="x" value="-2"/>
+  <variable name="y" value="-3"/>
+</caso>
+<caso>
+  <variable name="ret" value="-2"/>
+  <variable name="x" value="-2"/>
+  <variable name="y" value="-2"/>
+</caso>
+<caso>
+  <variable name="ret" value="-2"/>
+  <variable name="x" value="-2"/>
+  <variable name="y" value="-1"/>
+</caso>
+<caso>
+  <variable name="ret" value="-2"/>
+  <variable name="x" value="-2"/>
+  <variable name="y" value="0"/>
+</caso>
+<caso>
+  <variable name="ret" value="-2"/>
+  <variable name="x" value="-2"/>
+  <variable name="y" value="1"/>
+</caso>
+<caso>
+  <variable name="ret" value="-2"/>
+  <variable name="x" value="-2"/>
+  <variable name="y" value="2"/>
+</caso>
+<caso>
+  <variable name="ret" value="-2"/>
+  <variable name="x" value="-2"/>
+  <variable name="y" value="3"/>
+</caso>
+<caso>
+  <variable name="ret" value="-1"/>
+  <variable name="x" value="-1"/>
+  <variable name="y" value="-3"/>
+</caso>
+<caso>
+  <variable name="ret" value="-1"/>
+  <variable name="x" value="-1"/>
+  <variable name="y" value="-2"/>
+</caso>
+<caso>
+  <variable name="ret" value="-1"/>
+  <variable name="x" value="-1"/>
+  <variable name="y" value="-1"/>
+</caso>
+<caso>
+  <variable name="ret" value="-1"/>
+  <variable name="x" value="-1"/>
+  <variable name="y" value="0"/>
+</caso>
+<caso>
+  <variable name="ret" value="-1"/>
+  <variable name="x" value="-1"/>
+  <variable name="y" value="1"/>
+</caso>
+<caso>
+  <variable name="ret" value="-1"/>
+  <variable name="x" value="-1"/>
+  <variable name="y" value="2"/>
+</caso>
+<caso>
+  <variable name="ret" value="-1"/>
+  <variable name="x" value="-1"/>
+  <variable name="y" value="3"/>
+</caso>
+<caso>
+  <variable name="ret" value="0"/>
+  <variable name="x" value="0"/>
+  <variable name="y" value="-3"/>
+</caso>
+<caso>
+  <variable name="ret" value="0"/>
+  <variable name="x" value="0"/>
+  <variable name="y" value="-2"/>
+</caso>
+<caso>
+  <variable name="ret" value="0"/>
+  <variable name="x" value="0"/>
+  <variable name="y" value="-1"/>
+</caso>
+<caso>
+  <variable name="ret" value="0"/>
+  <variable name="x" value="0"/>
+  <variable name="y" value="0"/>
+</caso>
+<caso>
+  <variable name="ret" value="0"/>
+  <variable name="x" value="0"/>
+  <variable name="y" value="1"/>
+</caso>
+<caso>
+  <variable name="ret" value="0"/>
+  <variable name="x" value="0"/>
+  <variable name="y" value="2"/>
+</caso>
+<caso>
+  <variable name="ret" value="0"/>
+  <variable name="x" value="0"/>
+  <variable name="y" value="3"/>
+</caso>
+<caso>
+  <variable name="ret" value="1"/>
+  <variable name="x" value="1"/>
+  <variable name="y" value="-3"/>
+</caso>
+<caso>
+  <variable name="ret" value="1"/>
+  <variable name="x" value="1"/>
+  <variable name="y" value="-2"/>
+</caso>
+<caso>
+  <variable name="ret" value="1"/>
+  <variable name="x" value="1"/>
+  <variable name="y" value="-1"/>
+</caso>
+<caso>
+  <variable name="ret" value="1"/>
+  <variable name="x" value="1"/>
+  <variable name="y" value="0"/>
+</caso>
+<caso>
+  <variable name="ret" value="1"/>
+  <variable name="x" value="1"/>
+  <variable name="y" value="1"/>
+</caso>
+<caso>
+  <variable name="ret" value="1"/>
+  <variable name="x" value="1"/>
+  <variable name="y" value="2"/>
+</caso>
+<caso>
+  <variable name="ret" value="1"/>
+  <variable name="x" value="1"/>
+  <variable name="y" value="3"/>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="2"/>
+  <variable name="y" value="-3"/>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="2"/>
+  <variable name="y" value="-2"/>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="2"/>
+  <variable name="y" value="-1"/>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="2"/>
+  <variable name="y" value="0"/>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="2"/>
+  <variable name="y" value="1"/>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="2"/>
+  <variable name="y" value="2"/>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="2"/>
+  <variable name="y" value="3"/>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="x" value="3"/>
+  <variable name="y" value="-3"/>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="x" value="3"/>
+  <variable name="y" value="-2"/>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="x" value="3"/>
+  <variable name="y" value="-1"/>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="x" value="3"/>
+  <variable name="y" value="0"/>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="x" value="3"/>
+  <variable name="y" value="1"/>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="x" value="3"/>
+  <variable name="y" value="2"/>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="x" value="3"/>
+  <variable name="y" value="3"/>
+</caso>
