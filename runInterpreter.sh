@@ -1,1 +1,1 @@
-swipl --quiet -f Interpreter.pl -g "i,halt."
+swipl --quiet -f Interpreter.pl -g $1 -t halt.

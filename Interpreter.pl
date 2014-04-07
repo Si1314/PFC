@@ -34,12 +34,8 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
 	% Choose one to execute:
 	%load_xml_file('salida.xml', Program),
 	%load_xml_file('salida2.xml', Program),
-<<<<<<< HEAD
-	load_xml_file('salida4.xml', Program),
-=======
 	%load_xml_file('salida3.xml', Program),
 	load_xml_file(EntryFile, Program),
->>>>>>> fb45850d0f3880e6c9afef287989fabbbc062b56
 	%load_xml_file('plantillaExpresionesSim.xml', Program),
 	%load_xml_file('plantillaExpresiones.xml', Program),
 	%load_xml_file('plantillaIF.xml', Program),
@@ -53,8 +49,8 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
 
 	%findall(LabelTableValues,(callLabel(LabelTableValues,0,[],Sol)),Solution),!,
 	%findall(LabelTableValues,label(LabelTableValues),Solution),!,
-	%once(label(LabelTableValues)).
-	label(LabelTableValues).
+	once(label(LabelTableValues)).
+	%label(LabelTableValues).
 	%write(Solution), write('\n').
 
 					%%%%%%%%%%%
@@ -92,7 +88,8 @@ step(Entry,('function',[_,_=ExitValue],FuncionBody),Out) :- !,
 	execute(Out1,FuncionBody,Out).
 
 step(Entry,('param',[_=int,_=ParamName],ParamBody),Out) :- !,
-	[Value] ins -3..3,
+	%integer(Value),
+	Value in -3..3,
 	add(Entry,(int,ParamName,Value),Out1),
 	execute(Out1,ParamBody,Out).
 
@@ -109,11 +106,14 @@ step(Entry,('declarations',_,Body),Out) :- !,
 	execute(Entry,Body,Out).
 
 step(Entry,('declaration',[_=int,_=Name],[(const,[value=Value],_)]),Out):- !,
+	%integer(Value),
+	%number_codes(Value1,Value),
 	atom_number(Value,Value1),
 	add(Entry,(int,Name,Value1),Out).
 
 step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
-	[Value] ins -3..3,
+	%integer(Value),
+	Value in -3..3,
 	add(Entry,(int,Name,Value),Out1),
 	execute(Out1,DecBody,Out).
 
@@ -164,14 +164,14 @@ step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),N,Out):-
 step(Entry,('while',_,_),0,Entry):-!.
 
 step(Entry,('while',_,[Condition,('body',_,WhileBody)]),N,Out):-
-	resolveExpression(Entry,Condition,true), !,
-	apila(Entry,Out1),
-	execute(Out1,WhileBody,Out2),
-	desapila(Out2,Out3),
+	resolveExpression(Entry,Condition,true),	%apila(Entry,Out1),
+	execute(Entry,WhileBody,Out2),
+	write(Entry),write('\n'),
+	%desapila(Out2,Out3),
 	N1 is N - 1,
-	step(Out3,('while',_,[Condition,('body',_,WhileBody)]),N1,Out).
+	step(Out2,('while',_,[Condition,('body',_,WhileBody)]),N1,Out).
 
-%step(Entry,('while',_,_),_,Entry):-!.%:-resolveExpression(Entry,Condition,false),!.
+step(Entry,('while',_,_),_,Entry):-!.		%:-resolveExpression(Entry,Condition,false),!. 
 
 step(Entry,_,_,Entry).
 
@@ -195,6 +195,7 @@ resolveExpression(Entry,('variable',[_=OperandName],_),OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
 
 resolveExpression(_,('const',[_=Value],_),Result):- 
+	%number_codes(Result,Value).
 	atom_number(Value,Result).
 
 %resolveExpression(_,_,0).
@@ -323,6 +324,7 @@ writeList(Stream,[(N,V)|Xs]):- !,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 getTuple(int,(int,ret,Value)):-
+	%integer(Value),
 	Value in -3..3.
 
 getTuple(bool,(int,ret,Value)):-
