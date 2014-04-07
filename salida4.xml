@@ -2,11 +2,10 @@
     <param type="int" name="x"/>
     <body>
         <declarations>
-            <declaration type="int" name="w"/>
+            <declaration type="int" name="w">
+                <const value="1"/>
+            </declaration>
         </declarations>
-        <assignment name="w">
-            <const value="1"/>
-        </assignment>
         <for>
             <declarations>
                 <declaration type="int" name="i">
