@@ -13,10 +13,12 @@
                     <const value="0"/>
                 </declaration>
             </declarations>
+            
             <binaryOperator type="comparison" operator="<">
                 <variable name="i"/>
                 <variable name="x"/>
             </binaryOperator>
+
             <assignment name="i">
                 <binaryOperator type="arithmetic" operator="+">
                     <variable name="i"/>
