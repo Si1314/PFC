@@ -150,15 +150,16 @@ step(Entry,('for',_,_),0,Entry):-!.
 
 step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),N,Out):-
 	variableAdvance(Entry,Variable,VariableName,Entry1),
-	resolveExpression(Entry1,Condition,true),!,
-	apila(Entry1,Out1),
-	execute(Out1,ForBody,Out2),
-	desapila(Out2,Out3),
-	execute(Out3,[Advance],Out4),
+	write(Entry1), write('\n'),
+	resolveExpression(Entry1,Condition,true),
+	%apila(Entry1,Out1),
+	execute(Entry1,ForBody,Out2),
+	%desapila(Out2,Out3),
+	execute(Out2,[Advance],Out4),
 	N1 is N - 1,
 	step(Out4,('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),N1,Out).
 
-%step(Entry,('for',_,_),_,Entry):-!.
+step(Entry,('for',_,_),_,Entry):-!.
 
 % WHILE
 step(Entry,('while',_,_),0,Entry):-!.
@@ -242,9 +243,10 @@ work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 
 variableAdvance(Entry,('declarations',_,Variable),VarName,Out):-
 	getContent(Variable,VarName), !,
-	apila(Entry, Out1),
-	execute(Out1,Variable,Out2),
-	desapila(Out2,Out).
+	write('varName: '),write(VarName),write('\n'),
+	%apila(Entry, Out1),
+	execute(Entry,Variable,Out).
+	%desapila(Out2,Out).
 
 variableAdvance(Entry,Variable,Variable,Entry).
 

@@ -1,52 +1,39 @@
-<function name="bucle" type="int">
+<function name="antes" type="int">
     <param type="int" name="x"/>
-    <param type="int" name="y"/>
     <body>
         <declarations>
             <declaration type="int" name="w"/>
-            <declaration type="int" name="z"/>
         </declarations>
         <assignment name="w">
-            <variable name="y"/>
+            <const value="1"/>
         </assignment>
-        <assignment name="z">
-            <const value="0"/>
-        </assignment>
-        <if>
-            <binaryOperator type="comparison" operator=">">
+        <for>
+            <declarations>
+                <declaration type="int" name="i">
+                    <const value="0"/>
+                </declaration>
+            </declarations>
+            <binaryOperator type="comparison" operator="<">
+                <variable name="i"/>
                 <variable name="x"/>
-                <const value="1"/>
             </binaryOperator>
-            <then>
-                <body>
-                    <while>
-                        <binaryOperator type="comparison" operator=">">
-                            <variable name="w"/>
-                            <const value="0"/>
-                        </binaryOperator>
-                        <body>
-                            <assignment name="z">
-                                <binaryOperator type="arithmetic" operator="+">
-                                    <variable name="z"/>
-                                    <variable name="x"/>
-                                </binaryOperator>
-                            </assignment>
-                            <assignment name="w">
-                                <binaryOperator type="arithmetic" operator="-">
-                                    <variable name="w"/>
-                                    <const value="1"/>
-                                </binaryOperator>
-                            </assignment>
-                        </body>
-                    </while>
-                </body>
-            </then>
-            <else>
-                <body/>
-            </else>
-        </if>
+            <assignment name="i">
+                <binaryOperator type="arithmetic" operator="+">
+                    <variable name="i"/>
+                    <const value="1"/>
+                </binaryOperator>
+            </assignment>
+            <body>
+                <assignment name="w">
+                    <binaryOperator type="arithmetic" operator="*">
+                        <const value="2"/>
+                        <variable name="w"/>
+                    </binaryOperator>
+                </assignment>
+            </body>
+        </for>
         <return>
-            <variable name="z"/>
+            <variable name="w"/>
         </return>
     </body>
 </function>
