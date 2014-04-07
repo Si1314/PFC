@@ -127,6 +127,8 @@ step(Entry,('if',_,[_,_,('else',_,Else)]),Out):- !,
 	execute(Out1,Else,Out2),
 	desapila(Out2, Out).
 
+step(Entry,('if',_,_),Out):- !.
+
 step(Entry,('return',_,[Body]),Out):-!,
 	resolveExpression(Entry,Body,Result),
 	update(Entry,(ret,Result),Out).
