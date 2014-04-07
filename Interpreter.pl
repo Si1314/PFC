@@ -205,6 +205,10 @@ work('==', _,_,false).
 work('!=', Op1,Op2,true):- Op1 #\= Op2.
 work('!=', _,_,false).
 
+work('&amp;&amp;', Op1,Op2,true):- Op1 #/\ Op2.
+work('&amp;&amp;', _,_,false).
+
+
 %					--------------------
 %					---> arithmetic <---		
 %					--------------------
