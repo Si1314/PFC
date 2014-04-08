@@ -185,19 +185,19 @@ resolveExpression(_,('const',[_=Value],_),Result):-
 
 %					-----------------
 %					---> Boolean <---
-%					-----------------
+%					---------
 
-work('&lt;=', Op1,Op2, true):- Op1 #=< Op2.
-work('&lt;=', _,_,false).
+work('<', Op1,Op2,true):- Op1 #< Op2.
+work('<', _,_,false).
 
-work('&lt;', Op1,Op2,true):- Op1 #< Op2.
-work('&lt;', _,_,false).
+work('<=', Op1,Op2, true):- Op1 #=< Op2.
+work('<=', _,_,false).
 
-work('&gt;=', Op1,Op2,true):- Op1 #>= Op2.
-work('&gt;=', _,_,false).
+work('>=', Op1,Op2,true):- Op1 #>= Op2.
+work('>=', _,_,false).
 
-work('&gt;', Op1,Op2,true):- Op1 #> Op2.
-work('&gt;', _,_,false).
+work('>;', Op1,Op2,true):- Op1 #> Op2.
+work('>;', _,_,false).
 
 work('==', Op1,Op2,true):- Op1 #= Op2.
 work('==', _,_,false).
@@ -205,8 +205,8 @@ work('==', _,_,false).
 work('!=', Op1,Op2,true):- Op1 #\= Op2.
 work('!=', _,_,false).
 
-work('&amp;&amp;', Op1,Op2,true):- Op1 #/\ Op2.
-work('&amp;&amp;', _,_,false).
+work('&&', Op1,Op2,true):- Op1 #/\ Op2.
+work('&&', _,_,false).
 
 
 %					--------------------

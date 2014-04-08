@@ -13,7 +13,7 @@
                 </declaration>
             </declarations>
             
-            <binaryOperator type="comparison" operator="<">
+            <binaryOperator type="comparison" operator="&lt;">
                 <variable name="i"/>
                 <variable name="x"/>
             </binaryOperator>
