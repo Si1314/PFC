@@ -33,7 +33,7 @@ interpreter(EntryFile, OutFile):-
     close(Stream).
 
 interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
-	cd('../PFC'),
+	%cd('../PFC'),
 	load_xml_file(EntryFile, Program),
 
 	removeEmpty(Program,GoodProgram),
@@ -132,9 +132,7 @@ step(Entry,('if',_,_),Entry):- !.
 step(Entry,('return',_,[Body]),Out):-!,
 	resolveExpression(Entry,Body,Result),
 	update(Entry,(ret,Result),Out).
-
-step(Entry,_,Entry).
-
+	
 % FOR
 step(Entry,('for',_,_),0,Entry):-!.
 
@@ -196,8 +194,8 @@ work('<=', _,_,false).
 work('>=', Op1,Op2,true):- Op1 #>= Op2.
 work('>=', _,_,false).
 
-work('>;', Op1,Op2,true):- Op1 #> Op2.
-work('>;', _,_,false).
+work('>', Op1,Op2,true):- Op1 #> Op2.
+work('>', _,_,false).
 
 work('==', Op1,Op2,true):- Op1 #= Op2.
 work('==', _,_,false).
