@@ -5,7 +5,8 @@ Cosas para hacer
 
  - Hacer una copia interna en el intérprete de los parámetros de entrada para guardarlo y poder sacarlo por pantalla. Ejemplo:
 
-	`void main(int x, int y){
+	`
+	void main(int x, int y){
 
 	 	/* Copia parámetro */
 
@@ -18,7 +19,8 @@ Cosas para hacer
 
 	 	/* Cuerpo método */
 
-	 }`
+	}
+	`
 
  - El usuario tiene que poder elegir el dominio de los números: `inf y sup`
 
@@ -27,25 +29,15 @@ Cosas para hacer
  - Leer todas las formas de implementar el for, formas:
 
  	´
- 	**1.**
+ 	**1.** 	for(int i = 0; i < n; i++){...}
 
- 	for(int i = 0; i < n; i++){...}
+ 	**2.** 	for(int i = 0, j = 0; i < n, j < m; i++, j++){...}
 
- 	**2.**
+ 	**3.** 	for(int i = 0; int j < m, i < n; i++){...}
 
- 	for(int i = 0, j = 0; i < n, j < m; i++, j++){...}
+ 	**4.** 	for(int i = 0; (i < n)&&(i > m); i++){...}
 
- 	**3.**
-
- 	for(int i = 0; int j < m, i < n; i++){...}
-
- 	**4.**
-
- 	for(int i = 0; (i < n)&&(i > m); i++){...}
-
- 	**5.**
-
- 	for(; i < n; i++){...}
+ 	**5.** 	for(; i < n; i++){...}
 
  	**...**´
 
@@ -55,9 +47,7 @@ Cosas para hacer
 
  - Errores RunTimer como:
 
-  	**1.**
-  	
-  	`División por 0`
+  	**1.**	`División por 0`
 
   	**...**
 
