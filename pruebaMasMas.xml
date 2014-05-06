@@ -1,8 +1,9 @@
-<function name="deco2" type="int">
+<function name="main" type="int">
     <param type="int" name="a"/>
     <body>
         <declarations>
             <declaration type="int" name="z">
+                
                 <const value="10"/>
             </declaration>
         </declarations>
@@ -33,6 +34,11 @@
     </body>
 </function>
 
+<function name="foo" type="int">
+    <param type="int" name="a"/>
+    <body>
+    </body>
+</function>
 
 <!--
 	void deco2(int a){

@@ -89,6 +89,20 @@ updateLista([(Type,Name1,Value)|TV],(Name2,V),TVac, TVupdated):-
 
 %------------------------------------------------------------------------------------
 
+					%--- updateNames ---%
+
+updateNames([X|Xs],Ys,Out):-
+	updateNamesAux(X,Ys,[],Out1),
+	append([Out1],Xs,Out).
+
+updateNamesAux([],_,Ac,Ac):-!.
+updateNamesAux(_,[],Ac,Ac):-!.
+updateNamesAux([(Type,_,Value)|Xs],[Name2|Ys],Ac,Out):-
+	append(Ac,[(Type,Name2,Value)],Ac1),
+	updateNamesAux(Xs,Ys,Ac1,Out).
+
+%------------------------------------------------------------------------------------
+
 					%--- notInTable ---%
 
 notInTable(TVs,Variable):-
@@ -114,7 +128,6 @@ labelList([TV],SolNames,SolValues):- !,
  	labelAux(TV,[],[],SolNames,SolValues).
  
 labelAux([],AcNames,AcValues,AcNames,AcValues):-!.
-
 labelAux([(_,Name,Value)|TV],AcNames,AcValues,SolNames,SolValues):-
 	append(AcNames,[Name],AcNames1),
 	append(AcValues,[Value],AcValues1),

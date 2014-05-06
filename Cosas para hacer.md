@@ -1,4 +1,4 @@
-Cosas para hacer
+Cosas para hacer/hechas
 ===
 
 ##Lista de cosas para ir haciendo ya:
@@ -62,3 +62,8 @@ Cosas para hacer
  - Ver/Pensar cómo poner un árbol
 
  - Intérprete: Devuelva la traza del camino explorado, pinchando por ejemplo en un resultado.
+
+
+##Cosas hechas
+ - Ahora se puede poner `++ / --` y `+= / -=`
+ 

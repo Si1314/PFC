@@ -37,6 +37,8 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
 	load_xml_file(EntryFile, Program),
 
 	removeEmpty(Program,GoodProgram),
+	retractall(program(_)),
+	assert(program(GoodProgram)),
 	execute([],GoodProgram,ExitTable),
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
 	once(label(LabelTableValues)).
@@ -92,6 +94,10 @@ step(Entry,('body',_,Body),Out) :- !,
 	apila(Entry, Out1),
 	execute(Out1,Body,Out2),
 	desapila(Out2, Out).
+
+step(Entry,('bodyyyy',[_,_=void],FuncionBody),Out) :- !,
+	apila(Entry,Entry1),
+	execute(Entry1,FuncionBody,Out).
 
 step(Entry,('declarations',_,Body),Out) :- !,
 	execute(Entry,Body,Out).
@@ -180,13 +186,10 @@ resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 	getContent(Operator,Op),
 	resolveExpression(Entry,X, Operand1),
 	resolveExpression(Entry,Y, Operand2),
-	write('binaryOperator -> '), write(Operand1), write(' '), write(Operand2), write('\n'),
 	work(Op, Operand1, Operand2,Result).
 
 resolveExpression(Entry,('unaryOperator',[name=Name,Operator],_),Result):-
-	write('Name Unary Operator -> '), write(Operator), write('\n'),
-	resolveExpression(Entry,('binaryOperator',[Operator],[('variable',[_=Name],[]),('constValue',1,[])]),Result),
-	write('\nDespues de unary operator\n').
+	resolveExpression(Entry,('binaryOperator',[Operator],[('variable',[_=Name],[]),('constValue',1,[])]),Result).
 
 resolveExpression(Entry,('variable',[_=OperandName],_),OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
@@ -196,11 +199,19 @@ resolveExpression(_,('constValue',Value,_),Value).
 resolveExpression(_,('const',[_=Value],_),Result):-
 	atom_number(Value,Result).
 
+resolveExpression(Entry,('callFunction',[name=Name, type=Type],Params),Out):-!,
+	addListParams(Entry,Params,Out1),
+	program(Program),
+	lookForFunction(Program,Name,Type,Function),
+	createListParams(Function,Body,ListParams),
+	updateNames(Out1,ListParams,Out2),
+	execute(Out2,Body,Out3),
+	desapila(Out3,Out).
 
 
 %					-----------------
 %					---> Boolean <---
-%					---------
+%					-----------------
 
 work('<', Op1,Op2,true):- Op1 #< Op2.
 work('<', _,_,false).
@@ -228,8 +239,8 @@ work('&&', _,_,false).
 %					---> arithmetic <---		
 %					--------------------
 
-work('+', Op1,Op2,Z):- !, Z #= Op1 + Op2, write('\nSuma\n').
-work('-', Op1,Op2,Z):- !, Z #= Op1 - Op2, write('\nResta\n').
+work('+', Op1,Op2,Z):- !, Z #= Op1 + Op2.
+work('-', Op1,Op2,Z):- !, Z #= Op1 - Op2.
 work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -330,3 +341,30 @@ getTuple(int,(int,ret,Value)):-
 
 getTuple(bool,(int,ret,Value)):-
 	Value in true\/false.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+lookForFunction([],_,[]):-!.
+
+lookForFunction([(_,[name=Name,type=Type],Body)|_],Name,Type,Body):- !.
+
+lookForFunction([_|Xs],Name1,Type,Result):-
+	lookForFunction(Xs,Name1,Type,Result).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+addListParams(Entry,[],Entry):-!.
+addListParams(Entry,[(param,[name=Name,type=Type],_)|Xs],Out):-
+	add(Entry,(Type,Name,_),Out1),
+	addListParams(Out1,Xs,Out).
+
+createListParams(Xs,Body,ListParams):-
+	createListParamsAux(Xs,[],Body,ListParams).
+
+createListParamsAux([],Ac,[],Ac):-!.
+createListParamsAux([(body,_,Body)],Ac,Body,Ac):-!.
+createListParamsAux([(param,[_,name=Name],_)|Xs],Ac,Body,ListParams):-
+	append(Ac,[Name],Ac1),
+	createListParamsAux(Xs,Ac1,Body,ListParams).
+
+

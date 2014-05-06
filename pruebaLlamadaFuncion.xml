@@ -1,0 +1,36 @@
+<function name="main" type="int">
+    <param type="int" name="a"/>
+    <param type="int" name="b"/>
+    <body>
+        <assignment name="z">
+            <callFunction name="foo" type="int">
+                <param name="a" type="int"/>
+                <param name="b" type="int"/>
+            </callFunction>
+        </assignment>
+
+        <assigmentOperator name="z">
+            <unaryOperator name="z" operator="-"/>
+        </assigmentOperator>
+
+        <return>
+            <variable name="z"/>
+        </return>
+    </body>
+</function>
+
+
+<function name="foo" type="int">
+    <param type="int" name="aa"/>
+    <param type="int" name="bb"/>
+    <body>
+    </body>
+</function>
+
+
+<!--
+	void deco2(int a, int b){
+		int z = suma(a,b);
+    	z++;
+    	return z;
+-->
