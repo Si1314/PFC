@@ -115,7 +115,7 @@ step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
 	update(Entry,(Name,Value),Out).
 
 step(Entry,('assigmentOperator',[_=Name],[AssigBody]),Out) :- !,
-	resolveExpression(Entry,Name,AssigBody,Value),
+	resolveExpression(Entry,AssigBody,Value),
 	update(Entry,(Name,Value),Out).
 
 % IF -> THEN
@@ -180,13 +180,21 @@ resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 	getContent(Operator,Op),
 	resolveExpression(Entry,X, Operand1),
 	resolveExpression(Entry,Y, Operand2),
+	write('binaryOperator -> '), write(Operand1), write(' '), write(Operand2), write('\n'),
 	work(Op, Operand1, Operand2,Result).
+
+resolveExpression(Entry,('unaryOperator',[name=Name,Operator],_),Result):-
+	write('Name Unary Operator -> '), write(Operator), write('\n'),
+	resolveExpression(Entry,('binaryOperator',Operator,[('variable',[_=Name],[]),('const',[_=1],[])]),Result),
+	write('\nDespues de unary operator\n').
 
 resolveExpression(Entry,('variable',[_=OperandName],_),OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
 
 resolveExpression(_,('const',[_=Value],_),Result):-
-	atom_number(Value,Result).
+	write('Valor antes: '), write(Value), write('\n'),
+	atom_number(Value,Result),
+	write('Valor despues: '), write(Result), write('\n').
 
 %					-----------------
 %					---> Boolean <---
@@ -201,7 +209,7 @@ work('<=', _,_,false).
 work('>=', Op1,Op2,true):- Op1 #>= Op2.
 work('>=', _,_,false).
 
-work('>', Op1,Op2,true):- Op1 #> Op2, write('Nos metemos por >').
+work('>', Op1,Op2,true):- Op1 #> Op2.
 work('>', _,_,false).
 
 work('==', Op1,Op2,true):- Op1 #= Op2.
@@ -243,6 +251,7 @@ variableAdvance(Entry,Variable,Variable,Entry).
 
 					%--- getContent ---%
 
+getContent([_= (Op)], Op):- !.
 getContent([_,_= (Op)], Op):- !.
 getContent((_,[_=Name],_), Name):- !.
 getContent([('declaration',[_,name=VariableName],_)],VariableName).
