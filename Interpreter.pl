@@ -12,7 +12,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % First you have to keep this file in a folder called "PFC"
-% Then open swi Prolog and write "interpreter." to taste it
+% Then open swi Prolog and write "interpreter." to test it
 
 % Carga el arbol dado por xml en 'Program'
 
@@ -22,7 +22,7 @@ maxDepth(10).
 
 interpreter(EntryFile, OutFile):- 
 	findall((N,L),interpreterAux(EntryFile,N,L),V),
-	%interpreterAux(N,L),
+	%interpreterAux(EntryFile, N,L),
 	%write(V), write('\n'),
 	open(OutFile, write, Stream, []),
 
@@ -114,6 +114,10 @@ step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
 	resolveExpression(Entry,AssigBody,Value),
 	update(Entry,(Name,Value),Out).
 
+step(Entry,('assigmentOperator',[_=Name],[AssigBody]),Out) :- !,
+	resolveExpression(Entry,Name,AssigBody,Value),
+	update(Entry,(Name,Value),Out).
+
 % IF -> THEN
 step(Entry,('if',_,[Condition,('then',_,Then),_]),Out):-
 	resolveExpression(Entry,Condition,'true'),
@@ -169,6 +173,9 @@ step(Entry,_,_,Entry).
 
 					%--- resolveExpression ---%
 
+resolveExpression(Entry,Name,('binaryOperator',Operator,[Y]),Result):-
+	resolveExpression(Entry,('binaryOperator',Operator,[('variable',[_=Name],[]),Y]),Result).
+
 resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 	getContent(Operator,Op),
 	resolveExpression(Entry,X, Operand1),
@@ -194,7 +201,7 @@ work('<=', _,_,false).
 work('>=', Op1,Op2,true):- Op1 #>= Op2.
 work('>=', _,_,false).
 
-work('>', Op1,Op2,true):- Op1 #> Op2.
+work('>', Op1,Op2,true):- Op1 #> Op2, write('Nos metemos por >').
 work('>', _,_,false).
 
 work('==', Op1,Op2,true):- Op1 #= Op2.
@@ -211,8 +218,8 @@ work('&&', _,_,false).
 %					---> arithmetic <---		
 %					--------------------
 
-work('+', Op1,Op2,Z):- !, Z #= Op1 + Op2.
-work('-', Op1,Op2,Z):- !, Z #= Op1 - Op2.
+work('+', Op1,Op2,Z):- !, Z #= Op1 + Op2, write('\nSuma\n').
+work('-', Op1,Op2,Z):- !, Z #= Op1 - Op2, write('\nResta\n').
 work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

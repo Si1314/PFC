@@ -1,0 +1,52 @@
+<function name="deco2" type="int">
+    <param type="int" name="a"/>
+    <body>
+        <declarations>
+            <declaration type="int" name="z">
+                <const value="0"/>
+            </declaration>
+        </declarations>
+        <if>
+            <binaryOperator type="bool" operator="&gt;">
+                <variable name="a"/>
+                <const value="0"/>
+            </binaryOperator>
+            <then>
+                <body>
+	                <assigmentOperator name='z'>
+					    <binaryOperator type="arithmetic" operator="+">
+	                        <const value="3"/>
+	                    </binaryOperator>
+					</assigmentOperator>
+                </body>
+            </then>
+            <else>
+                <body>
+                	<assigmentOperator name='z'>
+					    <binaryOperator type="arithmetic" operator="+">
+	                        <const value="4"/>
+	                    </binaryOperator>
+					</assigmentOperator>
+                </body>
+            </else>
+        </if>
+        
+        <return>
+            <variable name="z"/>
+        </return>
+
+    </body>
+</function>
+
+<!--
+
+void deco2(int a){
+    int z = 0;
+    if(a > 0){
+        z = z + 3;
+    }else{ 
+        z = z + 4;
+    }
+    a = z;
+}
+-->
