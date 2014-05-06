@@ -118,7 +118,9 @@ step(Entry,('declaration',[_=Type,_=Name],DecBody),Out):- !,
 
 step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
 	resolveExpression(Entry,AssigBody,Value),
-	update(Entry,(Name,Value),Out).
+	update(Entry,(Name,Value),Out),
+	write('\nActualizar: (Name,Value)\n( '), write(Name), write(' , '),write(Value), write(' )'),
+	write('\nEntry:\n'), write(Entry), write('\nOut:\n'), write(Out).
 
 step(Entry,('assigmentOperator',[_=Name],[AssigBody]),Out) :- !,
 	resolveExpression(Entry,AssigBody,Value),
@@ -141,7 +143,10 @@ step(Entry,('if',_,_),Entry):- !.
 
 step(Entry,('return',_,[Body]),Out):-!,
 	resolveExpression(Entry,Body,Result),
-	update(Entry,(ret,Result),Out).
+	getTuple(Tuple),
+	add(Entry,Tuple,Out1),
+	update(Out1,(ret,Result),Out).
+	%write('\nEntry:\n'), write(Out1), write('\nOut:\n'), write(Out).
 	
 % FOR
 step(Entry,('for',_,_),0,Entry):-!.
@@ -199,14 +204,14 @@ resolveExpression(_,('constValue',Value,_),Value).
 resolveExpression(_,('const',[_=Value],_),Result):-
 	atom_number(Value,Result).
 
-resolveExpression(Entry,('callFunction',[name=Name, type=Type],Params),Out):-!,
+resolveExpression(Entry,('callFunction',[name=Name, type=Type],Params),ValueReturned):-!,
 	addListParams(Entry,Params,Out1),
 	program(Program),
 	lookForFunction(Program,Name,Type,Function),
 	createListParams(Function,Body,ListParams),
 	updateNames(Out1,ListParams,Out2),
 	execute(Out2,Body,Out3),
-	desapila(Out3,Out).
+	returnesValue(Out3,ValueReturned).
 
 
 %					-----------------
@@ -335,6 +340,10 @@ writeList(Stream,[(N,V)|Xs]):- !,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+getTuple((int,ret,Value)):-	% TODO
+	inf(X), sup(Y),
+	Value in X..Y.
+
 getTuple(int,(int,ret,Value)):-
 	inf(X), sup(Y),
 	Value in X..Y.
@@ -358,6 +367,8 @@ addListParams(Entry,[(param,[name=Name,type=Type],_)|Xs],Out):-
 	add(Entry,(Type,Name,_),Out1),
 	addListParams(Out1,Xs,Out).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 createListParams(Xs,Body,ListParams):-
 	createListParamsAux(Xs,[],Body,ListParams).
 
@@ -367,4 +378,12 @@ createListParamsAux([(param,[_,name=Name],_)|Xs],Ac,Body,ListParams):-
 	append(Ac,[Name],Ac1),
 	createListParamsAux(Xs,Ac1,Body,ListParams).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+returnesValue([X|_],ValueReturned):-
+	returnesValueAux(X,ValueReturned).
+
+returnesValueAux([],[]):-!.
+returnesValueAux([(_,ret,Value)|_],Value):-!.
+returnesValueAux([_|Xs],Return):-
+	returnesValueAux(Xs,Return).

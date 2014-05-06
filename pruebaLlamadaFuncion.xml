@@ -2,6 +2,8 @@
     <param type="int" name="a"/>
     <param type="int" name="b"/>
     <body>
+        <declaration type="int" name="z"/>
+        <declaration type="int" name="h"/>
         <assignment name="z">
             <callFunction name="foo" type="int">
                 <param name="a" type="int"/>
@@ -24,6 +26,16 @@
     <param type="int" name="aa"/>
     <param type="int" name="bb"/>
     <body>
+        <declaration type="int" name="zz"/>
+        <assignment name="zz">
+            <binaryOperator type="arithmetic" operator="+">
+                <variable name="aa"/>
+                <variable name="bb"/>
+            </binaryOperator>
+        </assignment>
+        <return>
+            <variable name="zz"/>
+        </return>
     </body>
 </function>
 
