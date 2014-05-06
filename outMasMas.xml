@@ -1,1 +1,7 @@
 <table/>
+<variable name="ret" value="11"/>
+<variable name="a" value="1"/>
+<table/>
+<variable name="ret" value="9"/>
+<variable name="a" value="-3"/>
+<table/>

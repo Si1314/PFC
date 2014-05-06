@@ -3,7 +3,7 @@
     <body>
         <declarations>
             <declaration type="int" name="z">
-                <const value="0"/>
+                <const value="10"/>
             </declaration>
         </declarations>
         <if>
@@ -42,5 +42,5 @@
     	}else{
     		z - -;
     	}
-    	a = z;
+    	return z;
 -->

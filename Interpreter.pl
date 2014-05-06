@@ -185,16 +185,18 @@ resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 
 resolveExpression(Entry,('unaryOperator',[name=Name,Operator],_),Result):-
 	write('Name Unary Operator -> '), write(Operator), write('\n'),
-	resolveExpression(Entry,('binaryOperator',Operator,[('variable',[_=Name],[]),('const',[_=1],[])]),Result),
+	resolveExpression(Entry,('binaryOperator',[Operator],[('variable',[_=Name],[]),('constValue',1,[])]),Result),
 	write('\nDespues de unary operator\n').
 
 resolveExpression(Entry,('variable',[_=OperandName],_),OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
 
+resolveExpression(_,('constValue',Value,_),Value).
+
 resolveExpression(_,('const',[_=Value],_),Result):-
-	write('Valor antes: '), write(Value), write('\n'),
-	atom_number(Value,Result),
-	write('Valor despues: '), write(Result), write('\n').
+	atom_number(Value,Result).
+
+
 
 %					-----------------
 %					---> Boolean <---
