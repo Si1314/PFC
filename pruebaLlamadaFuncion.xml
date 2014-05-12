@@ -11,8 +11,12 @@
             </callFunction>
         </assignment>
 
+        <assignment name="h">
+            <const value="0"/>
+        </assignment>
+
         <assigmentOperator name="z">
-            <unaryOperator name="z" operator="-"/>
+            <unaryOperator name="z" operator="+"/>
         </assigmentOperator>
 
         <return>
@@ -41,8 +45,18 @@
 
 
 <!--
-	void deco2(int a, int b){
-		int z = suma(a,b);
-    	z++;
-    	return z;
+    void main(int a, int b){
+        int z;
+        int h;
+        z = foo(a,b);
+        h = 0;
+        z++;
+        return z;
+    }
+
+    int foo(int aa, int bb){
+        int zz;
+        zz = aa + bb;
+        return zz;
+    }
 -->

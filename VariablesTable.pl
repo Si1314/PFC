@@ -75,7 +75,7 @@ updateListaDeListas([TV|TVs],Var,TVsAc,Result):-
 	append(TVsAc,[TV],ResultAux),
 	updateListaDeListas(TVs,Var,ResultAux,Result).
 
-updateLista([],_,TVac,TVac):- false.
+updateLista([],_,TVac,TVac):-false.
 
 updateLista([(Type,Name,_)|TV],(Name,Value),TVac,TVresult):-
 	!,

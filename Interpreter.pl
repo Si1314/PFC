@@ -40,6 +40,7 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
 	retractall(program(_)),
 	assert(program(GoodProgram)),
 	execute([],GoodProgram,ExitTable),
+
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
 	once(label(LabelTableValues)).
 	%label(LabelTableValues).
@@ -53,13 +54,15 @@ execute(Entry,[],Entry):-!.
 execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out) :-!,
 	maxDepth(N),
 	step(Entry,('while',_,[C,('body',_,B)]),N,Out1),
-	%execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out),
 	execute(Out1,RestInstructios,Out).
 
 execute(Entry,[('for',_,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
 	maxDepth(N),
 	step(Entry,('for',_,[V,C,A,('body',_,B)]),N,Out1),
 	execute(Out1,RestInstructios,Out).
+
+execute(Entry,[('function',Data,BodyFunction)|_],Out) :-!,
+	step(Entry,('function',Data,BodyFunction),Out). %para que solo haga el main
 
 execute(Entry,[Instruction|RestInstructios],Out) :-
 	step(Entry,Instruction,Out1),
@@ -95,10 +98,6 @@ step(Entry,('body',_,Body),Out) :- !,
 	execute(Out1,Body,Out2),
 	desapila(Out2, Out).
 
-step(Entry,('bodyyyy',[_,_=void],FuncionBody),Out) :- !,
-	apila(Entry,Entry1),
-	execute(Entry1,FuncionBody,Out).
-
 step(Entry,('declarations',_,Body),Out) :- !,
 	execute(Entry,Body,Out).
 
@@ -118,9 +117,7 @@ step(Entry,('declaration',[_=Type,_=Name],DecBody),Out):- !,
 
 step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
 	resolveExpression(Entry,AssigBody,Value),
-	update(Entry,(Name,Value),Out),
-	write('\nActualizar: (Name,Value)\n( '), write(Name), write(' , '),write(Value), write(' )'),
-	write('\nEntry:\n'), write(Entry), write('\nOut:\n'), write(Out).
+	update(Entry,(Name,Value),Out).
 
 step(Entry,('assigmentOperator',[_=Name],[AssigBody]),Out) :- !,
 	resolveExpression(Entry,AssigBody,Value),
@@ -145,8 +142,8 @@ step(Entry,('return',_,[Body]),Out):-!,
 	resolveExpression(Entry,Body,Result),
 	getTuple(Tuple),
 	add(Entry,Tuple,Out1),
-	update(Out1,(ret,Result),Out).
-	%write('\nEntry:\n'), write(Out1), write('\nOut:\n'), write(Out).
+	update(Out1,(ret,Result),Out2),
+	updateReturnValue(Out2,Out).
 	
 % FOR
 step(Entry,('for',_,_),0,Entry):-!.
@@ -170,7 +167,7 @@ step(Entry,('while',_,[Condition,('body',_,WhileBody)]),N,Out):-
 	N1 is N - 1,
 	step(Out1,('while',_,[Condition,('body',_,WhileBody)]),N1,Out).
 
-step(Entry,('while',_,_),_,Entry):-!. 
+step(Entry,('while',_,_),_,Entry):-!.
 
 step(Entry,_,_,Entry).
 
@@ -205,7 +202,8 @@ resolveExpression(_,('const',[_=Value],_),Result):-
 	atom_number(Value,Result).
 
 resolveExpression(Entry,('callFunction',[name=Name, type=Type],Params),ValueReturned):-!,
-	addListParams(Entry,Params,Out1),
+	apila(Entry,Entry1),
+	addListParams(Entry1,Params,Out1),
 	program(Program),
 	lookForFunction(Program,Name,Type,Function),
 	createListParams(Function,Body,ListParams),
@@ -364,7 +362,8 @@ lookForFunction([_|Xs],Name1,Type,Result):-
 
 addListParams(Entry,[],Entry):-!.
 addListParams(Entry,[(param,[name=Name,type=Type],_)|Xs],Out):-
-	add(Entry,(Type,Name,_),Out1),
+	getValue(Entry,Name,Value),
+	add(Entry,(Type,Name,Value),Out1),
 	addListParams(Out1,Xs,Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -387,3 +386,12 @@ returnesValueAux([],[]):-!.
 returnesValueAux([(_,ret,Value)|_],Value):-!.
 returnesValueAux([_|Xs],Return):-
 	returnesValueAux(Xs,Return).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+updateReturnValue(Entry,Out):-
+	returnesValue(Entry,ValueReturned),
+	updateReturnValueAux(Entry,ValueReturned,Out).
+
+updateReturnValueAux([X,Y|Xs],ValueReturned,[X,Out1|Xs]):-
+	update([Y|[]],('ret',ValueReturned),[Out1]).
