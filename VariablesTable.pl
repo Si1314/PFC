@@ -6,25 +6,31 @@
 
 					%--- create and remove Table ---%
 
-%------------------------------------------------------------------------------------
-
-					%--- add ---%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					
+					%%%%%%%%%%%
+					%   add   %
+					%%%%%%%%%%%
 
 add([TV|TVs],(Type,Name,Value),[TVupdated|TVs]):-
  	notInTable([TV|TVs],Name),!,
  	append(TV,[(Type,Name,Value)],TVupdated).
 
-%------------------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%--- apila / desapila ---%
+					%%%%%%%%%%%%%%%%%%%%
+					% apila / desapila %
+					%%%%%%%%%%%%%%%%%%%%
 
 apila(TV,[[]|TV]).
 
 desapila([_|TV],TV).
 
-%------------------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%--- getVariable ---%
+					%%%%%%%%%%%%%%%%%%%%
+					%	 getVariable   %
+					%%%%%%%%%%%%%%%%%%%%
 
 getVariable(TVs,Name,Variable):-
 	getVariableListaDeListas(TVs,Name,Variable).
@@ -40,9 +46,11 @@ isThere([(Type,Name,Value)|_],Name,(Type,Name,Value)):- !, true.
 isThere([_|Rest],Name,ValueReturned):-
 	isThere(Rest,Name,ValueReturned).
 
-%------------------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%--- getValue ---%
+					%%%%%%%%%%%%%%%%%
+					%	 getValue   %
+					%%%%%%%%%%%%%%%%%
 
 getValue(TVs,Name,Value):-
 	getValueListaDeListas(TVs,Name,Value).
@@ -58,9 +66,11 @@ getValueLista([(_,Name,Value)|_], Name, Value):- !,true.
 getValueLista([_|Rest], Name, Value):-
 	getValueLista(Rest, Name, Value).
 
-%------------------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%--- update ---%
+					%%%%%%%%%%%%%%%%%
+					%     update    %
+					%%%%%%%%%%%%%%%%%
 
 update(TVs,Var,TVupdated):-
 	updateListaDeListas(TVs,Var,[],TVupdated).
@@ -87,9 +97,11 @@ updateLista([(Type,Name1,Value)|TV],(Name2,V),TVac, TVupdated):-
 	append(TVac,[(Type,Name1,Value)],TVupdatedAux),
 	updateLista(TV,(Name2,V),TVupdatedAux,TVupdated).
 
-%------------------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%--- updateNames ---%
+					%%%%%%%%%%%%%%%%%
+					%  updateNames  %
+					%%%%%%%%%%%%%%%%%
 
 updateNames([X|Xs],Ys,Out):-
 	updateNamesAux(X,Ys,[],Out1),
@@ -101,9 +113,11 @@ updateNamesAux([(Type,_,Value)|Xs],[Name2|Ys],Ac,Out):-
 	append(Ac,[(Type,Name2,Value)],Ac1),
 	updateNamesAux(Xs,Ys,Ac1,Out).
 
-%------------------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%--- notInTable ---%
+					%%%%%%%%%%%%%%%%%
+					%   notInTable  %
+					%%%%%%%%%%%%%%%%%
 
 notInTable(TVs,Variable):-
 	notInTableListaDeListas(TVs,Variable).
@@ -120,9 +134,11 @@ notInTableLista([_|Rest],Name1) :-!,
 	notInTableLista(Rest,Name1).
 
 
-%------------------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%--- labelList ---%
+					%%%%%%%%%%%%%%%%%
+					%    labelList  %
+					%%%%%%%%%%%%%%%%%
 
 labelList([TV],SolNames,SolValues):- !,
  	labelAux(TV,[],[],SolNames,SolValues).

@@ -1,12 +1,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-					%   FUNCIONES AUXILIARES   %
+					%    AUXILIARY FUNCTIONS   %
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-					%--- variableAdvance ---%
 
 variableAdvance(Entry,('declarations',_,Variable),VarName,Out):-
 	getContent(Variable,VarName), !,
@@ -17,16 +15,12 @@ variableAdvance(Entry,Variable,Variable,Entry).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%--- getContent ---%
-
 getContent([_= (Op)], Op):- !.
 getContent([_,_= (Op)], Op):- !.
 getContent((_,[_=Name],_), Name):- !.
 getContent([('declaration',[_,name=VariableName],_)],VariableName).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-					%--- removeEmpty ---%
 
 removeEmpty(List,ReturnedList):-
 	removeEmptyAux(List,[],ReturnedList).

@@ -43,7 +43,7 @@ Cosas para hacer/hechas
 
  - Sustituir `MaxDepth por LoopK´
 
- - El usuario tiene que poder elegir el loopK. Añadir por tanto al intertpreter(...) esas tres variables de entrada: `inf, sup y loopk`
+
 
  - Errores RunTimer como:
 
@@ -67,4 +67,4 @@ Cosas para hacer/hechas
 ##Cosas hechas
  - Ahora se puede poner `++ / --` y `+= / -=`
  - Hacer llamadas a funciones (no metodos)
- 
+ - El usuario ya puede elegir el loopK. Añadido al intertpreter(...) estas tres variables de entrada: `inf, sup y loopk`

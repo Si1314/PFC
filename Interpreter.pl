@@ -1,6 +1,10 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%
 					%       INTERPRETER       %
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :-use_module(library(sgml)).
 :-use_module(library(clpfd)).
@@ -15,10 +19,9 @@
 % First you have to keep this file in a folder called "PFC"
 % Then open swi Prolog and write "interpreter('salida4.xml','output4.xml')." to test it
 
-% Carga el arbol dado por xml en 'Program'
 
 interpreter(EntryFile, OutFile):- 
-	interpreter(EntryFile, OutFile, -3, 3, 10). % Valores por defecto
+	interpreter(EntryFile, OutFile, -3, 3, 10). % Defaults
 
 interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth):- 
 	retractall(inf(_)),
@@ -51,9 +54,13 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
 	once(label(LabelTableValues)).
 	%label(LabelTableValues).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 					%%%%%%%%%%%
 					% execute %
 					%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 execute(Entry,[],Entry):-!.
 
@@ -74,10 +81,13 @@ execute(Entry,[Instruction|RestInstructios],Out) :-
 	step(Entry,Instruction,Out1),
 	execute(Out1,RestInstructios,Out).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 					%%%%%%%%
 					% STEP %
 					%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 step(Entry,('function',[_,_=void],FuncionBody),Out) :- !,
 	apila(Entry,Entry1),
@@ -185,8 +195,6 @@ step(Entry,_,_,Entry).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-					%--- resolveExpression ---%
-
 resolveExpression(Entry,Name,('binaryOperator',Operator,[Y]),Result):-
 	resolveExpression(Entry,('binaryOperator',Operator,[('variable',[_=Name],[]),Y]),Result).
 
@@ -218,9 +226,10 @@ resolveExpression(Entry,('callFunction',[name=Name, type=Type],Params),ValueRetu
 	returnesValue(Out3,ValueReturned).
 
 
-%					-----------------
-%					---> Boolean <---
-%					-----------------
+						%%%%%%%%%%%%
+						%   BOOL   %
+						%%%%%%%%%%%%
+
 
 work('<', Op1,Op2,true):- Op1 #< Op2.
 work('<', _,_,false).
@@ -244,11 +253,10 @@ work('&&', Op1,Op2,true):- Op1 #/\ Op2.
 work('&&', _,_,false).
 
 
-%					--------------------
-%					---> arithmetic <---		
-%					--------------------
+						%%%%%%%%%%%%%%%%%%
+						%   Arithmetic   %
+						%%%%%%%%%%%%%%%%%%
 
 work('+', Op1,Op2,Z):- !, Z #= Op1 + Op2.
 work('-', Op1,Op2,Z):- !, Z #= Op1 - Op2.
 work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
-
