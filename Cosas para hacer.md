@@ -66,5 +66,5 @@ Cosas para hacer/hechas
 
 ##Cosas hechas
  - Ahora se puede poner `++ / --` y `+= / -=`
- - Hacer llamadas a funciones
+ - Hacer llamadas a funciones (no metodos)
  
