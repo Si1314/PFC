@@ -12,15 +12,21 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % First you have to keep this file in a folder called "PFC"
-% Then open swi Prolog and write "interpreter." to test it
+% Then open swi Prolog and write "interpreter('salida4.xml','output4.xml')." to test it
 
 % Carga el arbol dado por xml en 'Program'
 
-inf(-3).
-sup(3).
-maxDepth(10).
-
 interpreter(EntryFile, OutFile):- 
+	interpreter(EntryFile, OutFile, -3, 3, 10). % Valores por defecto
+
+interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth):- 
+	retractall(inf(_)),
+	assert(inf(Inf)),
+	retractall(sup(_)),
+	assert(sup(Sup)),
+	retractall(maxDepth(_)),
+	assert(maxDepth(MaxDepth)),
+
 	findall((N,L),interpreterAux(EntryFile,N,L),V),
 	%interpreterAux(EntryFile, N,L),
 	%write(V), write('\n'),
@@ -33,7 +39,6 @@ interpreter(EntryFile, OutFile):-
     close(Stream).
 
 interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
-	%cd('../PFC'),
 	load_xml_file(EntryFile, Program),
 
 	removeEmpty(Program,GoodProgram),
