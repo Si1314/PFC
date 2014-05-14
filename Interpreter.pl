@@ -16,9 +16,17 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+					%%%%%%%%%%%%%%%
+					% interpreter %
+					%%%%%%%%%%%%%%%
+
 % First you have to keep this file in a folder called "PFC"
 % Then open swi Prolog and write "interpreter('salida4.xml','output4.xml')." to test it
 
+% Funcion principal, se le puede meter el fichero de entrada y salida, o incluirle también
+% las variables inf, sup y maxDepth, si no se incluyen se ponen por defecto a: -3, 3 y 10
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interpreter(EntryFile, OutFile):- 
 	interpreter(EntryFile, OutFile, -3, 3, 10). % Defaults
@@ -36,8 +44,6 @@ interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth):-
 	%write(V), write('\n'),
 	open(OutFile, write, Stream, []),
 
-    xml_write(Stream,element(table,[],[]),[header(false)]),
-    xml_write(Stream,'\n',[header(false)]),
     writeList(Stream,V),
    	%writeList(Stream,(N,L)),
     close(Stream).
@@ -59,6 +65,8 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
 					%%%%%%%%%%%
 					% execute %
 					%%%%%%%%%%%
+
+% Recorre la lista de instrucciones una a una para ir ejecutándolas
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -86,6 +94,8 @@ execute(Entry,[Instruction|RestInstructios],Out) :-
 					%%%%%%%%
 					% STEP %
 					%%%%%%%%
+
+% Ejecuta una instrucción en concreto
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -193,6 +203,9 @@ step(Entry,_,_,Entry).
 						%   EXPRESSIONS   %
 						%%%%%%%%%%%%%%%%%%%
 
+% Resuelve la expresión que se le pasa, puede ser operación:
+% 'binaria', 'unaria', 'llamada', 'buleana' ó 'aritmética' ...
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 resolveExpression(Entry,Name,('binaryOperator',Operator,[Y]),Result):-
@@ -260,3 +273,5 @@ work('&&', _,_,false).
 work('+', Op1,Op2,Z):- !, Z #= Op1 + Op2.
 work('-', Op1,Op2,Z):- !, Z #= Op1 - Op2.
 work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
+work('/', _,0,_):- !, fail.
+work('/', Op1,Op2,Z):- !, Z #= Op1 / Op2.
