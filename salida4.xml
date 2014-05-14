@@ -38,3 +38,13 @@
         </return>
     </body>
 </function>
+
+<!--
+int antes(int x){
+    int w = 1;
+    for(int i = 0; i < x; i++){
+        w = 2*w;
+    }
+    return w;
+}
+-->

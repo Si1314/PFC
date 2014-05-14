@@ -1,8 +1,8 @@
 <caso>
-  <variable name="ret" value="3"/>
   <variable name="a" value="1"/>
+  <variable name="b" value="1"/>
 </caso>
 <caso>
-  <variable name="ret" value="4"/>
   <variable name="a" value="-3"/>
+  <variable name="b" value="2"/>
 </caso>

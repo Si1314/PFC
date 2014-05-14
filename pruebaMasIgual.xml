@@ -14,18 +14,18 @@
             <then>
                 <body>
 	                <assigmentOperator name='z'>
-					    <binaryOperator type="arithmetic" operator="+">
+					    <unaryOperator name='z' operator="+">
 	                        <const value="3"/>
-	                    </binaryOperator>
+	                    </unaryOperator>
 					</assigmentOperator>
                 </body>
             </then>
             <else>
                 <body>
                 	<assigmentOperator name='z'>
-					    <binaryOperator type="arithmetic" operator="+">
+					    <unaryOperator name='z' operator="+">
 	                        <const value="4"/>
-	                    </binaryOperator>
+	                    </unaryOperator>
 					</assigmentOperator>
                 </body>
             </else>
@@ -40,14 +40,14 @@
 
 <!--
 
-void deco2(int a){
+int deco2(int a){
     int z = 0;
     if(a > 0){
         z += 3;
     }else{ 
         z += 4;
     }
-    a = z;
+    return z;
 }
 -->
 

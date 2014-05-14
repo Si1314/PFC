@@ -1,1 +1,8 @@
-<table/>
+<caso>
+  <variable name="ret" value="11"/>
+  <variable name="a" value="1"/>
+</caso>
+<caso>
+  <variable name="ret" value="9"/>
+  <variable name="a" value="-3"/>
+</caso>

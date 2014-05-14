@@ -208,17 +208,17 @@ step(Entry,_,_,Entry).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-resolveExpression(Entry,Name,('binaryOperator',Operator,[Y]),Result):-
-	resolveExpression(Entry,('binaryOperator',Operator,[('variable',[_=Name],[]),Y]),Result).
-
 resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
 	getContent(Operator,Op),
 	resolveExpression(Entry,X, Operand1),
 	resolveExpression(Entry,Y, Operand2),
 	work(Op, Operand1, Operand2,Result).
 
-resolveExpression(Entry,('unaryOperator',[name=Name,Operator],_),Result):-
+resolveExpression(Entry,('unaryOperator',[name=Name,Operator],[]),Result):-!,
 	resolveExpression(Entry,('binaryOperator',[Operator],[('variable',[_=Name],[]),('constValue',1,[])]),Result).
+
+resolveExpression(Entry,('unaryOperator',[name=Name,Operator],[Y]),Result):-!,
+	resolveExpression(Entry,('binaryOperator',[Operator],[('variable',[_=Name],[]),Y]),Result).
 
 resolveExpression(Entry,('variable',[_=OperandName],_),OperandValue):-
 	getValue(Entry,OperandName,OperandValue).
