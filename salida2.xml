@@ -25,16 +25,3 @@
         </if>
     </body>
 </function>
-
-<!--
-
-void deco2(int a){
-    int z;
-    if(a > 0){
-        z = 3;
-    }else{ 
-        z = 4;
-    }
-}
-    <const value="0"/>
--->

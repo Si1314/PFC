@@ -3,7 +3,6 @@
     <body>
         <declarations>
             <declaration type="int" name="z">
-                
                 <const value="10"/>
             </declaration>
         </declarations>

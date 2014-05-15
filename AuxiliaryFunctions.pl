@@ -6,6 +6,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Devuelve la variable de avance en un "for", si no esta declarada la declara
+% si esta declarada solo devuelve el nombre
+
 variableAdvance(Entry,('declarations',_,Variable),VarName,Out):-
 	getContent(Variable,VarName), !,
 	execute(Entry,Variable,Out).
@@ -15,12 +18,16 @@ variableAdvance(Entry,Variable,Variable,Entry).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Devuelve el contenido de lo que se le pase por parametro: una "op", el nombre de la variable...
+
 getContent([_= (Op)], Op):- !.
 getContent([_,_= (Op)], Op):- !.
 getContent((_,[_=Name],_), Name):- !.
 getContent([('declaration',[_,name=VariableName],_)],VariableName).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Limpia la lista de entrada de cosas que no tengan la estructura "element(_,_,_)"
 
 removeEmpty(List,ReturnedList):-
 	removeEmptyAux(List,[],ReturnedList).
@@ -37,24 +44,20 @@ removeEmptyAux([_|List],Ac,ReturnedList):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-writeInXML2(Stream,_,[]):-!,
-    xml_write(Stream,element(table,[],[]),[header(false)]),
-    xml_write(Stream,'\n',[header(false)]).
+% Escribe en Stream los casos con los nombres y valores que se le pasen en las listas
+% (N,V) = (nombre,valor)
 
-writeInXML2(Stream,[],_):-!,
-    xml_write(Stream,element(table,[],[]),[header(false)]),
-    xml_write(Stream,'\n',[header(false)]).
-
-writeInXML2(Stream,[N|Ns],[V|Vs]):-
-    xml_write(Stream,element(variable,[name=N,value=V],[]),[header(false)]),
-	xml_write(Stream,'\n',[header(false)]),
-	writeInXML2(Stream, Ns, Vs).
-
-	% Possible future useful code:
-	% xml_write(Stream,element(aap,[],[noot]),[]), 
-	% Possible Options: [layout(false),doctype(xml),header(true)]
+writeList(_,[]):- !.
+writeList(Stream,[(N,V)|Xs]):- !,
+	writeInXML(Stream,N,V),	% writeInXML para guardar bien en el XML, writeInXML2 para guardarlo mal
+	writeList(Stream,Xs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Escribe en Stream un nuevo caso con los nombres y valores que se le pasen en las listas
+% [N|Ns] para nombres
+% [V|Vs] para valores
+
 writeInXML(Stream,[N|Ns],[V|Vs]):-
 	writeInXMLAux(Stream,[N|Ns],[V|Vs],[],Result),
 	xml_write(Stream,element(caso,[],Result),[header(false)]),
@@ -66,25 +69,11 @@ writeInXMLAux(Stream,[N|Ns],[V|Vs],Ac,Zs):-
 	append(Ac,[element(variable,[name=N,value=V],[])],Ac1),
 	writeInXMLAux(Stream,Ns,Vs,Ac1,Zs).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
-
-callLabel(_,0,Ac,Ac):-!.
-callLabel(LabelTableValues,Nivel,Ac,Sol1):-
-	label(LabelTableValues),
-	append(Ac,[LabelTableValues],Sol),
-	Nivel1 is Nivel - 1,
-	callLabel(LabelTableValues,Nivel1,Sol,Sol1).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-writeList(_,[]):- !.
-writeList(Stream,[(N,V)|Xs]):- !,
-	writeInXML2(Stream,N,V),	% quitar el "2" para guardar bien en el XML
-	writeList(Stream,Xs).
+% devuelve la variable de retorno "ret" como una tupla: (int,ret,Value)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-getTuple((int,ret,Value)):-	% TODO
+getTuple((int,ret,Value)):-	% TODO types
 	inf(X), sup(Y),
 	Value in X..Y.
 
@@ -97,14 +86,16 @@ getTuple(bool,(int,ret,Value)):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Buscamos en la lista de funciones una función en concreto pasandole el nombre
+
 lookForFunction([],_,[]):-!.
-
 lookForFunction([(_,[name=Name,type=Type],Body)|_],Name,Type,Body):- !.
-
 lookForFunction([_|Xs],Name1,Type,Result):-
 	lookForFunction(Xs,Name1,Type,Result).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Añade a la tabla de variablse los parámetros pasados en la lista
 
 addListParams(Entry,[],Entry):-!.
 addListParams(Entry,[(param,[name=Name,type=Type],_)|Xs],Out):-
@@ -113,6 +104,8 @@ addListParams(Entry,[(param,[name=Name,type=Type],_)|Xs],Out):-
 	addListParams(Out1,Xs,Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Crea una lista sólo con los nombres de los parámetros
 
 createListParams(Xs,Body,ListParams):-
 	createListParamsAux(Xs,[],Body,ListParams).
@@ -125,6 +118,8 @@ createListParamsAux([(param,[_,name=Name],_)|Xs],Ac,Body,ListParams):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Devuelve el valor de la variable de retorno "ret"
+
 returnesValue([X|_],ValueReturned):-
 	returnesValueAux(X,ValueReturned).
 
@@ -134,6 +129,8 @@ returnesValueAux([_|Xs],Return):-
 	returnesValueAux(Xs,Return).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Actualiza el valor de la variable de retorno "ret"
 
 updateReturnValue(Entry,Out):-
 	returnesValue(Entry,ValueReturned),

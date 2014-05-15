@@ -1,13 +1,16 @@
-<table/>
-<variable name="ret" value="8"/>
-<variable name="x" value="3"/>
-<table/>
-<variable name="ret" value="4"/>
-<variable name="x" value="2"/>
-<table/>
-<variable name="ret" value="2"/>
-<variable name="x" value="1"/>
-<table/>
-<variable name="ret" value="1"/>
-<variable name="x" value="-3"/>
-<table/>
+<caso>
+  <variable name="ret" value="8"/>
+  <variable name="x" value="3"/>
+</caso>
+<caso>
+  <variable name="ret" value="4"/>
+  <variable name="x" value="2"/>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="x" value="1"/>
+</caso>
+<caso>
+  <variable name="ret" value="1"/>
+  <variable name="x" value="-3"/>
+</caso>

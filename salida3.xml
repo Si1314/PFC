@@ -80,25 +80,28 @@
     <param type="int" name="x"/>
     <param type="int" name="y"/>
     <body>
+        <declaration type="int" name="z">
+            <const value="0"/>
+        </declaration>
         <if>
-            <binaryOperator type="bool" operator="<">
+            <binaryOperator type="bool" operator="&lt;">
                 <variable name="x"/>
                 <variable name="y"/>
             </binaryOperator>
             <then>
                 <body>
                     <while>
-                        <binaryOperator type="bool" operator="<">
+                        <binaryOperator type="bool" operator="&lt;">
                             <variable name="x"/>
                             <variable name="y"/>
                         </binaryOperator>
                         <body>
-                            <assignment name="x">
-                                <binaryOperator type="arithmetic" operator="+">
-                                    <variable name="x"/>
-                                    <const value="1"/>
-                                </binaryOperator>
-                            </assignment>
+                            <assigmentOperator name="x">
+                                <unaryOperator name="x" operator="+"/>
+                            </assigmentOperator>
+                            <assigmentOperator name="z">
+                                <unaryOperator name="z" operator="+"/>
+                            </assigmentOperator>
                         </body>
                     </while>
                 </body>
@@ -108,10 +111,25 @@
             </else>
         </if>
         <return>
-            <variable name="x"/>
+            <variable name="z"/>
         </return>
     </body>
 </function>
+
+<!--
+int bucle(int x, int y){
+    int z = 0;
+    if(x < y){
+        while(x < y){
+            x++;
+            z++;
+        }
+    }else{}
+    
+    return z;
+}
+-->
+
 <!--
 <function name="eso" type="int">
     <param type="int" name="x"/>
@@ -125,7 +143,7 @@
                     <const value="0"/>
                 </declaration>
             </declarations>
-            <binaryOperator type="bool" operator="<">
+            <binaryOperator type="bool" operator="&lt;">
                 <variable name="i"/>
                 <const value="5"/>
             </binaryOperator>
