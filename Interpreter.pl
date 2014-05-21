@@ -29,10 +29,15 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-interpreter(EntryFile, OutFile):- 
-	interpreter(EntryFile, OutFile, -3, 3, 10). % Defaults
+interpreter(EntryFile, OutFile, FunctionName):- 
+	interpreter(EntryFile, OutFile, -3, 3, 10, FunctionName). % Defaults
 
-interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth):- 
+interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):- 
+	assert(inf(0)),
+	assert(sup(0)),
+	assert(maxDepth(0)),
+	assert(program(0)),
+
 	retractall(inf(_)),
 	assert(inf(Inf)),
 	retractall(sup(_)),
@@ -40,7 +45,7 @@ interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth):-
 	retractall(maxDepth(_)),
 	assert(maxDepth(MaxDepth)),
 
-	findall((N,L),interpreterAux(EntryFile,N,L),V),
+	findall((N,L),interpreterAux(EntryFile,N,L, FunctionName),V),
 	%interpreterAux(EntryFile, N,L),
 	%write(V), write('\n'),
 	open(OutFile, write, Stream, []),
@@ -49,13 +54,15 @@ interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth):-
    	%writeList(Stream,(N,L)),
     close(Stream).
 
-interpreterAux(EntryFile,LabelTableNames, LabelTableValues):-
+interpreterAux(EntryFile,LabelTableNames, LabelTableValues, FunctionName):-
 	load_xml_file(EntryFile, Program),
 
 	removeEmpty(Program,GoodProgram),
 	retractall(program(_)),
 	assert(program(GoodProgram)),
-	execute([],GoodProgram,ExitTable),
+	lookForFunction(GoodProgram,FunctionName,Function),
+	execute([],Function,ExitTable),
+
 
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
 	once(label(LabelTableValues)).
@@ -83,8 +90,8 @@ execute(Entry,[('for',_,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
 	step(Entry,('for',_,[V,C,A,('body',_,B)]),N,Out1),
 	execute(Out1,RestInstructios,Out).
 
-execute(Entry,[('function',Data,BodyFunction)|_],Out) :-!,
-	step(Entry,('function',Data,BodyFunction),Out). %para que solo haga el main
+%execute(Entry,[('function',Data,BodyFunction)|_],Out) :-!,
+%	step(Entry,('function',Data,BodyFunction),Out). %para que solo haga el main
 
 execute(Entry,[Instruction|RestInstructios],Out) :-
 	step(Entry,Instruction,Out1),
