@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interpreter(EntryFile, OutFile, FunctionName):- 
-	interpreter(EntryFile, OutFile, 2, 10, 10, FunctionName). % Defaults
+	interpreter(EntryFile, OutFile, -10, 10, 10, FunctionName). % Defaults
 
 interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):- 
 	assert(inf(0)),
@@ -280,24 +280,30 @@ step(EntryS,('if',[_=Line],[_,_,('else',_,Else)]),OutS):- !,
 		desapila(Table2, Table3),
 	state(OutS,Table3,Cin2,Cout2,Trace2).
 
-step(EntryS,('if',[_=Line],_),OutS):- !,
-	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
-	state(OutS,Table,Cin,Cout,Trace1).
+step(EntryS,('if',[_=Line],_),EntryS):- !.
+%	state(EntryS,Table,Cin,Cout,Trace),
+%		append(Trace,[Line],Trace1),
+%	state(OutS,Table,Cin,Cout,Trace1).
 
 step(EntryS,('return',[_=Line],[Body]),OutS):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
-	resolveExpression(EntryS1,Body,Result,EntryS2),
+%	resolveExpression(EntryS1,Body,Result,EntryS2),
+%	write(result_:_),write(Result),write('\n'),
+%	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+%		%getTuple(Tuple),
+%		%add(Table2,Tuple,Table3),
+%		update(Table2,(ret,Result),Table4),
+%		updateReturnValue(Table4,Table5),
+%	state(OutS,Table5,Cin2,Cout2,Trace2).
+
+	resolveExpression(EntryS1,Body,Value,EntryS2),
 
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
-		getTuple(Tuple),
-		add(Table2,Tuple,Table3),
-		update(Table3,(ret,Result),Table4),
-		updateReturnValue(Table4,Table5),
-	state(OutS,Table5,Cin2,Cout2,Trace2).
+		update(Table2,(ret,Value),Table3),
+	state(OutS,Table3,Cin2,Cout2,Trace2).
 	
 % FOR
 step(EntryS,('for',[_=Line],_),0,OutS):-!,
@@ -379,6 +385,8 @@ resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-
 	write(Y),write('\n'),
 	resolveExpression(EntryS,X, Operand1,EntryS1),
 	resolveExpression(EntryS1,Y, Operand2,OutS),
+	write(operand),write(Operand1),write('\n'),
+	write(operand),write(Operand2),write('\n'),
 	work(Op, Operand1, Operand2,Result).
 
 resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
@@ -389,7 +397,9 @@ resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
 resolveExpression(EntryS,('constValue',Value,_),Value,EntryS). % DEPRECATED?
 
 resolveExpression(EntryS,('const',[_=Value],_),Result,EntryS):-
-	atom_number(Value,Result).
+	write(jola_),write(Value),
+	atom_number(Value,Result),
+	write(Result).
 
 resolveExpression(EntryS,('consoleIn',[_=int],_),Value,OutS):-
 	state(EntryS,Table,Cin,Cout,Trace),
