@@ -89,7 +89,7 @@ getTuple(int,(int,ret,Value)):-
 	Value in X..Y.
 
 getTuple(bool,(int,ret,Value)):-
-	Value in true\/false.
+	Value in 0..1.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interpreter(EntryFile, OutFile, FunctionName):- 
-	interpreter(EntryFile, OutFile, -3, 3, 10, FunctionName). % Defaults
+	interpreter(EntryFile, OutFile, 2, 10, 10, FunctionName). % Defaults
 
 interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):- 
 	assert(inf(0)),
@@ -60,15 +60,11 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues, FunctionName):-
 	removeEmpty(Program,GoodProgram),
 	retractall(program(_)),
 	assert(program(GoodProgram)),
-	write(GoodProgram),write('\n'),
+	
 	write(FunctionName),write('\n'),
 	lookForFunction(GoodProgram,FunctionName,Function),
 	
-	
-	write(Function),
-
 	state(InitS,[],[],[],[]),
-	%execute([],Function,ExitTable),
 	execute(InitS,Function,EndS),
 	state(EndS,ExitTable,Cinput,Coutput,Trace),
 
@@ -105,6 +101,7 @@ execute(Entry,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
 %	step(Entry,('function',Data,BodyFunction),Out). %para que solo haga el main
 
 execute(Entry,[Instruction|RestInstructios],Out) :-
+	write(Instruction),write('\n'),
 	step(Entry,Instruction,Out1),
 	execute(Out1,RestInstructios,Out).
 
@@ -119,14 +116,15 @@ execute(Entry,[Instruction|RestInstructios],Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 step(EntryS,('function',[_,_=void,_=Line],FunctionBody),OutS) :- !,
+	write(fuuuuu),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
 		append(Trace,[Line],Trace1),
 	state(EntryS1,Table1,Cin,Cout,Trace1),
-	write(f),
+
 	execute(EntryS1,FunctionBody,OutS).
 
-step(EntryS,('function',[_,_=ExitValue,_=Line],FuncionBody),OutS) :- !,
+step(EntryS,('function',[_,_=ExitValue,_=Line],FunctionBody),OutS) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
 		getTuple(ExitValue,Tuple),
@@ -134,7 +132,7 @@ step(EntryS,('function',[_,_=ExitValue,_=Line],FuncionBody),OutS) :- !,
 		append(Trace,[Line],Trace1),
 	state(EntryS1,Table2,Cin,Cout,Trace1),
 
-	execute(EntryS1,FuncionBody,OutS).
+	execute(EntryS1,FunctionBody,OutS).
 
 step(EntryS,('param',[_=int,_=ParamName],ParamBody),OutS) :- !,
 	inf(X), sup(Y),
@@ -168,6 +166,7 @@ step(EntryS,('declarations',_,Body),OutS) :- !,
 	execute(EntryS,Body,OutS).
 
 step(EntryS,('declaration',[_=int,_=Name,_=Line],[(const,[value=Value],_)]),OutS):- !,
+	write(declara1),write(Line),write('\n'),
 	atom_number(Value,Value1),
 
 	state(EntryS,Table,Cin,Cout,Trace),
@@ -175,18 +174,22 @@ step(EntryS,('declaration',[_=int,_=Name,_=Line],[(const,[value=Value],_)]),OutS
 		append(Trace,[Line],Trace1),
 	state(OutS,Table1,Cin,Cout,Trace1).
 
-step(EntryS,('declaration',[_=int,_=Name,_=Line],DecBody),OutS):- !,
+step(EntryS,('declaration',[_=int,_=Name,_=Line],[DecBody]),OutS):- !,
 	inf(X), sup(Y),
 	Value in X..Y,
-
+	write(declara2),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
-		add(Table,(int,Name,Value),Table1),
 		append(Trace,[Line],Trace1),
-	state(EntryS1,Table1,Cin,Cout,Trace1),
+	state(EntryS1,Table,Cin,Cout,Trace1),
 
-	execute(EntryS1,DecBody,OutS).
+	resolveExpression(EntryS1,DecBody,Value,EntryS2),
+	
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+	add(Table2,(int,Name,Value),Table3),
+	state(OutS,Table3,Cin2,Cout2,Trace2).
 
 step(EntryS,('declaration',[_=Type,_=Name,_=Line],DecBody),OutS):- !,
+	write(declara3),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		add(Table,(Type,Name,_),Table1),
 		append(Trace,[Line],Trace1),
@@ -194,7 +197,7 @@ step(EntryS,('declaration',[_=Type,_=Name,_=Line],DecBody),OutS):- !,
 
 	execute(EntryS1,DecBody,OutS).
 
-step(EntryS,('assignment',[_=Name,_=Line],[AssigBody]),OutS) :- !,
+step(EntryS,('assignment',[_=Name,_=Line],AssigBody),OutS) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
@@ -205,7 +208,7 @@ step(EntryS,('assignment',[_=Name,_=Line],[AssigBody]),OutS) :- !,
 		update(Table2,(Name,Value),Table3),
 	state(OutS,Table3,Cin2,Cout2,Trace2).
 
-step(EntryS,('assigmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody]),OutS) :- !,
+step(EntryS,('assignmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody]),OutS) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
@@ -220,6 +223,7 @@ step(EntryS,('assigmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody]),OutS)
 	state(OutS,Table3,Cin2,Cout2,Trace2).
 
 step(EntryS,('unaryOperator',[_=Name,_=Operator,_=Line],[]),OutS):-!,
+	write(unary),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
@@ -354,27 +358,32 @@ step(EntryS,_,_,EntryS).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-resolveExpression(EntryS,('notOperator',_,Expr),NotResult,OutS):-
+resolveExpression(EntryS,('notOperator',_,[Expr]),NotResult,OutS):-
 	resolveExpression(EntryS,Expr,Result,OutS),
 	not(Result,NotResult).
 
-resolveExpression(EntryS,('signOperator',[type='-'],Expr),InvResult,OutS):-
+resolveExpression(EntryS,('signOperator',[type='-'],[Expr]),InvResult,OutS):-
+	write(Expr),write('\n'),
 	resolveExpression(EntryS,Expr,Result,OutS),
 	work('*',-1,Result,InvResult).
 
-resolveExpression(EntryS,('signOperator',[type='+'],Expr),Result,OutS):-
-	write(signOp),
+resolveExpression(EntryS,('signOperator',[type='+'],[Expr]),Result,OutS):-
+	write(signOp),write('\n'),
 	resolveExpression(EntryS,Expr,Result,OutS).
 
 
 resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-
 	getContent(Operator,Op),
+	write(cosa),write('\n'),
+	write(X),write('\n'),
+	write(Y),write('\n'),
 	resolveExpression(EntryS,X, Operand1,EntryS1),
 	resolveExpression(EntryS1,Y, Operand2,OutS),
 	work(Op, Operand1, Operand2,Result).
 
 resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
 	state(EntryS,Table,_,_,_),
+	write(OperandName),write('\n'),
 	getValue(Table,OperandName,OperandValue).
 
 resolveExpression(EntryS,('constValue',Value,_),Value,EntryS). % DEPRECATED?
@@ -440,7 +449,7 @@ work('||', _,_,0).
 work('+', Op1,Op2,Z):- !, Z #= Op1 + Op2.
 work('-', Op1,Op2,Z):- !, Z #= Op1 - Op2.
 work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
-work('/', _,0,_):- !, fail.
+%work('/', _,0,_):- !, fail.
 work('/', Op1,Op2,Z):- !, Z #= Op1 / Op2.
 
 
