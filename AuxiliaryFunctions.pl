@@ -96,12 +96,12 @@ getTuple(bool,(int,ret,Value)):-
 % Buscamos en la lista de funciones una función en concreto pasandole el nombre
 
 lookForFunction([],_,_,[]):-!.
-lookForFunction([(_,[name=Name,type=Type],Body)|_],Name,Type,Body):- !.
+lookForFunction([(_,[name=Name,type=Type,_],Body)|_],Name,Type,Body):- !.
 lookForFunction([_|Xs],Name1,Type,Result):-
 	lookForFunction(Xs,Name1,Type,Result).
 
 lookForFunction([],_,[]):-!.
-lookForFunction([(Field1,[name=Name,Field2],Body)|_],Name,[(Field1,[name=Name,Field2],Body)]):- !.
+lookForFunction([(function,[name=Name,Type,Line],Body)|_],Name,[(function,[name=Name,Type,Line],Body)]):- !.
 lookForFunction([_|Xs],Name1,Result):-
 	lookForFunction(Xs,Name1,Result).
 

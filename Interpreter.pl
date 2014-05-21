@@ -60,9 +60,12 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues, FunctionName):-
 	removeEmpty(Program,GoodProgram),
 	retractall(program(_)),
 	assert(program(GoodProgram)),
+	write(GoodProgram),write('\n'),
+	write(FunctionName),write('\n'),
 	lookForFunction(GoodProgram,FunctionName,Function),
 	
-	write(GoodProgram),
+	
+	write(Function),
 
 	state(InitS,[],[],[],[]),
 	%execute([],Function,ExitTable),
