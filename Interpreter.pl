@@ -62,6 +62,8 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues, FunctionName):-
 	assert(program(GoodProgram)),
 	lookForFunction(GoodProgram,FunctionName,Function),
 	
+	write(GoodProgram),
+
 	state(InitS,[],[],[],[]),
 	%execute([],Function,ExitTable),
 	execute(InitS,Function,EndS),
@@ -118,7 +120,7 @@ step(EntryS,('function',[_,_=void,_=Line],FunctionBody),OutS) :- !,
 		apila(Table,Table1),
 		append(Trace,[Line],Trace1),
 	state(EntryS1,Table1,Cin,Cout,Trace1),
-
+	write(f),
 	execute(EntryS1,FunctionBody,OutS).
 
 step(EntryS,('function',[_,_=ExitValue,_=Line],FuncionBody),OutS) :- !,
@@ -322,9 +324,8 @@ step(EntryS,('while',[_=Line],_),0,OutS):-!,
 
 step(EntryS,('while',[_=Line],[Condition,('body',_,WhileBody)]),N,OutS):-
 	state(EntryS,Table,Cin,Cout,Trace),
-		variableAdvance(Table,Variable,VariableName,Table1),
 		append(Trace,[Line],Trace1),
-	state(EntryS1,Table1,Cin,Cout,Trace1),
+	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,Condition,1,EntryS2),
 	execute(EntryS2,WhileBody,EntryS3),
@@ -359,6 +360,7 @@ resolveExpression(EntryS,('signOperator',[type='-'],Expr),InvResult,OutS):-
 	work('*',-1,Result,InvResult).
 
 resolveExpression(EntryS,('signOperator',[type='+'],Expr),Result,OutS):-
+	write(signOp),
 	resolveExpression(EntryS,Expr,Result,OutS).
 
 
@@ -399,6 +401,8 @@ resolveExpression(Entry,('callFunction',[name=Name, type=Type],Params),ValueRetu
 						%   BOOL   %
 						%%%%%%%%%%%%
 
+not(Value,1):-Value#=0.
+not(Value,0):-Value#=1.
 
 work('<', Op1,Op2,1):- Op1 #< Op2.
 work('<', _,_,0).
@@ -424,8 +428,6 @@ work('&&', _,_,0).
 work('||', Op1,Op2,1):- Op1 #\/ Op2.
 work('||', _,_,0).
 
-not(Value,1):-Value#=0.
-not(Value,0):-Value#=1.
 
 
 						%%%%%%%%%%%%%%%%%%
@@ -437,3 +439,5 @@ work('-', Op1,Op2,Z):- !, Z #= Op1 - Op2.
 work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
 work('/', _,0,_):- !, fail.
 work('/', Op1,Op2,Z):- !, Z #= Op1 / Op2.
+
+
