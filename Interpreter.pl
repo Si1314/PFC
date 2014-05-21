@@ -61,11 +61,17 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues, FunctionName):-
 	retractall(program(_)),
 	assert(program(GoodProgram)),
 	lookForFunction(GoodProgram,FunctionName,Function),
-	execute([],Function,ExitTable),
-
+	
+	state(InitS,[],[],[],[]),
+	%execute([],Function,ExitTable),
+	execute(InitS,Function,EndS),
+	state(EndS,ExitTable,Cinput,Coutput,Trace),
 
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
-	once(label(LabelTableValues)).
+	once(label(LabelTableValues)),
+	write(Cinput),
+	write(Coutput),
+	write(Trace).
 	%label(LabelTableValues).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,14 +86,14 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues, FunctionName):-
 
 execute(Entry,[],Entry):-!.
 
-execute(Entry,[('while',_,[C,('body',_,B)])|RestInstructios],Out) :-!,
+execute(Entry,[('while',Data,[C,('body',_,B)])|RestInstructios],Out) :-!,
 	maxDepth(N),
-	step(Entry,('while',_,[C,('body',_,B)]),N,Out1),
+	step(Entry,('while',Data,[C,('body',_,B)]),N,Out1),
 	execute(Out1,RestInstructios,Out).
 
-execute(Entry,[('for',_,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
+execute(Entry,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
 	maxDepth(N),
-	step(Entry,('for',_,[V,C,A,('body',_,B)]),N,Out1),
+	step(Entry,('for',Data,[V,C,A,('body',_,B)]),N,Out1),
 	execute(Out1,RestInstructios,Out).
 
 %execute(Entry,[('function',Data,BodyFunction)|_],Out) :-!,
@@ -107,103 +113,231 @@ execute(Entry,[Instruction|RestInstructios],Out) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-step(Entry,('function',[_,_=void],FuncionBody),Out) :- !,
-	apila(Entry,Entry1),
-	execute(Entry1,FuncionBody,Out).
+step(EntryS,('function',[_,_=void,_=Line],FunctionBody),OutS) :- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		apila(Table,Table1),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table1,Cin,Cout,Trace1),
 
-step(Entry,('function',[_,_=ExitValue],FuncionBody),Out) :- !,
-	apila(Entry,Entry1),
-	getTuple(ExitValue,Tuple),
-	add(Entry1,Tuple,Out1),
-	execute(Out1,FuncionBody,Out).
+	execute(EntryS1,FunctionBody,OutS).
 
-step(Entry,('param',[_=int,_=ParamName],ParamBody),Out) :- !,
+step(EntryS,('function',[_,_=ExitValue,_=Line],FuncionBody),OutS) :- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		apila(Table,Table1),
+		getTuple(ExitValue,Tuple),
+		add(Table1,Tuple,Table2),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table2,Cin,Cout,Trace1),
+
+	execute(EntryS1,FuncionBody,OutS).
+
+step(EntryS,('param',[_=int,_=ParamName],ParamBody),OutS) :- !,
 	inf(X), sup(Y),
 	Value in X..Y,
-	add(Entry,(int,ParamName,Value),Out1),
-	execute(Out1,ParamBody,Out).
 
-step(Entry,('param',[_=ParamType,_=ParamName],ParamBody),Out) :- !,
-	add(Entry,(ParamType,ParamName,_),Out1),
-	execute(Out1,ParamBody,Out).
+	state(EntryS,Table,Cin,Cout,Trace),
+		add(Table,(int,ParamName,Value),Table1),
+	state(EntryS1,Table1,Cin,Cout,Trace),
 
-step(Entry,('body',_,Body),Out) :- !,
-	apila(Entry, Out1),
-	execute(Out1,Body,Out2),
-	desapila(Out2, Out).
+	execute(EntryS1,ParamBody,OutS).
 
-step(Entry,('declarations',_,Body),Out) :- !,
-	execute(Entry,Body,Out).
+step(EntryS,('param',[_=ParamType,_=ParamName],ParamBody),OutS) :- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		add(Table,(ParamType,ParamName,_),Table1),
+	state(EntryS1,Table1,Cin,Cout,Trace),
 
-step(Entry,('declaration',[_=int,_=Name],[(const,[value=Value],_)]),Out):- !,
+	execute(EntryS1,ParamBody,OutS).
+
+step(EntryS,('body',_,Body),OutS) :- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		apila(Table, Table1),
+	state(EntryS1,Table1,Cin,Cout,Trace),
+
+	execute(EntryS1,Body,EntryS2),
+
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		desapila(Table2, Table3),
+	state(OutS,Table3,Cin2,Cout2,Trace2).
+
+step(EntryS,('declarations',_,Body),OutS) :- !,
+	execute(EntryS,Body,OutS).
+
+step(EntryS,('declaration',[_=int,_=Name,_=Line],[(const,[value=Value],_)]),OutS):- !,
 	atom_number(Value,Value1),
-	add(Entry,(int,Name,Value1),Out).
 
-step(Entry,('declaration',[_=int,_=Name],DecBody),Out):- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		add(Table,(int,Name,Value1),Table1),
+		append(Trace,[Line],Trace1),
+	state(OutS,Table1,Cin,Cout,Trace1).
+
+step(EntryS,('declaration',[_=int,_=Name,_=Line],DecBody),OutS):- !,
 	inf(X), sup(Y),
 	Value in X..Y,
-	add(Entry,(int,Name,Value),Out1),
-	execute(Out1,DecBody,Out).
 
-step(Entry,('declaration',[_=Type,_=Name],DecBody),Out):- !,
-	add(Entry,(Type,Name,_),Entry1),
-	execute(Entry1,DecBody,Out).
+	state(EntryS,Table,Cin,Cout,Trace),
+		add(Table,(int,Name,Value),Table1),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table1,Cin,Cout,Trace1),
 
-step(Entry,('assignment',[_=Name],[AssigBody]),Out) :- !,
-	resolveExpression(Entry,AssigBody,Value),
-	update(Entry,(Name,Value),Out).
+	execute(EntryS1,DecBody,OutS).
 
-step(Entry,('assigmentOperator',[_=Name],[AssigBody]),Out) :- !,
-	resolveExpression(Entry,AssigBody,Value),
-	update(Entry,(Name,Value),Out).
+step(EntryS,('declaration',[_=Type,_=Name,_=Line],DecBody),OutS):- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		add(Table,(Type,Name,_),Table1),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table1,Cin,Cout,Trace1),
+
+	execute(EntryS1,DecBody,OutS).
+
+step(EntryS,('assignment',[_=Name,_=Line],[AssigBody]),OutS) :- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table,Cin,Cout,Trace1),
+
+	resolveExpression(EntryS1,AssigBody,Value,EntryS2),
+
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		update(Table2,(Name,Value),Table3),
+	state(OutS,Table3,Cin2,Cout2,Trace2).
+
+step(EntryS,('assigmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody]),OutS) :- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table,Cin,Cout,Trace1),
+
+	resolveExpression(EntryS1,
+		('binaryOperator',[Operator],
+			[('variable',[_=Name],[]),AssigBody])
+		,Value,EntryS2),
+
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		update(Table2,(Name,Value),Table3),
+	state(OutS,Table3,Cin2,Cout2,Trace2).
+
+step(EntryS,('unaryOperator',[_=Name,_=Operator,_=Line],[]),OutS):-!,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table,Cin,Cout,Trace1),
+
+	resolveExpression(EntryS1,
+		('binaryOperator',[Operator],
+			[('variable',[_=Name],[]),
+				('constValue',1,[])])
+		,Value,EntryS2),
+
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		update(Table2,(Name,Value),Table3),
+	state(OutS,Table3,Cin2,Cout2,Trace2).
+
+step(EntryS,('consoleOut',[_=Line],Expr),OutS):-!,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table,Cin,Cout,Trace1),
+
+	resolveExpression(EntryS1,Expr,Value,EntryS2),
+
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		append(Cout2,[Value],Cout3),
+	state(OutS,Table2,Cin2,Cout3,Trace2).
 
 % IF -> THEN
-step(Entry,('if',_,[Condition,('then',_,Then),_]),Out):-
-	resolveExpression(Entry,Condition,'true'),
-	apila(Entry,Out1),
-	execute(Out1,Then,Out2),
-	desapila(Out2, Out).
+step(EntryS,('if',[_=Line],[Condition,('then',_,Then),_]),OutS):-
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table,Cin,Cout,Trace1),
+
+	resolveExpression(EntryS1,Condition,1,EntryS2),
+
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		apila(Table2,Table3),
+	state(EntryS3,Table3,Cin2,Cout2,Trace2),
+
+	execute(EntryS3,Then,EntryS4),
+
+	state(EntryS4,Table4,Cin4,Cout4,Trace4),
+		desapila(Table4, Table5),
+	state(OutS,Table5,Cin4,Cout4,Trace4).
 
 % IF -> ELSE
-step(Entry,('if',_,[_,_,('else',_,Else)]),Out):- !,
-	apila(Entry,Out1),
-	execute(Out1,Else,Out2),
-	desapila(Out2, Out).
+step(EntryS,('if',[_=Line],[_,_,('else',_,Else)]),OutS):- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		apila(Table,Table1),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table1,Cin,Cout,Trace1),
 
-step(Entry,('if',_,_),Entry):- !.
+	execute(EntryS1,Else,EntryS2),
 
-step(Entry,('return',_,[Body]),Out):-!,
-	resolveExpression(Entry,Body,Result),
-	getTuple(Tuple),
-	add(Entry,Tuple,Out1),
-	update(Out1,(ret,Result),Out2),
-	updateReturnValue(Out2,Out).
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		desapila(Table2, Table3),
+	state(OutS,Table3,Cin2,Cout2,Trace2).
+
+step(EntryS,('if',[_=Line],_),OutS):- !,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(OutS,Table,Cin,Cout,Trace1).
+
+step(EntryS,('return',[_=Line],[Body]),OutS):-!,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table,Cin,Cout,Trace1),
+
+	resolveExpression(EntryS1,Body,Result,EntryS2),
+
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		getTuple(Tuple),
+		add(Table2,Tuple,Table3),
+		update(Table3,(ret,Result),Table4),
+		updateReturnValue(Table4,Table5),
+	state(OutS,Table5,Cin2,Cout2,Trace2).
 	
 % FOR
-step(Entry,('for',_,_),0,Entry):-!.
+step(EntryS,('for',[_=Line],_),0,OutS):-!,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(OutS,Table,Cin,Cout,Trace1).
 
-step(Entry,('for',_,[Variable,Condition,Advance,('body',_,ForBody)]),N,Out):-
-	variableAdvance(Entry,Variable,VariableName,Entry1),
-	resolveExpression(Entry1,Condition,true),
-	execute(Entry1,ForBody,Out1),
-	execute(Out1,[Advance],Out2),
+step(EntryS,('for',[_=Line],[Variable,Condition,Advance,('body',_,ForBody)]),N,OutS):-
+	state(EntryS,Table,Cin,Cout,Trace),
+		variableAdvance(Table,Variable,VariableName,Table1),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table1,Cin,Cout,Trace1),
+
+	resolveExpression(EntryS1,Condition,1,EntryS2),
+	execute(EntryS2,ForBody,EntryS3),
+	execute(EntryS3,[Advance],EntryS4),
+
 	N1 is N - 1,
-	step(Out2,('for',_,[VariableName,Condition,Advance,('body',_,ForBody)]),N1,Out).
+	step(EntryS4,('for',[_=Line],[VariableName,Condition,Advance,('body',_,ForBody)]),N1,OutS).
 
-step(Entry,('for',_,_),_,Entry):-!.
+step(EntryS,('for',[_=Line],_),_,OutS):-!,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(OutS,Table,Cin,Cout,Trace1).
 
 % WHILE
-step(Entry,('while',_,_),0,Entry):-!.
+step(EntryS,('while',[_=Line],_),0,OutS):-!,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(OutS,Table,Cin,Cout,Trace1).
 
-step(Entry,('while',_,[Condition,('body',_,WhileBody)]),N,Out):-
-	resolveExpression(Entry,Condition,true),
-	execute(Entry,WhileBody,Out1),
+step(EntryS,('while',[_=Line],[Condition,('body',_,WhileBody)]),N,OutS):-
+	state(EntryS,Table,Cin,Cout,Trace),
+		variableAdvance(Table,Variable,VariableName,Table1),
+		append(Trace,[Line],Trace1),
+	state(EntryS1,Table1,Cin,Cout,Trace1),
+
+	resolveExpression(EntryS1,Condition,1,EntryS2),
+	execute(EntryS2,WhileBody,EntryS3),
+
 	N1 is N - 1,
-	step(Out1,('while',_,[Condition,('body',_,WhileBody)]),N1,Out).
+	step(EntryS3,('while',[_=Line],[Condition,('body',_,WhileBody)]),N1,OutS).
 
-step(Entry,('while',_,_),_,Entry):-!.
+step(EntryS,('while',[_=Line],_),_,OutS):-!,
+	state(EntryS,Table,Cin,Cout,Trace),
+		append(Trace,[Line],Trace1),
+	state(OutS,Table,Cin,Cout,Trace1).
 
-step(Entry,_,_,Entry).
+step(EntryS,_,_,EntryS).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -216,25 +350,39 @@ step(Entry,_,_,Entry).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-resolveExpression(Entry,('binaryOperator',Operator,[X,Y]),Result):-
+resolveExpression(EntryS,('notOperator',_,Expr),NotResult,OutS):-
+	resolveExpression(EntryS,Expr,Result,OutS),
+	not(Result,NotResult).
+
+resolveExpression(EntryS,('signOperator',[type='-'],Expr),InvResult,OutS):-
+	resolveExpression(EntryS,Expr,Result,OutS),
+	work('*',-1,Result,InvResult).
+
+resolveExpression(EntryS,('signOperator',[type='+'],Expr),Result,OutS):-
+	resolveExpression(EntryS,Expr,Result,OutS).
+
+
+resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-
 	getContent(Operator,Op),
-	resolveExpression(Entry,X, Operand1),
-	resolveExpression(Entry,Y, Operand2),
+	resolveExpression(EntryS,X, Operand1,EntryS1),
+	resolveExpression(EntryS1,Y, Operand2,OutS),
 	work(Op, Operand1, Operand2,Result).
 
-resolveExpression(Entry,('unaryOperator',[name=Name,Operator],[]),Result):-!,
-	resolveExpression(Entry,('binaryOperator',[Operator],[('variable',[_=Name],[]),('constValue',1,[])]),Result).
+resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
+	state(EntryS,Table,_,_,_),
+	getValue(Table,OperandName,OperandValue).
 
-resolveExpression(Entry,('unaryOperator',[name=Name,Operator],[Y]),Result):-!,
-	resolveExpression(Entry,('binaryOperator',[Operator],[('variable',[_=Name],[]),Y]),Result).
+resolveExpression(EntryS,('constValue',Value,_),Value,EntryS). % DEPRECATED?
 
-resolveExpression(Entry,('variable',[_=OperandName],_),OperandValue):-
-	getValue(Entry,OperandName,OperandValue).
-
-resolveExpression(_,('constValue',Value,_),Value).
-
-resolveExpression(_,('const',[_=Value],_),Result):-
+resolveExpression(EntryS,('const',[_=Value],_),Result,EntryS):-
 	atom_number(Value,Result).
+
+resolveExpression(EntryS,('consoleIn',[_=int],_),Value,OutS):-
+	state(EntryS,Table,Cin,Cout,Trace),
+	inf(X), sup(Y),
+	Value in X..Y,
+	append(Cin,[Value],Cin1),
+	state(OutS,Table,Cin1,Cout,Trace).
 
 resolveExpression(Entry,('callFunction',[name=Name, type=Type],Params),ValueReturned):-!,
 	apila(Entry,Entry1),
@@ -252,26 +400,32 @@ resolveExpression(Entry,('callFunction',[name=Name, type=Type],Params),ValueRetu
 						%%%%%%%%%%%%
 
 
-work('<', Op1,Op2,true):- Op1 #< Op2.
-work('<', _,_,false).
+work('<', Op1,Op2,1):- Op1 #< Op2.
+work('<', _,_,0).
 
-work('<=', Op1,Op2, true):- Op1 #=< Op2.
-work('<=', _,_,false).
+work('<=', Op1,Op2, 1):- Op1 #=< Op2.
+work('<=', _,_,0).
 
-work('>=', Op1,Op2,true):- Op1 #>= Op2.
-work('>=', _,_,false).
+work('>=', Op1,Op2,1):- Op1 #>= Op2.
+work('>=', _,_,0).
 
-work('>', Op1,Op2,true):- Op1 #> Op2.
-work('>', _,_,false).
+work('>', Op1,Op2,1):- Op1 #> Op2.
+work('>', _,_,0).
 
-work('==', Op1,Op2,true):- Op1 #= Op2.
-work('==', _,_,false).
+work('==', Op1,Op2,1):- Op1 #= Op2.
+work('==', _,_,0).
 
-work('!=', Op1,Op2,true):- Op1 #\= Op2.
-work('!=', _,_,false).
+work('!=', Op1,Op2,1):- Op1 #\= Op2.
+work('!=', _,_,0).
 
-work('&&', Op1,Op2,true):- Op1 #/\ Op2.
-work('&&', _,_,false).
+work('&&', Op1,Op2,1):- Op1 #/\ Op2.
+work('&&', _,_,0).
+
+work('||', Op1,Op2,1):- Op1 #\/ Op2.
+work('||', _,_,0).
+
+not(Value,1):-Value#=0.
+not(Value,0):-Value#=1.
 
 
 						%%%%%%%%%%%%%%%%%%

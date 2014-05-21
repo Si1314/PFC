@@ -20,10 +20,17 @@ variableAdvance(Entry,Variable,Variable,Entry).
 
 % Devuelve el contenido de lo que se le pase por parametro: una "op", el nombre de la variable...
 
+getContent([Op], Op):- !.
 getContent([_= (Op)], Op):- !.
 getContent([_,_= (Op)], Op):- !.
 getContent((_,[_=Name],_), Name):- !.
 getContent([('declaration',[_,name=VariableName],_)],VariableName).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Permite conformar un State = (Tabla,ConsolaInput,ConsolaOutput,Trace)
+
+state((T,Cinput,Coutput,Trace),T,Cinput,Coutput,Trace).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
