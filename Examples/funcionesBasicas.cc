@@ -48,3 +48,39 @@ int introduceEntero(int a){
 	ConsoleOut_Int(a);
 	return 0;
 }
+
+int pruebaIf01(int a){
+	if (a==0) return 1;
+	if (a>0) return 3;
+	if (a<0) return -2;
+}
+
+int pruebaIf02(int a){
+	if(a>=0){
+		return 2;
+	}else{
+		return -2;
+	}
+}
+
+
+int pruebaFor01(int a){
+	if(a>0){
+		int r = 0;
+		for(int i=0;i<10;i++){
+			r += a;
+		}
+		return r;
+	}else{
+		return -1;
+	}
+}
+
+int pruebaWhile01(int a){
+	int r = a;
+	while(r>0){
+		ConsoleOut_Int(r);
+		r--;
+	}
+	return 0;
+}
