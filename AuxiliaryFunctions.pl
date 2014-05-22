@@ -55,8 +55,9 @@ removeEmptyAux([_|List],Ac,ReturnedList):-
 % (N,V) = (nombre,valor)
 
 writeList(_,[]):- !.
-writeList(Stream,[(N,V)|Xs]):- !,
+writeList(Stream,[(N,V,T,Cin,Cout)|Xs]):- !,
 	writeInXML(Stream,N,V),	% writeInXML para guardar bien en el XML, writeInXML2 para guardarlo mal
+	writeInXML(Stream,T,Cin,Cout),
 	writeList(Stream,Xs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,6 +76,15 @@ writeInXMLAux(_,_,[],Ac,Ac):-!.
 writeInXMLAux(Stream,[N|Ns],[V|Vs],Ac,Zs):-
 	append(Ac,[element(variable,[name=N,value=V],[])],Ac1),
 	writeInXMLAux(Stream,Ns,Vs,Ac1,Zs).
+
+writeInXML(Stream,T,Cin,Cout):-
+	xml_write(Stream,
+		element(data,[],[
+			element(traza,[],T),
+			element(cin,[],Cin),
+			element(cout,[],Cout)
+		]),[header(false)]),
+	xml_write(Stream,'\n',[header(false)]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

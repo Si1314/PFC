@@ -22,7 +22,7 @@
 					%%%%%%%%%%%%%%%
 
 % First you have to keep this file in a folder called "PFC"
-% Then open swi Prolog and write "interpreter('salida4.xml','output4.xml')." to test it
+% Then open swi Prolog and write "interpreter('funcionesBasicas.xml','output4.xml',potencia)." to test it
 
 % Funcion principal, se le puede meter el fichero de entrada y salida, o incluirle también
 % las variables inf, sup y maxDepth, si no se incluyen se ponen por defecto a: -3, 3 y 10
@@ -45,7 +45,7 @@ interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):-
 	retractall(maxDepth(_)),
 	assert(maxDepth(MaxDepth)),
 
-	findall((N,L,T,Cin,Cout),interpreterAux(EntryFile,N,L, FunctionName),V),
+	findall((N,L,T,Cin,Cout),interpreterAux(EntryFile,N,L,FunctionName,T,Cin,Cout),V),
 	%interpreterAux(EntryFile, N,L),
 	%write(V), write('\n'),
 	open(OutFile, write, Stream, []),
@@ -54,7 +54,7 @@ interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):-
    	%writeList(Stream,(N,L)),
     close(Stream).
 
-interpreterAux(EntryFile,LabelTableNames, LabelTableValues, FunctionName):-
+interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Cinput,Coutput):-
 	load_xml_file(EntryFile, Program),
 
 	removeEmpty(Program,GoodProgram),
