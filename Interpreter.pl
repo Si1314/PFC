@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interpreter(EntryFile, OutFile, FunctionName):- 
-	interpreter(EntryFile, OutFile, -10, 10, 10, FunctionName). % Defaults
+	interpreter(EntryFile, OutFile, -5, 100, 200, FunctionName). % Defaults
 
 interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):- 
 	assert(inf(0)),
@@ -93,8 +93,9 @@ execute(Entry,[('while',Data,[C,('body',_,B)])|RestInstructios],Out) :-!,
 	execute(Out1,RestInstructios,Out).
 
 execute(Entry,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
+	write(ffffff),write('\n'),
 	maxDepth(N),
-	step(Entry,('for',Data,[V,C,A,('body',_,B)]),N,Out1),
+	step(Entry,[('for',Data,[V,C,A,[('body',_,B)]])],N,Out1),
 	execute(Out1,RestInstructios,Out).
 
 %execute(Entry,[('function',Data,BodyFunction)|_],Out) :-!,
@@ -166,18 +167,19 @@ step(EntryS,('declarations',_,Body),OutS) :- !,
 	execute(EntryS,Body,OutS).
 
 step(EntryS,('declaration',[_=int,_=Name,_=Line],[(const,[value=Value],_)]),OutS):- !,
-	write(declara1),write(Line),write('\n'),
+	write(declara1_),write('\n'),
 	atom_number(Value,Value1),
-
 	state(EntryS,Table,Cin,Cout,Trace),
+		%write(Value1),write('\n'),
 		add(Table,(int,Name,Value1),Table1),
+		%write(hechoAdd),write('\n'),
 		append(Trace,[Line],Trace1),
 	state(OutS,Table1,Cin,Cout,Trace1).
 
-step(EntryS,('declaration',[_=int,_=Name,_=Line],[DecBody]),OutS):- !,
+step(EntryS,('declaration',[_=int,_=Name,_=Line],DecBody),OutS):- !,
 	inf(X), sup(Y),
 	Value in X..Y,
-	write(declara2),write(Line),write('\n'),
+	write(declara2_),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
@@ -300,34 +302,41 @@ step(EntryS,('return',[_=Line],[Body]),OutS):-!,
 %	state(OutS,Table5,Cin2,Cout2,Trace2).
 
 	resolveExpression(EntryS1,Body,Value,EntryS2),
-
+	write('result_:->'),write(Value),write('<-\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		update(Table2,(ret,Value),Table3),
 	state(OutS,Table3,Cin2,Cout2,Trace2).
 	
 % FOR
-step(EntryS,('for',[_=Line],_),0,OutS):-!,
+step(EntryS,[('for',[_=Line],_)],0,OutS):-!,
+	write(entraFor1),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[Line],Trace1),
 	state(OutS,Table,Cin,Cout,Trace1).
 
-step(EntryS,('for',[_=Line],[Variable,Condition,Advance,('body',_,ForBody)]),N,OutS):-
-	state(EntryS,Table,Cin,Cout,Trace),
-		variableAdvance(Table,Variable,VariableName,Table1),
-		append(Trace,[Line],Trace1),
-	state(EntryS1,Table1,Cin,Cout,Trace1),
-
-	resolveExpression(EntryS1,Condition,1,EntryS2),
-	execute(EntryS2,ForBody,EntryS3),
-	execute(EntryS3,[Advance],EntryS4),
-
+step(EntryS,[('for',[_=Line],[Variable,Condition,Advance,[('body',_,ForBody)]])],N,OutS):-
+	write(entraFor2A),write('\n'),
+	write(Variable),write('\n'),
+	variableAdvance(EntryS,Variable,VariableName,EntryS1),
+	state(EntryS1,Table1,Cin1,Cout1,Trace1),
+	append(Trace1,[Line],Trace2),
+	state(EntryS2,Table1,Cin1,Cout1,Trace2),
+	write(entraFor2B),write('\n'),
+	resolveExpression(EntryS2,Condition,1,EntryS3),
+	write(entraFor2C),write('\n'),
+	execute(EntryS3,ForBody,EntryS4),
+	write(entraFor2D),write('\n'),
+	execute(EntryS4,[Advance],EntryS5),
+	write(entraFor2E),write('\n'),
 	N1 is N - 1,
-	step(EntryS4,('for',[_=Line],[VariableName,Condition,Advance,('body',_,ForBody)]),N1,OutS).
+	write(N1),write('\n'),
+	step(EntryS5,[('for',[_=Line],[VariableName,Condition,Advance,[('body',_,ForBody)]])],N1,OutS).
 
-step(EntryS,('for',[_=Line],_),_,OutS):-!,
-	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
-	state(OutS,Table,Cin,Cout,Trace1).
+step(EntryS,[('for',[_=Line],B)],N,EntryS):-!.
+%	write(entraFor3),write('\n'),
+%	state(EntryS,Table,Cin,Cout,Trace),
+%		append(Trace,[Line],Trace1),
+%	state(OutS,Table,Cin,Cout,Trace1).
 
 % WHILE
 step(EntryS,('while',[_=Line],_),0,OutS):-!,
@@ -371,18 +380,18 @@ resolveExpression(EntryS,('notOperator',_,[Expr]),NotResult,OutS):-
 resolveExpression(EntryS,('signOperator',[type='-'],[Expr]),InvResult,OutS):-
 	write(Expr),write('\n'),
 	resolveExpression(EntryS,Expr,Result,OutS),
-	work('*',-1,Result,InvResult).
+	work('*',-1,Result,InvResult),write(InvResult),write('\n').
 
 resolveExpression(EntryS,('signOperator',[type='+'],[Expr]),Result,OutS):-
 	write(signOp),write('\n'),
-	resolveExpression(EntryS,Expr,Result,OutS).
+	resolveExpression(EntryS,Expr,Result,OutS),write(Result),write('\n').
 
 
 resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-
 	getContent(Operator,Op),
-	write(cosa),write('\n'),
-	write(X),write('\n'),
-	write(Y),write('\n'),
+	%write(cosa),write('\n'),
+	%write(X),write('\n'),
+	%write(Y),write('\n'),
 	resolveExpression(EntryS,X, Operand1,EntryS1),
 	resolveExpression(EntryS1,Y, Operand2,OutS),
 	write(operand),write(Operand1),write('\n'),
@@ -391,15 +400,15 @@ resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-
 
 resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
 	state(EntryS,Table,_,_,_),
-	write(OperandName),write('\n'),
+	%write(OperandName),write('\n'),
 	getValue(Table,OperandName,OperandValue).
 
 resolveExpression(EntryS,('constValue',Value,_),Value,EntryS). % DEPRECATED?
 
 resolveExpression(EntryS,('const',[_=Value],_),Result,EntryS):-
-	write(jola_),write(Value),
+	write('jola,'),write(Value),write('\n'),
 	atom_number(Value,Result),
-	write(Result).
+	write('jola,'),write(Result),write('\n').
 
 resolveExpression(EntryS,('consoleIn',[_=int],_),Value,OutS):-
 	state(EntryS,Table,Cin,Cout,Trace),

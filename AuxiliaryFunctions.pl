@@ -11,7 +11,10 @@
 
 variableAdvance(Entry,('declarations',_,Variable),VarName,Out):-
 	getContent(Variable,VarName), !,
+	%write(hechoGetContent),write('\n'),
+	%write(Variable),write('\n'),
 	execute(Entry,Variable,Out).
+	%write(execute),write('\n').
 
 variableAdvance(Entry,Variable,Variable,Entry).
 
@@ -20,11 +23,12 @@ variableAdvance(Entry,Variable,Variable,Entry).
 
 % Devuelve el contenido de lo que se le pase por parametro: una "op", el nombre de la variable...
 
+getContent([('declaration',[_,name=VariableName,_],_)],VariableName):-!.
 getContent([Op], Op):- !.
 getContent([_= (Op)], Op):- !.
 getContent([_,_= (Op)], Op):- !.
 getContent((_,[_=Name],_), Name):- !.
-getContent([('declaration',[_,name=VariableName],_)],VariableName).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
