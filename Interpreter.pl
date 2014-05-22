@@ -45,7 +45,7 @@ interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):-
 	retractall(maxDepth(_)),
 	assert(maxDepth(MaxDepth)),
 
-	findall((N,L),interpreterAux(EntryFile,N,L, FunctionName),V),
+	findall((N,L,T,Cin,Cout),interpreterAux(EntryFile,N,L, FunctionName),V),
 	%interpreterAux(EntryFile, N,L),
 	%write(V), write('\n'),
 	open(OutFile, write, Stream, []),
