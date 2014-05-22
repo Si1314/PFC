@@ -120,7 +120,8 @@ step(EntryS,('function',[_,_=void,_=Line],FunctionBody),OutS) :- !,
 	write(fuuuuu),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table1,Cin,Cout,Trace1),
 
 	execute(EntryS1,FunctionBody,OutS).
@@ -130,7 +131,8 @@ step(EntryS,('function',[_,_=ExitValue,_=Line],FunctionBody),OutS) :- !,
 		apila(Table,Table1),
 		getTuple(ExitValue,Tuple),
 		add(Table1,Tuple,Table2),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table2,Cin,Cout,Trace1),
 
 	execute(EntryS1,FunctionBody,OutS).
@@ -173,7 +175,8 @@ step(EntryS,('declaration',[_=int,_=Name,_=Line],[(const,[value=Value],_)]),OutS
 		%write(Value1),write('\n'),
 		add(Table,(int,Name,Value1),Table1),
 		%write(hechoAdd),write('\n'),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(OutS,Table1,Cin,Cout,Trace1).
 
 step(EntryS,('declaration',[_=int,_=Name,_=Line],DecBody),OutS):- !,
@@ -181,7 +184,8 @@ step(EntryS,('declaration',[_=int,_=Name,_=Line],DecBody),OutS):- !,
 	Value in X..Y,
 	write(declara2_),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,DecBody,Value,EntryS2),
@@ -194,14 +198,16 @@ step(EntryS,('declaration',[_=Type,_=Name,_=Line],DecBody),OutS):- !,
 	write(declara3),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		add(Table,(Type,Name,_),Table1),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table1,Cin,Cout,Trace1),
 
 	execute(EntryS1,DecBody,OutS).
 
 step(EntryS,('assignment',[_=Name,_=Line],AssigBody),OutS) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,AssigBody,Value,EntryS2),
@@ -212,7 +218,8 @@ step(EntryS,('assignment',[_=Name,_=Line],AssigBody),OutS) :- !,
 
 step(EntryS,('assignmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody]),OutS) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,
@@ -227,7 +234,8 @@ step(EntryS,('assignmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody]),OutS
 step(EntryS,('unaryOperator',[_=Name,_=Operator,_=Line],[]),OutS):-!,
 	write(unary),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,
@@ -242,7 +250,8 @@ step(EntryS,('unaryOperator',[_=Name,_=Operator,_=Line],[]),OutS):-!,
 
 step(EntryS,('consoleOut',[_=Line],Expr),OutS):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,Expr,Value,EntryS2),
@@ -254,7 +263,8 @@ step(EntryS,('consoleOut',[_=Line],Expr),OutS):-!,
 % IF -> THEN
 step(EntryS,('if',[_=Line],[Condition,('then',_,Then),_]),OutS):-
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,Condition,1,EntryS2),
@@ -273,7 +283,8 @@ step(EntryS,('if',[_=Line],[Condition,('then',_,Then),_]),OutS):-
 step(EntryS,('if',[_=Line],[_,_,('else',_,Else)]),OutS):- !,
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table1,Cin,Cout,Trace1),
 
 	execute(EntryS1,Else,EntryS2),
@@ -282,14 +293,16 @@ step(EntryS,('if',[_=Line],[_,_,('else',_,Else)]),OutS):- !,
 		desapila(Table2, Table3),
 	state(OutS,Table3,Cin2,Cout2,Trace2).
 
-step(EntryS,('if',[_=Line],_),EntryS):- !.
+step(EntryS,('if',[_=_],_),EntryS):- !.
 %	state(EntryS,Table,Cin,Cout,Trace),
-%		append(Trace,[Line],Trace1),
+%		append(Trace,[' '],Space),
+%		append(Space,[Line],Trace1),
 %	state(OutS,Table,Cin,Cout,Trace1).
 
 step(EntryS,('return',[_=Line],[Body]),OutS):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 %	resolveExpression(EntryS1,Body,Result,EntryS2),
@@ -311,7 +324,8 @@ step(EntryS,('return',[_=Line],[Body]),OutS):-!,
 step(EntryS,[('for',[_=Line],_)],0,OutS):-!,
 	write(entraFor1),
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(OutS,Table,Cin,Cout,Trace1).
 
 step(EntryS,[('for',[_=Line],[Variable,Condition,Advance,[('body',_,ForBody)]])],N,OutS):-
@@ -319,7 +333,8 @@ step(EntryS,[('for',[_=Line],[Variable,Condition,Advance,[('body',_,ForBody)]])]
 	write(Variable),write('\n'),
 	variableAdvance(EntryS,Variable,VariableName,EntryS1),
 	state(EntryS1,Table1,Cin1,Cout1,Trace1),
-	append(Trace1,[Line],Trace2),
+	append(Trace1,[' '],Space),
+	append(Space,[Line],Trace2),
 	state(EntryS2,Table1,Cin1,Cout1,Trace2),
 	write(entraFor2B),write('\n'),
 	resolveExpression(EntryS2,Condition,1,EntryS3),
@@ -332,21 +347,24 @@ step(EntryS,[('for',[_=Line],[Variable,Condition,Advance,[('body',_,ForBody)]])]
 	write(N1),write('\n'),
 	step(EntryS5,[('for',[_=Line],[VariableName,Condition,Advance,[('body',_,ForBody)]])],N1,OutS).
 
-step(EntryS,[('for',[_=Line],B)],N,EntryS):-!.
+step(EntryS,[('for',[_=_],_)],_,EntryS):-!.
 %	write(entraFor3),write('\n'),
 %	state(EntryS,Table,Cin,Cout,Trace),
-%		append(Trace,[Line],Trace1),
+%		append(Trace,[' '],Space),
+%		append(Space,[Line],Trace1),
 %	state(OutS,Table,Cin,Cout,Trace1).
 
 % WHILE
 step(EntryS,('while',[_=Line],_),0,OutS):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(OutS,Table,Cin,Cout,Trace1).
 
 step(EntryS,('while',[_=Line],[Condition,('body',_,WhileBody)]),N,OutS):-
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,Condition,1,EntryS2),
@@ -357,7 +375,8 @@ step(EntryS,('while',[_=Line],[Condition,('body',_,WhileBody)]),N,OutS):-
 
 step(EntryS,('while',[_=Line],_),_,OutS):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[Line],Trace1),
+		append(Trace,[' '],Space),
+		append(Space,[Line],Trace1),
 	state(OutS,Table,Cin,Cout,Trace1).
 
 step(EntryS,_,_,EntryS).
