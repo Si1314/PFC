@@ -269,10 +269,32 @@
     </body>
 </function>
 
-<function name="pruebaFor01" type="int" line="67">
+<function name="pruebaIf03" type="int" line="66">
     <param type="int" name="a"/>
     <body>
-        <if line="68">
+        <if line="67">
+            <binaryOperator type="comparison" operator="&gt;=">
+                <variable name="a"/>
+                <const value="0"/>
+            </binaryOperator>
+            <then>
+                <body>
+                    <return line="68">
+                        <const value="2"/>
+                    </return>
+                </body>
+            </then>
+        </if>
+        <return line="70">
+            <const value="3"/>
+        </return>
+    </body>
+</function>
+
+<function name="pruebaFor01" type="int" line="73">
+    <param type="int" name="a"/>
+    <body>
+        <if line="74">
             <binaryOperator type="comparison" operator="&gt;">
                 <variable name="a"/>
                 <const value="0"/>
@@ -280,13 +302,13 @@
             <then>
                 <body>
                     <declarations>
-                        <declaration type="int" name="r" line="69">
+                        <declaration type="int" name="r" line="75">
                             <const value="0"/>
                         </declaration>
                     </declarations>
-                    <for line="70">
+                    <for line="76">
                         <declarations>
-                            <declaration type="int" name="i" line="70">
+                            <declaration type="int" name="i" line="76">
                                 <const value="0"/>
                             </declaration>
                         </declarations>
@@ -294,21 +316,21 @@
                             <variable name="i"/>
                             <const value="10"/>
                         </binaryOperator>
-                        <unaryOperator name="i" operator="+" line="70"/>
+                        <unaryOperator name="i" operator="+" line="76"/>
                         <body>
-                            <assignmentOperator name="r" type="arithmetic" operator="+" line="71">
+                            <assignmentOperator name="r" type="arithmetic" operator="+" line="77">
                                 <variable name="a"/>
                             </assignmentOperator>
                         </body>
                     </for>
-                    <return line="73">
+                    <return line="79">
                         <variable name="r"/>
                     </return>
                 </body>
             </then>
             <else>
                 <body>
-                    <return line="75">
+                    <return line="81">
                         <signOperator type="-">
                             <const value="1"/>
                         </signOperator>
@@ -319,27 +341,27 @@
     </body>
 </function>
 
-<function name="pruebaWhile01" type="int" line="79">
+<function name="pruebaWhile01" type="int" line="85">
     <param type="int" name="a"/>
     <body>
         <declarations>
-            <declaration type="int" name="r" line="80">
+            <declaration type="int" name="r" line="86">
                 <variable name="a"/>
             </declaration>
         </declarations>
-        <while line="81">
+        <while line="87">
             <binaryOperator type="comparison" operator="&gt;">
                 <variable name="r"/>
                 <const value="0"/>
             </binaryOperator>
             <body>
-                <consoleOut line="82">
+                <consoleOut line="88">
                     <variable name="r"/>
                 </consoleOut>
-                <unaryOperator name="r" operator="-" line="83"/>
+                <unaryOperator name="r" operator="-" line="89"/>
             </body>
         </while>
-        <return line="85">
+        <return line="91">
             <const value="0"/>
         </return>
     </body>

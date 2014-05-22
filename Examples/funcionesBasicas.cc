@@ -63,6 +63,12 @@ int pruebaIf02(int a){
 	}
 }
 
+int pruebaIf03(int a){
+	if (a>=0){ 
+		return 2;
+	}
+	return 3;
+}
 
 int pruebaFor01(int a){
 	if(a>0){
