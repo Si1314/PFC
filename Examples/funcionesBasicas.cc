@@ -49,6 +49,20 @@ int introduceEntero(int a){
 	return 0;
 }
 
+int llamadaFactorial(int a){
+	return factorial(a);
+}
+
+int ifLlamada(int a, int b){
+	int r;
+	if(a<=0){
+		r = factorial(b);
+	}else{
+		r = potencia(b,a);
+	}
+	return r;
+}
+
 int pruebaIf01(int a){
 	if (a==0) return 1;
 	if (a>0) return 3;
@@ -68,6 +82,16 @@ int pruebaIf03(int a){
 		return 2;
 	}
 	return 3;
+}
+
+int pruebaIf04(int a){
+	if (a==0) return 1;
+	else return -1;
+}
+
+int pruebaIf05(int a){
+	if (a==0) return 1;
+	else {return -1;}
 }
 
 int pruebaFor01(int a){
