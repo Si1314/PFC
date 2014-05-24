@@ -1,7 +1,10 @@
-<function name="potencia" type="int" line="3">
-    <param type="int" name="a"/>
+<function name="potencia" type="int" line="2">
+    <!--<param type="int" name="a"/>-->
     <param type="int" name="b"/>
     <body>
+        <declarations>
+            <declaration type="int" name="a" line="3"/>
+        </declarations>
         <if line="4">
             <binaryOperator type="comparison" operator="&gt;=">
                 <variable name="b"/>
@@ -192,7 +195,7 @@
     </body>
 </function>
 
-<function name="introduceEntero" type="int" line="47">
+<function name="escribeEntero" type="int" line="47">
     <param type="int" name="a"/>
     <body>
         <consoleOut line="48">
@@ -478,6 +481,102 @@
         </while>
         <return line="115">
             <const value="0"/>
+        </return>
+    </body>
+</function>
+
+<function name="pruebaWhile02" type="int" line="116">
+    <param type="int" name="a"/>
+    <param type="int" name="b"/>
+    <body>
+        <declarations>
+            <declaration type="int" name="c" line="117">
+                <variable name="b"/>
+            </declaration>
+        </declarations>
+        <declarations>
+            <declaration type="int" name="r" line="118">
+                <const value="1"/>
+            </declaration>
+        </declarations>
+        <while line="119">
+            <binaryOperator type="comparison" operator="&gt;">
+                <variable name="c"/>
+                <const value="0"/>
+            </binaryOperator>
+            <body>
+                <assignmentOperator name="r" type="arithmetic" operator="*" line="120">
+                    <variable name="a"/>
+                </assignmentOperator>
+                <unaryOperator name="c" operator="-" line="121"/>
+            </body>
+        </while>
+        <return line="122">
+            <variable name="r"/>
+        </return>
+    </body>
+</function>
+
+<function name="llamadaAFuncion" type="int" line="123">
+    <param type="int" name="a"/>
+    <body>
+        <declarations>
+            <declaration type="int" name="r" line="124"/>
+        </declarations>
+        
+        <assignment name="r" line="125">
+            <callFunction name="factorial" type="int">
+                <variable name="b"/>
+            </callFunction>
+        </assignment>
+
+        <return line="126">
+            <variable name="r"/>
+        </return>
+    </body>
+</function>
+
+<function name="main" type="int" line="127">
+    <param type="int" name="a"/>
+    <param type="int" name="b"/>
+    <body>
+        <declaration type="int" name="z" line="128"/>
+        <declaration type="int" name="h" line="129"/>
+        <assignment name="z" line="130">
+            <callFunction name="foo" type="int">
+                <param name="a" type="int"/>
+                <param name="b" type="int"/>
+            </callFunction>
+        </assignment>
+
+        <assignment name="h" line="131">
+            <const value="0"/>
+        </assignment>
+
+        <assigmentOperator name="z" line="132">
+            <unaryOperator name="z" operator="+" line="133"/>
+        </assigmentOperator>
+
+        <return line="134">
+            <variable name="z"/>
+        </return>
+    </body>
+</function>
+
+
+<function name="foo" type="int" line="">
+    <param type="int" name="aa"/>
+    <param type="int" name="bb"/>
+    <body>
+        <declaration type="int" name="zz" line=""/>
+        <assignment name="zz" line="">
+            <binaryOperator type="arithmetic" operator="+">
+                <variable name="aa"/>
+                <variable name="bb"/>
+            </binaryOperator>
+        </assignment>
+        <return line="">
+            <variable name="zz"/>
         </return>
     </body>
 </function>
