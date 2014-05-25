@@ -209,7 +209,9 @@
     <body>
         <return line="53">
             <callFunction name="factorial" type="int">
-                <variable name="a"/>
+                <arg>
+                    <variable name="a"/>
+                </arg>
             </callFunction>
         </return>
     </body>
@@ -231,7 +233,9 @@
                 <body>
                     <assignment name="r" line="59">
                         <callFunction name="factorial" type="int">
-                            <variable name="b"/>
+                            <arg>
+                                <variable name="b"/>
+                            </arg>
                         </callFunction>
                     </assignment>
                 </body>
@@ -240,8 +244,12 @@
                 <body>
                     <assignment name="r" line="61">
                         <callFunction name="potencia" type="int">
-                            <variable name="b"/>
-                            <variable name="a"/>
+                            <arg>
+                                <variable name="b"/>
+                            </arg>
+                            <arg>
+                                <variable name="a"/>
+                            </arg>
                         </callFunction>
                     </assignment>
                 </body>
