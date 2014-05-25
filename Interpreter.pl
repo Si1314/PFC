@@ -65,7 +65,7 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Ci
 	lookForFunction(GoodProgram,FunctionName,Function),
 	
 	state(InitS,[],[],[],[]),
-	execute(InitS,Function,EndS),
+		execute(InitS,Function,EndS),
 	state(EndS,ExitTable,Cinput,Coutput,Trace),
 
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
@@ -117,7 +117,7 @@ execute(Entry,[Instruction|RestInstructios],Out) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 step(EntryS,('function',[_,_=void,_=Line],FunctionBody),OutS) :- !,
-	write('fuuuuu'),write('\n'),
+	write('Metodo'),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
 		append(Trace,[' '],Space),
@@ -127,8 +127,10 @@ step(EntryS,('function',[_,_=void,_=Line],FunctionBody),OutS) :- !,
 	execute(EntryS1,FunctionBody,OutS).
 
 step(EntryS,('function',[_,_=ExitValue,_=Line],FunctionBody),OutS) :- !,
+	write('Funcion'),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
+		write('apilamos: '), write(Table1),
 		getTuple(ExitValue,Tuple),
 		add(Table1,Tuple,Table2),
 		append(Trace,[' '],Space),
@@ -211,8 +213,9 @@ step(EntryS,('assignment',[_=Name,_=Line],AssigBody),OutS) :- !,
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
+	write('\n---\n'),
 	resolveExpression(EntryS1,AssigBody,Value,EntryS2),
-
+	write('\n???\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		update(Table2,(Name,Value),Table3),
 	state(OutS,Table3,Cin2,Cout2,Trace2).
@@ -273,7 +276,7 @@ step(EntryS,('if',[_=Line],[Condition,('then',_,Then),_]),OutS):-
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,Condition,1,EntryS2),
-
+	write('\nTRUE IF\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		apila(Table2,Table3),
 	state(EntryS3,Table3,Cin2,Cout2,Trace2),
@@ -286,6 +289,7 @@ step(EntryS,('if',[_=Line],[Condition,('then',_,Then),_]),OutS):-
 
 % IF -> ELSE
 step(EntryS,('if',[_=Line],[_,_,('else',_,Else)]),OutS):- !,
+	write('\nFALSE IF\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
 		append(Trace,[' '],Space),
@@ -309,6 +313,8 @@ step(EntryS,('return',[_=Line],[Body]),OutS):-!,
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
+
+	write('\nTablaaaaaaaa:\n'), write(Table), write('\n'),
 
 %	resolveExpression(EntryS1,Body,Result,EntryS2),
 %	write('result: '),write(Result),write('\n'),
@@ -423,14 +429,18 @@ resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-
 	%write(Y),write('\n'),
 	resolveExpression(EntryS,X, Operand1,EntryS1),
 	resolveExpression(EntryS1,Y, Operand2,OutS),
-	write('operand'),write(Operand1),write('\n'),
-	write('operand'),write(Operand2),write('\n'),
-	work(Op, Operand1, Operand2,Result).
+	write('operand '),write(Operand1),write('\n'),
+	write('operand '),write(Operand2),write('\n'),
+	work(Op, Operand1, Operand2,Result),
+	write('result '),write(Result),write('\n').
 
 resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
 	state(EntryS,Table,_,_,_),
 	write('---resolveExpression---'),write('\n'),
-	getValue(Table,OperandName,OperandValue).
+	getValue(Table,OperandName,OperandValue),
+	write('\nTable \n'),write(Table),write('\n'),
+	write('\nOperandName \n'),write(OperandName),write('\n'),
+	write('\nOperandValue \n'),write(OperandValue),write('\n').
 
 resolveExpression(EntryS,('constValue',Value,_),Value,EntryS). % DEPRECATED?
 
@@ -446,14 +456,16 @@ resolveExpression(EntryS,('consoleIn',[_=int],_),Value,OutS):-
 	append(Cin,[Value],Cin1),
 	state(OutS,Table,Cin1,Cout,Trace).
 
-resolveExpression(Entry,('callFunction',[name=Name, type=Type],Params),ValueReturned, Out):-!,	% he añadido el Out
+resolveExpression((Entry,Cin,Cout,Trace),[('callFunction',[name=Name, type=Type],Params)],ValueReturned, (Out,Cin1,Cout1,Trace1)):-!,	% he añadido el Out
 	apila(Entry,Entry1),
 	addListParams(Entry1,Params,Out1),
 	program(Program),
+
 	lookForFunction(Program,Name,Type,Function),
+	
 	createListParams(Function,Body,ListParams),
 	updateNames(Out1,ListParams,Out2),
-	execute(Out2,Body,Out),
+	execute((Out2,Cin,Cout,Trace),Body,(Out,Cin1,Cout1,Trace1)),
 	returnesValue(Out,ValueReturned).
 
 						%%%%%%%%%%%%

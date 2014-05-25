@@ -1,38 +1,38 @@
 <function name="potencia" type="int" line="3">
-    <param type="int" name="a"/>
-    <param type="int" name="b"/>
+    <param type="int" name="bbb"/>
+    <param type="int" name="aaa"/>
     <body>
         <if line="4">
             <binaryOperator type="comparison" operator="&gt;=">
-                <variable name="b"/>
+                <variable name="aaa"/>
                 <const value="0"/>
             </binaryOperator>
             <then>
                 <body>
                     <declarations>
-                        <declaration type="int" name="c" line="5">
-                            <variable name="b"/>
+                        <declaration type="int" name="ccc" line="5">
+                            <variable name="aaa"/>
                         </declaration>
                     </declarations>
                     <declarations>
-                        <declaration type="int" name="r" line="6">
+                        <declaration type="int" name="rrr" line="6">
                             <const value="1"/>
                         </declaration>
                     </declarations>
                     <while line="7">
                         <binaryOperator type="comparison" operator="&gt;">
-                            <variable name="c"/>
+                            <variable name="ccc"/>
                             <const value="0"/>
                         </binaryOperator>
                         <body>
-                            <assignmentOperator name="r" type="arithmetic" operator="*" line="8">
-                                <variable name="a"/>
+                            <assignmentOperator name="rrr" type="arithmetic" operator="*" line="8">
+                                <variable name="bbb"/>
                             </assignmentOperator>
-                            <unaryOperator name="c" operator="-" line="9"/>
+                            <unaryOperator name="ccc" operator="-" line="9"/>
                         </body>
                     </while>
                     <return line="11">
-                        <variable name="r"/>
+                        <variable name="rrr"/>
                     </return>
                 </body>
             </then>
@@ -50,11 +50,11 @@
 </function>
 
 <function name="factorial" type="int" line="17">
-    <param type="int" name="a"/>
+    <param type="int" name="aa"/>
     <body>
         <if line="18">
             <binaryOperator type="comparison" operator="&gt;=">
-                <variable name="a"/>
+                <variable name="aa"/>
                 <const value="0"/>
             </binaryOperator>
             <then>
@@ -72,7 +72,7 @@
                         </declarations>
                         <binaryOperator type="comparison" operator="&lt;=">
                             <variable name="i"/>
-                            <variable name="a"/>
+                            <variable name="aa"/>
                         </binaryOperator>
                         <unaryOperator name="i" operator="+" line="20"/>
                         <body>
@@ -209,9 +209,9 @@
     <body>
         <return line="53">
             <callFunction name="factorial" type="int">
-                <arg>
+               
                     <variable name="a"/>
-                </arg>
+                
             </callFunction>
         </return>
     </body>
@@ -233,9 +233,9 @@
                 <body>
                     <assignment name="r" line="59">
                         <callFunction name="factorial" type="int">
-                            <arg>
+                           
                                 <variable name="b"/>
-                            </arg>
+                            
                         </callFunction>
                     </assignment>
                 </body>
@@ -244,12 +244,12 @@
                 <body>
                     <assignment name="r" line="61">
                         <callFunction name="potencia" type="int">
-                            <arg>
+                           
                                 <variable name="b"/>
-                            </arg>
-                            <arg>
+                            
+                           
                                 <variable name="a"/>
-                            </arg>
+                            
                         </callFunction>
                     </assignment>
                 </body>

@@ -135,10 +135,12 @@ lookForFunction([_|Xs],Name1,Result):-
 % Añade a la tabla de variablse los parámetros pasados en la lista
 
 addListParams(Entry,[],Entry):-!.
-addListParams(Entry,[(param,[name=Name,type=Type],_)|Xs],Out):-
-	getValue(Entry,Name,Value),
-	add(Entry,(Type,Name,Value),Out1),
-	addListParams(Out1,Xs,Out).
+
+addListParams(Entry,[(variable,[name=Name],_)|Xs],Out):-
+		getValue(Entry,Name,Value),
+		add(Entry,(int,Name,Value),Out1),	% TODO corregir el int
+		
+		addListParams(Out1,Xs,Out).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -173,5 +175,5 @@ updateReturnValue(Entry,Out):-
 	returnesValue(Entry,ValueReturned),
 	updateReturnValueAux(Entry,ValueReturned,Out).
 
-updateReturnValueAux([X,Y|Xs],ValueReturned,[X,Out1|Xs]):-
+updateReturnValueAux(([X,Y|Xs],Cin,Cout,Trace),ValueReturned,([X,Out1|Xs],Cin,Cout,Trace)):-
 	update([Y|[]],('ret',ValueReturned),[Out1]).
