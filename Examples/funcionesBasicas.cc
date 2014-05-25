@@ -44,7 +44,7 @@ int introduceEntero(){
 	return ConsoleIn_Int();
 }
 
-int escribeEntero(int a){
+int introduceEntero(int a){
 	ConsoleOut_Int(a);
 	return 0;
 }
@@ -113,20 +113,4 @@ int pruebaWhile01(int a){
 		r--;
 	}
 	return 0;
-}
-
-int pruebaWhile02(int a, int b){
-	int c = b;
-	int r = 1;
-	while(c>0){
-		r *= a;
-		c--;
-	}
-	return r;
-}
-
-int llamadaAFuncion(int a){
-	int r;
-	r = factorial(a);
-	return r;
 }
