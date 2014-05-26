@@ -461,13 +461,41 @@ resolveExpression(EntryS,('consoleIn',[_=int],_),Value,OutS):-
 	append(Cin,[Value],Cin1),
 	state(OutS,Table,Cin1,Cout,Trace).
 
-resolveExpression(EntryS,('callFunction',[name=Name, type=Type],Args),ValueReturned,OutS):-!,
+
+resolveExpression(EntryS,('callFunction',[name=Name, type=Type],Args),ValueReturned,OutS):-
+	write('en la caallllfunciton '),write('\n'),
 	program(Program),
-	lookForFunction(Program,Name,Type,[Params,Function]),
+	lookForFunction(Program,Name,Type,[(_,_,Params),Function]),
 	write('params '),write(Params),write('\n'),
-	write('funcion '),write(Function),write('\n'),
+	%write('funcion '),write(Function),write('\n'),
 	write('argumentos '),write(Args),write('\n'),
-	ValueReturned #= 1.
+	apila([],TCall),
+	getTuple(ExitValue,Tuple),
+	add(TCall,Tuple,TCall1),
+	buildCallTable(EntryS,EntryS1,TCall1,Params,Args,TCall2),
+	state(EntryS1,Table,Cin,Cout,Trace),
+	state(EntryCall,TCall2,Cin,Cout,Trace),!,
+	execute(EntryCall,[Function],EntryS2),
+	state(EntryS2,[[(_,_,ValueReturned)|_]],Cin2,Cout2,Trace2),
+	write('el estado de vuelta '),write(ValueReturned),write('\n'),
+	state(OutS,Table,Cin2,Cout2,Trace2).
+	%ValueReturned #= 1.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Inicializamos una tabla con los valores de los argumentos pasados a la llamada
+
+buildCallTable(S,S,T,[],[],T):-!,
+write('tablitaaa'),write(T),write('\n').
+
+buildCallTable(EntryS,OutS,Tin,[(_,[_=Type,_=Name],_)|Params],[(_,_,[Arg])|Args],Tout):-
+	write('estamos construyendo la tabla '),write('\n'),
+	resolveExpression(EntryS,Arg,Value,EntryS1),
+	write('meteremos el valor en la tabla '),write('\n'),
+	add(Tin,(Type,Name,Value),T1),
+	write('metido el valor en la tabla '),write('\n'),
+	buildCallTable(EntryS1,OutS,T1,Params,Args,Tout).
+
 
 %resolveExpression((Entry,Cin,Cout,Trace),[('callFunction',[name=Name, type=Type],Params)],ValueReturned, (Out,Cin1,Cout1,Trace1)):-!,	% he añadido el Out
 %	apila(Entry,Entry1),

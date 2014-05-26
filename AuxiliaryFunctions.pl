@@ -177,3 +177,5 @@ updateReturnValue(Entry,Out):-
 
 updateReturnValueAux(([X,Y|Xs],Cin,Cout,Trace),ValueReturned,([X,Out1|Xs],Cin,Cout,Trace)):-
 	update([Y|[]],('ret',ValueReturned),[Out1]).
+
+
