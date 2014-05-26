@@ -129,15 +129,20 @@ step(EntryS,('function',[_,_=void,_=Line],FunctionBody),OutS) :- !,
 step(EntryS,('function',[_,_=ExitValue,_=Line],FunctionBody),OutS) :- !,
 	write('Funcion'),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
+	write('esta es la tabla nada más comenzandoA: '), write(Table),write('\n'),
 		apila(Table,Table1),
-		write('apilamos: '), write(Table1),
+		write('apilamos: '), write(Table1),write('\n'),
 		getTuple(ExitValue,Tuple),
 		add(Table1,Tuple,Table2),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table2,Cin,Cout,Trace1),
-
+	write('esta es la tabla nada más comenzandoB: '), write(Table2),write('\n'),
 	execute(EntryS1,FunctionBody,OutS).
+
+step(EntryS,('params',_,Params),OutS) :- !,
+	write('estoy en Params: '), write(Params),write('\n'),
+	execute(EntryS,Params,OutS).
 
 step(EntryS,('param',[_=int,_=ParamName],ParamBody),OutS) :- !,
 	inf(X), sup(Y),
@@ -456,17 +461,25 @@ resolveExpression(EntryS,('consoleIn',[_=int],_),Value,OutS):-
 	append(Cin,[Value],Cin1),
 	state(OutS,Table,Cin1,Cout,Trace).
 
-resolveExpression((Entry,Cin,Cout,Trace),[('callFunction',[name=Name, type=Type],Params)],ValueReturned, (Out,Cin1,Cout1,Trace1)):-!,	% he añadido el Out
-	apila(Entry,Entry1),
-	addListParams(Entry1,Params,Out1),
+resolveExpression(EntryS,('callFunction',[name=Name, type=Type],Args),ValueReturned,OutS):-!,
 	program(Program),
+	lookForFunction(Program,Name,Type,[Params,Function]),
+	write('params '),write(Params),write('\n'),
+	write('funcion '),write(Function),write('\n'),
+	write('argumentos '),write(Args),write('\n'),
+	ValueReturned #= 1.
 
-	lookForFunction(Program,Name,Type,Function),
+%resolveExpression((Entry,Cin,Cout,Trace),[('callFunction',[name=Name, type=Type],Params)],ValueReturned, (Out,Cin1,Cout1,Trace1)):-!,	% he añadido el Out
+%	apila(Entry,Entry1),
+%	addListParams(Entry1,Params,Out1),
+%	program(Program),
+
+%	lookForFunction(Program,Name,Type,Function),
 	
-	createListParams(Function,Body,ListParams),
-	updateNames(Out1,ListParams,Out2),
-	execute((Out2,Cin,Cout,Trace),Body,(Out,Cin1,Cout1,Trace1)),
-	returnesValue(Out,ValueReturned).
+%	createListParams(Function,Body,ListParams),
+%	updateNames(Out1,ListParams,Out2),
+%	execute((Out2,Cin,Cout,Trace),Body,(Out,Cin1,Cout1,Trace1)),
+%	returnesValue(Out,ValueReturned).
 
 						%%%%%%%%%%%%
 						%   BOOL   %
