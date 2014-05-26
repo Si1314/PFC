@@ -101,9 +101,9 @@ execute(Entry,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
 %execute(Entry,[('function',Data,BodyFunction)|_],Out) :-!,
 %	step(Entry,('function',Data,BodyFunction),Out). %para que solo haga el main
 
-execute(Entry,[('return',D1,D2)|_],Out) :-!,
-	write('estoy haciendo return'),write('\n'),
-	step(Entry,('return',D1,D2),Out),!.
+%execute(Entry,[('return',D1,D2)|_],Out) :-!,
+	%write('estoy haciendo return'),write('\n'),
+	%step(Entry,('return',D1,D2),Out),!.
 
 execute(Entry,[Instruction|RestInstructios],Out) :-
 	write(Instruction),write('\n'),
@@ -474,7 +474,7 @@ resolveExpression(EntryS,('callFunction',[name=Name, type=Type],Args),ValueRetur
 	%write('funcion '),write(Function),write('\n'),
 	write('argumentos '),write(Args),write('\n'),
 	apila([],TCall),
-	getTuple(ExitValue,Tuple),
+	getTuple(Type,Tuple),
 	add(TCall,Tuple,TCall1),
 	buildCallTable(EntryS,EntryS1,TCall1,Params,Args,TCall2),
 	state(EntryS1,Table,Cin,Cout,Trace),
