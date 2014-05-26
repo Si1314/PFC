@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interpreter(EntryFile, OutFile, FunctionName):- 
-	interpreter(EntryFile, OutFile, -5, 10, 20, FunctionName). % Defaults
+	interpreter(EntryFile, OutFile, -5, 15, 5, FunctionName). % Defaults
 
 interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):- 
 	assert(inf(0)),
@@ -101,9 +101,9 @@ execute(Entry,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
 %execute(Entry,[('function',Data,BodyFunction)|_],Out) :-!,
 %	step(Entry,('function',Data,BodyFunction),Out). %para que solo haga el main
 
-%execute(Entry,[('return',D1,D2)|_],Out) :-!,
-	%write('estoy haciendo return'),write('\n'),
-	%step(Entry,('return',D1,D2),Out),!.
+execute(Entry,[('return',D1,D2)|_],Out) :-!,
+	write('estoy haciendo return'),write('\n'),
+	step(Entry,('return',D1,D2),Out),!.
 
 execute(Entry,[Instruction|RestInstructios],Out) :-
 	write(Instruction),write('\n'),
@@ -367,12 +367,12 @@ step(EntryS,[('for',[_=Line],[Variable,Condition,Advance,[('body',_,ForBody)]])]
 	write(N1),write('\n'),
 	step(EntryS5,[('for',[_=Line],[VariableName,Condition,Advance,[('body',_,ForBody)]])],N1,OutS).
 
-step(EntryS,[('for',[_=Line],_)],_,OutS):-!,
-	write('entraFor3'),write('\n'),
-	state(EntryS,Table,Cin,Cout,Trace),
-		append(Trace,[' '],Space),
-		append(Space,[Line],Trace1),
-	state(OutS,Table,Cin,Cout,Trace1).
+%step(EntryS,[('for',[_=Line],_)],_,OutS):-!,
+%	write('entraFor3'),write('\n'),
+%	state(EntryS,Table,Cin,Cout,Trace),
+%		append(Trace,[' '],Space),
+%		append(Space,[Line],Trace1),
+%	state(OutS,Table,Cin,Cout,Trace1).
 
 % WHILE
 step(EntryS,('while',[_=Line],_),0,OutS):-!,

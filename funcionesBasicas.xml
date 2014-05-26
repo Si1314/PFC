@@ -1,8 +1,6 @@
 <function name="potencia" type="int" line="3">
-    <params>
-        <param type="int" name="a"/>
-        <param type="int" name="b"/>
-    </params>
+    <param type="int" name="a"/>
+    <param type="int" name="b"/>
     <body>
         <if line="4">
             <binaryOperator type="comparison" operator="&gt;=">
@@ -52,9 +50,7 @@
 </function>
 
 <function name="factorial" type="int" line="17">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <if line="18">
             <binaryOperator type="comparison" operator="&gt;=">
@@ -104,9 +100,7 @@
 </function>
 
 <function name="fibonacci" type="int" line="29">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <if line="30">
             <binaryOperator type="comparison" operator="&lt;">
@@ -191,7 +185,6 @@
 </function>
 
 <function name="introduceEntero" type="int" line="43">
-    <params/>
     <body>
         <return line="44">
             <consoleIn type="int"/>
@@ -200,9 +193,7 @@
 </function>
 
 <function name="introduceEntero" type="int" line="47">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <consoleOut line="48">
             <variable name="a"/>
@@ -214,9 +205,7 @@
 </function>
 
 <function name="llamadaFactorial" type="int" line="52">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <return line="53">
             <callFunction name="factorial" type="int">
@@ -229,10 +218,8 @@
 </function>
 
 <function name="ifLlamada" type="int" line="56">
-    <params>
-        <param type="int" name="a"/>
-        <param type="int" name="b"/>
-    </params>
+    <param type="int" name="a"/>
+    <param type="int" name="b"/>
     <body>
         <declarations>
             <declaration type="int" name="r" line="57"/>
@@ -275,9 +262,7 @@
 </function>
 
 <function name="pruebaIf01" type="int" line="66">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <if line="67">
             <binaryOperator type="comparison" operator="==">
@@ -324,9 +309,7 @@
 </function>
 
 <function name="pruebaIf02" type="int" line="72">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <if line="73">
             <binaryOperator type="comparison" operator="&gt;=">
@@ -354,9 +337,7 @@
 </function>
 
 <function name="pruebaIf03" type="int" line="80">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <if line="81">
             <binaryOperator type="comparison" operator="&gt;=">
@@ -378,9 +359,7 @@
 </function>
 
 <function name="pruebaIf04" type="int" line="87">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <if line="88">
             <binaryOperator type="comparison" operator="==">
@@ -408,9 +387,7 @@
 </function>
 
 <function name="pruebaIf05" type="int" line="92">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <if line="93">
             <binaryOperator type="comparison" operator="==">
@@ -438,9 +415,7 @@
 </function>
 
 <function name="pruebaFor01" type="int" line="97">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <if line="98">
             <binaryOperator type="comparison" operator="&gt;">
@@ -490,9 +465,7 @@
 </function>
 
 <function name="pruebaWhile01" type="int" line="109">
-    <params>
-        <param type="int" name="a"/>
-    </params>
+    <param type="int" name="a"/>
     <body>
         <declarations>
             <declaration type="int" name="r" line="110">
