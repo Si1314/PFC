@@ -101,6 +101,10 @@ execute(Entry,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
 %execute(Entry,[('function',Data,BodyFunction)|_],Out) :-!,
 %	step(Entry,('function',Data,BodyFunction),Out). %para que solo haga el main
 
+execute(Entry,[('return',D1,D2)|_],Out) :-!,
+	write('estoy haciendo return'),write('\n'),
+	step(Entry,('return',D1,D2),Out),!.
+
 execute(Entry,[Instruction|RestInstructios],Out) :-
 	write(Instruction),write('\n'),
 	step(Entry,Instruction,Out1),
@@ -281,7 +285,7 @@ step(EntryS,('if',[_=Line],[Condition,('then',_,Then),_]),OutS):-
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,Condition,1,EntryS2),
-	write('\nTRUE IF\n'),
+	write('\nTRUE IF\n\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		apila(Table2,Table3),
 	state(EntryS3,Table3,Cin2,Cout2,Trace2),
@@ -294,7 +298,7 @@ step(EntryS,('if',[_=Line],[Condition,('then',_,Then),_]),OutS):-
 
 % IF -> ELSE
 step(EntryS,('if',[_=Line],[_,_,('else',_,Else)]),OutS):- !,
-	write('\nFALSE IF\n'),
+	write('\n\nFALSE IF\n\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
 		append(Trace,[' '],Space),
@@ -307,7 +311,7 @@ step(EntryS,('if',[_=Line],[_,_,('else',_,Else)]),OutS):- !,
 		desapila(Table2, Table3),
 	state(OutS,Table3,Cin2,Cout2,Trace2).
 
-step(EntryS,('if',[_=_],_),EntryS):- !.
+%step(EntryS,('if',[_=_],_),EntryS):- !.
 %	state(EntryS,Table,Cin,Cout,Trace),
 %		append(Trace,[' '],Space),
 %		append(Space,[Line],Trace1),
