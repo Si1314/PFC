@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interpreter(EntryFile, OutFile, FunctionName):- 
-	interpreter(EntryFile, OutFile, -5, 15, 5, FunctionName). % Defaults
+	interpreter(EntryFile, OutFile, -5, 15, 20, FunctionName). % Defaults
 
 interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):- 
 	assert(inf(0)),
@@ -101,9 +101,9 @@ execute(Entry,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],Out) :-!,
 %execute(Entry,[('function',Data,BodyFunction)|_],Out) :-!,
 %	step(Entry,('function',Data,BodyFunction),Out). %para que solo haga el main
 
-execute(Entry,[('return',D1,D2)|_],Out) :-!,
-	write('estoy haciendo return'),write('\n'),
-	step(Entry,('return',D1,D2),Out),!.
+%execute(Entry,[('return',D1,D2)|_],Out) :-!,
+%	write('estoy haciendo return'),write('\n'),
+%	step(Entry,('return',D1,D2),Out),!.
 
 execute(Entry,[Instruction|RestInstructios],Out) :-
 	write(Instruction),write('\n'),
@@ -190,7 +190,7 @@ step(EntryS,('declaration',[_=int,_=Name,_=Line],[(const,[value=Value],_)]),OutS
 		append(Space,[Line],Trace1),
 	state(OutS,Table1,Cin,Cout,Trace1).
 
-step(EntryS,('declaration',[_=int,_=Name,_=Line],DecBody),OutS):- !,
+step(EntryS,('declaration',[_=int,_=Name,_=Line],[DecBody]),OutS):- !,
 	inf(X), sup(Y),
 	Value in X..Y,
 	write('declara2 '),write(Line),write('\n'),
@@ -206,7 +206,7 @@ step(EntryS,('declaration',[_=int,_=Name,_=Line],DecBody),OutS):- !,
 	add(Table2,(int,Name,Value),Table3),
 	state(OutS,Table3,Cin2,Cout2,Trace2).
 
-step(EntryS,('declaration',[_=Type,_=Name,_=Line],DecBody),OutS):- !,
+step(EntryS,('declaration',[_=Type,_=Name,_=Line],[DecBody]),OutS):- !,
 	write('declara3'),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		add(Table,(Type,Name,_),Table1),
@@ -261,14 +261,15 @@ step(EntryS,('unaryOperator',[_=Name,_=Operator,_=Line],[]),OutS):-!,
 		update(Table2,(Name,Value),Table3),
 	state(OutS,Table3,Cin2,Cout2,Trace2).
 
-step(EntryS,('consoleOut',[_=Line],Expr),OutS):-!,
+step(EntryS,('consoleOut',[_=Line],[Expr]),OutS):-!,
+	write('hagoOut'),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,Expr,Value,EntryS2),
-
+	write('calculadoOut'),write(Line),write('\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		append(Cout2,[Value],Cout3),
 	state(OutS,Table2,Cin2,Cout3,Trace2).
@@ -317,6 +318,7 @@ step(EntryS,('if',[_=Line],[_,_,('else',_,Else)]),OutS):- !,
 %		append(Space,[Line],Trace1),
 %	state(OutS,Table,Cin,Cout,Trace1).
 
+% RETURN
 step(EntryS,('return',[_=Line],[Body]),OutS):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
@@ -390,6 +392,7 @@ step(EntryS,('while',[_=Line],[Condition,('body',_,WhileBody)]),N,OutS):-
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,Condition,1,EntryS2),
+		write('*hecha la condicion y return 1*'),write('\n'),
 	execute(EntryS2,WhileBody,EntryS3),
 
 	N1 is N - 1,
