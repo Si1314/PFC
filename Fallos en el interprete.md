@@ -3,32 +3,22 @@
 
 ##Funciones que dan fallo:
 
-* **Fibonacci:**
-
-*El fichero de salida sale vacio*
-
-
-* **IntroduceEntero:**
-
-*Da error directamente al ejecutar*
-
-
 * **LlamadaFactorial:**
 
 *El fichero de salida sale vacio*
-
 
 * **IfLlamada:**
 
 *El fichero de salida sale vacio*
 
 
-* **PruebaWhile01:**
-
-*El fichero de salida sale vacio*
 
 
 ##Funciones regulares:
+
+* **Fibonacci:**
+
+*saca cosas pero no se si salen bien*
 
 * **PruebaFor01:**
 
@@ -37,7 +27,7 @@
 
 * **Potencia:**
 
-*Saca solo el resultado cuando no se cumple la condición del If y por tanto se va al else*
+*Ahora se queda pillado al hacer Label, pero una vez corregido eso, funcionará perfecto*
 
 
 * **EscribeEntero:**
@@ -45,24 +35,28 @@
 *No se ni que tiene que hacer esta funcion...*
 
 
-* **PruebaIf01:**
+* **PruebaIf03:**
 
-*Da valores correctos pero hay resultados raros como:*
+*Devuelve 3 tanto si a es > o = a 0 como si no, corregir return*
 
-  `<variable name="ret" value="-5"/>
-  <variable name="a" value="-5"/>`
+* **PruebaWhile01:**
 
-*Hay que mirar que cuando se haga el return no siga mirando el resto de instrucciones si no que pare.*
+	*no hace el caso en el que r>0*
+
 
 
 ##Funciones que no dan fallo:
 
-* **Factorial:**
+* **Factorial**
 
-* **PruebaIf02:**
+* **IntroduceEntero**
 
-* **PruebaIf03:**
+* **PruebaIf01**
 
-* **PruebaIf04:**
+* **PruebaIf02**
 
-* **PruebaIf05:**
+* **PruebaIf04**
+
+* **PruebaIf05**
+
+* **potencia2**
