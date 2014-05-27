@@ -199,3 +199,31 @@
         </return>
     </body>
 </function>
+
+<function name="hazWhile" type="int" line="59">
+    <params>
+        <param type="int" name="a"/>
+    </params>
+    <body>
+        <declarations>
+            <declaration type="int" name="b" line="60">
+                <binaryOperator type="arithmetic" operator="+">
+                    <variable name="a"/>
+                    <const value="1"/>
+                </binaryOperator>
+            </declaration>
+        </declarations>
+        <while line="61">
+            <binaryOperator type="comparison" operator="&lt;">
+                <variable name="b"/>
+                <const value="0"/>
+            </binaryOperator>
+            <body>
+                <unaryOperator name="b" operator="+" line="62"/>
+            </body>
+        </while>
+        <return line="64">
+            <variable name="b"/>
+        </return>
+    </body>
+</function>

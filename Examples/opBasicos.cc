@@ -55,3 +55,11 @@ bool igual(int a, int b){
 bool distinto(int a, int b){
 	return a!=b;
 }
+
+int hazWhile(int a){
+	int b = a + 1;
+	while(b<0){
+		b++;
+	}
+	return b;
+}
