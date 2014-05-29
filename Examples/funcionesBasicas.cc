@@ -14,6 +14,33 @@ int potencia(int a, int b){
 	}
 }
 
+int multDiez(int a){
+	int b;
+	if(a<0){
+		b = -a;
+	}else{
+		b = a;
+	}
+	int c = 10;
+	int r = 0;
+	while(c > 0){
+		r += a;
+		c--;
+	}
+	return r;
+}
+
+int dimeSiPos(int a){
+	int r;
+	if(a>=0){
+		r = 1;
+	}else{
+		r = 0;
+	}
+	return r;
+}
+
+
 int factorial(int a){
 	if(a>=0){
 		int fact = 1;
@@ -44,7 +71,7 @@ int introduceEntero(){
 	return ConsoleIn_Int();
 }
 
-int introduceEntero(int a){
+int reproduceEntero(int a){
 	ConsoleOut_Int(a);
 	return 0;
 }
