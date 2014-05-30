@@ -1,0 +1,18 @@
+<caso>
+  <variable name="ret" value="1"/>
+  <variable name="a" value="0"/>
+  <data>
+    <traza> 33 34 35 36 40</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="0"/>
+  <variable name="a" value="-5"/>
+  <data>
+    <traza> 33 34 35 38 40</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>

@@ -310,7 +310,7 @@ execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then)])|RestInstructios],Out
 
 %%%%%%IF-THEN%%%%%%
 
-execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),_])|RestInstructios],OutS):-!,
+execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),_])|RestInstructios],OutS):-
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
