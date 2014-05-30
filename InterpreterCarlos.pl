@@ -310,13 +310,14 @@ execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then)])|RestInstructios],Out
 
 %%%%%%IF-THEN%%%%%%
 
-execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),_])|RestInstructios],OutS):-
+execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),_])|RestInstructios],OutS):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
-	resolveExpression(EntryS1,Condition,1,EntryS2),
+	resolveExpression(EntryS1,Condition,R,EntryS2),
+	R#=1,
 	write('\n\nTRUE IF\n\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		apila(Table2,Table3),
@@ -330,23 +331,29 @@ execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),_])|RestInstructios],O
 		desapila(Table4, Table5),
 	state(OutS1,Table5,Cin4,Cout4,Trace4),
 	write(Table5),
-	execute(OutS1,RestInstructios,OutS).
+	execute(OutS1,RestInstructios,OutS),
+	write('hecho el ifTRUE').
 
 %%%%%%IF-ELSE%%%%%%
 
 execute(EntryS,[('if',[_=Line],[_,_,('else',_,Else)])|RestInstructios],OutS):- 
-	%write('\n\nFALSE IF\n\n'),
+	write('\n\nFALSE IF\n\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
-		apila(Table,Table1),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
-	state(EntryS1,Table1,Cin,Cout,Trace1),
+	state(EntryS1,Table,Cin,Cout,Trace1),
 
-	execute(EntryS1,Else,EntryS2),
-	%write('he llegao asta aqui'),
+	resolveExpression(EntryS1,Condition,R,EntryS2),
+	R#=0,
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
-		desapila(Table2, Table3),
-	state(OutS1,Table3,Cin2,Cout2,Trace2),
+		apila(Table2,Table3),
+	state(EntryS3,Table3,Cin2,Cout2,Trace2),
+
+	execute(EntryS3,Else,EntryS4),
+	%write('he llegao asta aqui'),
+	state(EntryS4,Table4,Cin4,Cout4,Trace4),
+		desapila(Table4, Table5),
+	state(OutS1,Table5,Cin4,Cout4,Trace4),
 
 	execute(OutS1,RestInstructios,OutS).
 
@@ -371,23 +378,30 @@ executeL(EntryS,[_|RestInstructios],0,OutS):-!,
 	write('Sale por limite\n'),
 	execute(EntryS,RestInstructios,OutS).
 
-executeL(EntryS,[('while',Data,[Condition,_])|RestInstructios],_,OutS) :-!,
+executeL(EntryS,[('while',Data,[Condition,_])|RestInstructios],_,OutS) :-
 	write('Casa en sale\n'),
-	resolveExpression(EntryS,Condition,0,EntryS1),
+	write('condicion:  ->'),write(Condition),write('<-- condicion\n'),
+	state(EntryS,T,_,_,_),
+	write('tabla:  ->'),write(T),write('<-- tabla\n'),
+	resolveExpression(EntryS,Condition,R,EntryS1),
+	write('condicionR:  ->'),write(R),write('<-- condicionR\n'),
+	R #= 0,
 	write('Sale por condicion\n'),
 	execute(EntryS1,RestInstructios,OutS).
 
-executeL(EntryS,[('while',[_=Line],[C,('body',_,B)])|RestInstructios],N,OutS):-!,
+executeL(EntryS,[('while',[_=Line],[C,('body',_,B)])|RestInstructios],N,OutS):-
 	write('Casa en sigue\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
+	resolveExpression(EntryS1,Condition,R,EntryS2),
+	R#=1,
 	write(B),write('\n'),
-	execute(EntryS1,B,EntryS2),
+	execute(EntryS2,B,EntryS3),
 	N1 is N-1,
 	write('Sigue en bucle\n'),
-	executeL(EntryS2,[('while',[_=Line],[C,('body',_,B)])|RestInstructios],N1,OutS).
+	executeL(EntryS3,[('while',[_=Line],[C,('body',_,B)])|RestInstructios],N1,OutS).
 
 executeL(EntryS,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],_,OutS) :-!,
 	resolveExpression(EntryS,Condition,0,EntryS1),
@@ -433,17 +447,17 @@ resolveExpression(EntryS,('signOperator',[type='+'],[Expr]),Result,OutS):-
 	resolveExpression(EntryS,Expr,Result,OutS),write(Result),write('\n').
 
 
-resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-
+resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-!,
 	getContent(Operator,Op),
 	%write(cosa),write('\n'),
 	%write(X),write('\n'),
 	%write(Y),write('\n'),
 	resolveExpression(EntryS,X, Operand1,EntryS1),
 	resolveExpression(EntryS1,Y, Operand2,OutS),
-	%write('operand '),write(Operand1),write('\n'),
-	%write('operand '),write(Operand2),write('\n'),
-	work(Op, Operand1, Operand2,Result).
-	%write('result '),write(Result),write('\n').
+	write('operand '),write(Operand1),write('\n'),
+	write('operand '),write(Operand2),write('\n'),
+	work(Op, Operand1, Operand2,Result),!,
+	write('result '),write(Result),write('\n').
 
 resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
 	state(EntryS,Table,_,_,_),
