@@ -311,7 +311,22 @@
     </params>
     <body>
         <return line="80">
-            <callFunction name="factorial" type="int">
+            <callFunction name="reproduceEntero" type="int">
+                <arg>
+                    <variable name="a"/>
+                </arg>
+            </callFunction>
+        </return>
+    </body>
+</function>
+
+<function name="llamadaLlamada" type="int" line="83">
+    <params>
+        <param type="int" name="a"/>
+    </params>
+    <body>
+        <return line="84">
+            <callFunction name="llamadaFactorial" type="int">
                 <arg>
                     <variable name="a"/>
                 </arg>

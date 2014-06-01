@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interpreter(EntryFile, OutFile, FunctionName):- 
-	interpreter(EntryFile, OutFile, -5, 15, 5, FunctionName). % Defaults
+	interpreter(EntryFile, OutFile, -5, 15, 15, FunctionName). % Defaults
 
 interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):- 
 	assert(inf(0)),
@@ -312,6 +312,7 @@ execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then)])|RestInstructios],Out
 
 execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),_])|RestInstructios],OutS):-
 	state(EntryS,Table,Cin,Cout,Trace),
+		write('la tabla entrando al ifTHEN 1'),write(Table),write('\n\n'),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
@@ -339,6 +340,7 @@ execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),_])|RestInstructios],O
 execute(EntryS,[('if',[_=Line],[_,_,('else',_,Else)])|RestInstructios],OutS):- 
 	write('\n\nFALSE IF\n\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
+		write('la tabla entrando al ifELSE 2'),write(Table),write('\n\n'),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
@@ -368,26 +370,15 @@ execute(EntryS,[('while',Data,[C,B])|RestInstructios],OutS) :-!,
 
 %%%%%%FOR%%%%%%
 
-execute(EntryS,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],OutS) :-!,
+execute(EntryS,[('for',Data,[Variable,C,A,('body',_,B)])|RestInstructios],OutS) :-!,
 	maxDepth(N),
-	executeL(EntryS,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],N,OutS).
+	write('le damos profundidad al for\n'),
+	variableAdvance(EntryS,Variable,VariableName,EntryS1),
+	executeL(EntryS1,[('for',Data,[Variable,C,A,('body',_,B)])|RestInstructios],N,OutS).
 
 %%%%%%LOOPS%%%%%%
 
-executeL(EntryS,[_|RestInstructios],0,OutS):-!,
-	write('Sale por limite\n'),
-	execute(EntryS,RestInstructios,OutS).
 
-executeL(EntryS,[('while',Data,[Condition,_])|RestInstructios],_,OutS) :-
-	write('Casa en sale\n'),
-	write('condicion:  ->'),write(Condition),write('<-- condicion\n'),
-	state(EntryS,T,_,_,_),
-	write('tabla:  ->'),write(T),write('<-- tabla\n'),
-	resolveExpression(EntryS,Condition,R,EntryS1),
-	write('condicionR:  ->'),write(R),write('<-- condicionR\n'),
-	R #= 0,
-	write('Sale por condicion\n'),
-	execute(EntryS1,RestInstructios,OutS).
 
 executeL(EntryS,[('while',[_=Line],[C,('body',_,B)])|RestInstructios],N,OutS):-
 	write('Casa en sigue\n'),
@@ -403,21 +394,66 @@ executeL(EntryS,[('while',[_=Line],[C,('body',_,B)])|RestInstructios],N,OutS):-
 	write('Sigue en bucle\n'),
 	executeL(EntryS3,[('while',[_=Line],[C,('body',_,B)])|RestInstructios],N1,OutS).
 
-executeL(EntryS,[('for',Data,[V,C,A,('body',_,B)])|RestInstructios],_,OutS) :-!,
-	resolveExpression(EntryS,Condition,0,EntryS1),
-	execute(EntryS1,RestInstructios,Out).
 
-executeL(EntryS,[('for',[_=Line],[Variable,Condition,Advance,[('body',_,ForBody)]])|RestInstructios],N,OutS):-!,
-	variableAdvance(EntryS,Variable,VariableName,EntryS1),
+executeL(EntryS,[('while',Data,[Condition,_])|RestInstructios],_,OutS) :-
+	write('Casa en sale\n'),
+	write('condicion:  ->'),write(Condition),write('<-- condicion\n'),
+	state(EntryS,T,_,_,_),
+	write('tabla:  ->'),write(T),write('<-- tabla\n'),
+	resolveExpression(EntryS,Condition,R,EntryS1),
+	write('condicionR:  ->'),write(R),write('<-- condicionR\n'),
+	R #= 0,
+	write('Sale por condicion\n'),
+	execute(EntryS1,RestInstructios,OutS).
+
+executeL(EntryS1,[('for',[_=Line],[Variable,Condition,Advance,('body',_,ForBody)])|RestInstructios],N,OutS):-!,
+	write('hagamos cosas del for A\n'),
+	%variableAdvance(EntryS,Variable,VariableName,EntryS1),
+	%getContent(Variable,VariableName),
+	%execute(EntryS,Variable,EntryS1),
 	state(EntryS1,Table1,Cin1,Cout1,Trace1),
+		write('la tabla entrando al for 1'),write(Table1),write('\n\n'),
 		append(Trace1,[' '],Space),
 		append(Space,[Line],Trace2),
 	state(EntryS2,Table1,Cin1,Cout1,Trace2),
-	resolveExpression(EntryS2,Condition,1,EntryS3),
+	write('hagamos cosas del for B\n'),
+	resolveExpression(EntryS2,Condition,R,EntryS3),
+	write(R),write('<<---es el valor de R\n'),
+	R#=1,
+	write('hagamos cosas del for C\n'),
 	execute(EntryS3,ForBody,EntryS4),
+	write('hagamos cosas del for D\n'),
 	execute(EntryS4,[Advance],EntryS5),
+	write('hagamos cosas del for E\n'),
+	read(Ww),
 	N1 is N - 1,
-	executeL(EntryS5,[('for',[_=Line],[Variable,Condition,Advance,[('body',_,ForBody)]])|RestInstructios],N1,OutS).
+	executeL(EntryS5,[('for',[_=Line],[Variable,Condition,Advance,('body',_,ForBody)])|RestInstructios],N1,OutS).
+
+
+
+executeL(EntryS1,[('for',[_=Line],[Variable,Condition,Advance,('body',_,ForBody)])|RestInstructios],_,OutS) :-
+	write('saldremos del for\n'),
+	%variableAdvance(EntryS,Variable,VariableName,EntryS1),
+	%getContent(Variable,VariableName),
+	%execute(EntryS,Variable,EntryS1),
+	state(EntryS1,Table1,Cin1,Cout1,Trace1),
+		write('la tabla entrando al for 2'),write(Table1),write('\n\n'),
+		append(Trace1,[' '],Space),
+		append(Space,[Line],Trace2),
+	state(EntryS2,Table1,Cin1,Cout1,Trace2),
+	write('estamos saliendo del for\n'),
+	resolveExpression(EntryS2,Condition,R,EntryS3),
+	write(R),write('<<---es el valor de R\n'),
+	R#=0,
+	read(U),
+	write('resto de instrucciones'),
+	write(RestInstructios),write('\n'),
+	execute(EntryS3,RestInstructios,OutS).
+
+
+executeL(EntryS,[_|RestInstructios],0,OutS):-!,
+	write('Sale por limite\n'),
+	execute(EntryS,RestInstructios,OutS).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

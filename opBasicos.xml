@@ -227,3 +227,50 @@
         </return>
     </body>
 </function>
+
+<function name="forSimple" type="int" line="67">
+    <params>
+        <param type="int" name="a"/>
+    </params>
+    <body>
+        <if line="68">
+            <binaryOperator type="comparison" operator="&gt;">
+                <variable name="a"/>
+                <const value="0"/>
+            </binaryOperator>
+            <then>
+                <body>
+                    <for line="69">
+                        <declarations>
+                            <declaration type="int" name="i" line="69">
+                                <const value="0"/>
+                            </declaration>
+                        </declarations>
+                        <binaryOperator type="comparison" operator="&lt;">
+                            <variable name="i"/>
+                            <const value="3"/>
+                        </binaryOperator>
+                        <unaryOperator name="i" operator="+" line="69"/>
+                        <body>
+                            <consoleOut line="70">
+                                <variable name="i"/>
+                            </consoleOut>
+                        </body>
+                    </for>
+                    <return line="72">
+                        <const value="0"/>
+                    </return>
+                </body>
+            </then>
+            <else>
+                <body>
+                    <return line="74">
+                        <signOperator type="-">
+                            <const value="1"/>
+                        </signOperator>
+                    </return>
+                </body>
+            </else>
+        </if>
+    </body>
+</function>
