@@ -93,10 +93,12 @@ writeInXML(Stream,T,Cin,Cout):-
 
 writeInXML(Stream,[N|Ns],[V|Vs],T,Cin,Cout):-
 	writeInXMLAux(Stream,[N|Ns],[V|Vs],[],Result),
+	fixNumber(Cout,Cout1),
+	fixNumber(Cin,Cin1),
 	append(Result, [element(data,[],[
 			element(traza,[],T),
-			element(cin,[],Cin),
-			element(cout,[],Cout)
+			element(cin,[],Cin1),
+			element(cout,[],Cout1)
 		])], R),
 	xml_write(Stream,element(caso,[],R),[header(false)]),
 	xml_write(Stream,'\n',[header(false)]).
@@ -184,4 +186,13 @@ updateReturnValue(Entry,Out):-
 updateReturnValueAux(([X,Y|Xs],Cin,Cout,Trace),ValueReturned,([X,Out1|Xs],Cin,Cout,Trace)):-
 	update([Y|[]],('ret',ValueReturned),[Out1]).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+fixNumber([],[]).
+
+fixNumber([' '|Xs],[' '|Xs2]):-!,
+	fixNumber(Xs,Xs2).
+
+fixNumber([N|Xs],[AN|Xs2]):-
+	atom_number(AN,N),
+	fixNumber(Xs,Xs2).
