@@ -73,6 +73,15 @@ int hazWhile2(int a){
 	return b;
 }
 
+int hazWhile3(int a){
+	int b = 0;
+	while(b<a){
+		ConsoleOut_Int(b);
+		b++;
+	}
+	return b;
+}
+
 int forSimple(int a){
 	if(a>0){
 		for(int i=0;i<a;i++){

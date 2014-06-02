@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 interpreter(EntryFile, OutFile, FunctionName):- 
-	interpreter(EntryFile, OutFile, -5, 15, 10, FunctionName). % Defaults
+	interpreter(EntryFile, OutFile, -5, 15, 3, FunctionName). % Defaults
 
 interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):- 
 	assert(inf(0)),
@@ -70,6 +70,7 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Ci
 
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
 	once(label(LabelTableValues)),
+	write(ExitTable),
 	write(Cinput),
 	write(Coutput),
 	write(Trace).
@@ -282,7 +283,7 @@ execute(EntryS,[('consoleOut',[_=Line],[Expr])|RestInstructios],OutS):-!,
 	resolveExpression(EntryS1,Expr,Value,EntryS2),
 	write('calculadoOut'),write(Line),write('\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
-		append(Cout2,[Value],Cout3),
+		append(Cout2,[' ',Value],Cout3),
 	state(OutS1,Table2,Cin2,Cout3,Trace2),
 	execute(OutS1,RestInstructios,OutS).
 
@@ -379,11 +380,14 @@ execute(EntryS,[('for',Data,[Variable,C,A,('body',_,B)])|RestInstructios],OutS):
 	read(U),
 	executeLoop(EntryS1,[('for',Data,[Variable,C,A,('body',_,B)])|RestInstructios],N,1,OutS).
 
-executeLoop(EntryS,[('while',Data,[Condition,B])|RestInstructios],0,_,OutS):-!,
-	resolveExpression(EntryS,Condition,0,OutS),
-	write('Deberia salirse del while debido al limite: '),write('\n'),
-	read(A),fail.
-	%execute(EntryS1,RestInstructios,OutS).
+%%%%%%EXECUTE-LOOP-WHILE%%%%%%
+
+executeLoop(EntryS,[('while',Data,[Condition,('body',_,B)])|RestInstructios],1,_,OutS):-!,
+	resolveExpression(EntryS,Condition,0,EntryS1),
+	write('Deberia salirse del while debido al limite: ejecuta el cuerpo una ultima vez'),write('\n'),
+	read(A),
+	execute(EntryS1,B,EntryS2),
+	execute(EntryS2,RestInstructios,OutS).
 
 executeLoop(EntryS,[('while',[_=Line],[Condition,B])|RestInstructios],N,0,OutS):-N>=0,!,
 	write('llegando con valor N: '),write(N),write('\n'),
@@ -409,6 +413,8 @@ executeLoop(EntryS,[('while',[_=Line],[Condition,('body',_,B)])|RestInstructios]
 	write('evaluando el valor '),write(Value),write('\n'),
 	read(A),
 	executeLoop(EntryS3,[('while',[_=Line],[Condition,('body',_,B)])|RestInstructios],N1,Value,OutS).
+
+%%%%%%EXECUTE-LOOP-FOR%%%%%%
 
 executeLoop(EntryS,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstructios],0,_,OutS):-!,
 	resolveExpression(EntryS,Condition,0,OutS),
@@ -579,7 +585,7 @@ resolveExpression(EntryS,('consoleIn',[_=int],_),Value,OutS):-
 	state(EntryS,Table,Cin,Cout,Trace),
 	inf(X), sup(Y),
 	Value in X..Y,
-	append(Cin,[Value],Cin1),
+	append(Cin,[' ',Value],Cin1),
 	state(OutS,Table,Cin1,Cout,Trace).
 
 

@@ -262,6 +262,33 @@
     </body>
 </function>
 
+<function name="hazWhile3" type="int" line="67">
+    <params>
+        <param type="int" name="a"/>
+    </params>
+    <body>
+        <declarations>
+            <declaration type="int" name="b" line="68">
+                <const value="0"/>
+            </declaration>
+        </declarations>
+        <while line="69">
+            <binaryOperator type="comparison" operator="&lt;">
+                <variable name="b"/>
+                <variable name="a"/>
+            </binaryOperator>
+            <body>
+                <consoleOut line="70">
+                    <variable name="b"/>
+                </consoleOut>
+                <unaryOperator name="b" operator="+" line="71"/>
+            </body>
+        </while>
+        <return line="73">
+            <variable name="b"/>
+        </return>
+    </body>
+</function>
 
 <function name="forSimple" type="int" line="76">
     <params>
