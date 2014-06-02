@@ -288,7 +288,7 @@ execute(EntryS,[('consoleOut',[_=Line],[Expr])|RestInstructios],OutS):-!,
 
 %%%%%%RETURN%%%%%%
 
-execute(EntryS,[('return',[_=Line],[Body])|_],OutS):-!,
+execute(EntryS,[('return',[_=Line],[Body])|_],OutS):-
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
@@ -302,7 +302,6 @@ execute(EntryS,[('return',[_=Line],[Body])|_],OutS):-!,
 	write('\nUpdateeee:\n'), write(Table3), write('\n'),
 
 	state(OutS,Table3,Cin2,Cout2,Trace2).
-
 %%%%%%IF%%%%%%
 
 execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then)])|RestInstructios],OutS):-!,

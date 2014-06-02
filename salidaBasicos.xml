@@ -1,9 +1,9 @@
 <caso>
-  <variable name="ret" value="-5"/>
+  <variable name="ret" value="-1"/>
   <variable name="a" value="-5"/>
   <data>
-    <traza> 67 68 69 70 71 69 70 71 69 70 71</traza>
+    <traza> 76 77 83</traza>
     <cin/>
-    <cout>
-    <cin/>
-    <cout>
+    <cout/>
+  </data>
+</caso>
