@@ -220,6 +220,9 @@
             </binaryOperator>
             <body>
                 <unaryOperator name="b" operator="+" line="62"/>
+                <consoleOut line="70">
+                    <variable name="b"/>
+                </consoleOut>
             </body>
         </while>
         <return line="64">
