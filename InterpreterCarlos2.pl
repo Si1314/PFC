@@ -33,6 +33,7 @@ interpreter(EntryFile, OutFile, FunctionName):-
 	interpreter(EntryFile, OutFile, -5, 15, 10, FunctionName). % Defaults
 
 interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):- 
+	write('\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n'),
 	assert(inf(0)),
 	assert(sup(0)),
 	assert(maxDepth(0)),
@@ -66,9 +67,11 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Ci
 	
 	state(InitS,[],[],[],[]),
 		execute(InitS,Function,EndS),
+		write('\ndespues de la funcion\n\n'),
 	state(EndS,ExitTable,Cinput,Coutput,Trace),
-
+	write('\n\n\n'),write(ExitTable),write('\n\n\n'),
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
+		write('\ndespues del label\n\n'),
 	once(label(LabelTableValues)),
 	write(ExitTable),
 	write(Cinput),
@@ -112,9 +115,8 @@ execute(EntryS,[('function',[_,_=ExitValue,_=Line],FunctionBody)|RestInstructios
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table2,Cin,Cout,Trace1),
 	write('esta es la tabla nada más comenzandoB: '), write(Table2),write('\n'),
-	execute(EntryS1,FunctionBody,OutS1),
-	write('estamos saliendo de la funcion\n'),
-	execute(OutS1,RestInstructios,OutS).
+	execute(EntryS1,FunctionBody,OutS),
+	write('estamos saliendo de la funcion\n').
 
 %%%%%%PARAMS%%%%%%
 
@@ -185,7 +187,7 @@ execute(EntryS,[('declaration',[_=int,_=Name,_=Line],[])|RestInstructios],OutS):
 	write('la tabla tras la decl '),write(Table3),write('\n'),
 	execute(OutS1,RestInstructios,OutS).
 
-execute(EntryS,[('declaration',[_=Type,_=Name,_=Line],[DecBody])|RestInstructios],OutS):- !,
+execute(EntryS,[('declaration',[_,_=Name,_=Line],[DecBody])|RestInstructios],OutS):- !,
 	write('declara3'),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 	write('mi tabla recien llegado '),write(Table),write('\n'),
@@ -234,6 +236,7 @@ execute(EntryS,[('assignmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody])|
 		('binaryOperator',[Operator],
 			[('variable',[_=Name],[]),AssigBody])
 		,Value,EntryS2),
+
 	write('assigmentOperatorrB'),write(Line),write('\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		update(Table2,(Name,Value),Table3),
@@ -248,13 +251,13 @@ execute(EntryS,[('unaryOperator',[_=Name,_=Operator,_=Line],[])|RestInstructios]
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
-
+	write('antes del menosmenos '),write(Operator),write('\n'),
 	resolveExpression(EntryS1,
 		('binaryOperator',[Operator],
 			[('variable',[_=Name],[]),
-				('constValue',1,[])])
+				('const',[_='1'],_)])
 		,Value,EntryS2),
-
+	write('despues del menos menos '),write(Line),write('\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		update(Table2,(Name,Value),Table3),
 	state(OutS1,Table3,Cin2,Cout2,Trace2),
@@ -296,62 +299,24 @@ execute(EntryS,[('return',[_=Line],[Body])|_],OutS):-!,
 %%%%%%IF%%%%%%
 
 execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then)])|RestInstructios],OutS):-!,
+	write('lno tiene else 1'),write(Table),write('\n\n'),
 	execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),('else',_,[])])|RestInstructios],OutS).
 
 %%%%%%IF-THEN%%%%%%
 
-execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),_])|RestInstructios],OutS):-
+execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),('else',_,Body)])|RestInstructios],OutS):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
-		write('la tabla entrando al ifTHEN 1'),write(Table),write('\n\n'),
+		write('la tabla entrando al IF 1'),write(Table),write('\n\n'),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
-	resolveExpression(EntryS1,Condition,R,EntryS2),
-	R#=1,
-	write('\n\nTRUE IF\n\n'),
-	state(EntryS2,Table2,Cin2,Cout2,Trace2),
-		apila(Table2,Table3),
-	state(EntryS3,Table3,Cin2,Cout2,Trace2),
-	%write('hacer el then\n'),
-	%write(Then),
-	%write('hacer el then\n'),
-	execute(EntryS3,Then,EntryS4),
-	%write('hecho el then\n'),
-	state(EntryS4,Table4,Cin4,Cout4,Trace4),
-		desapila(Table4, Table5),
-	state(OutS1,Table5,Cin4,Cout4,Trace4),
-	write(Table5),
-	execute(OutS1,RestInstructios,OutS),
-	write('hecho el ifTRUE').
-
-%%%%%%IF-ELSE%%%%%%
-
-execute(EntryS,[('if',[_=Line],[_,_,('else',_,Else)])|RestInstructios],OutS):- 
-	write('\n\nFALSE IF\n\n'),
-	state(EntryS,Table,Cin,Cout,Trace),
-		write('la tabla entrando al ifELSE 2'),write(Table),write('\n\n'),
-		append(Trace,[' '],Space),
-		append(Space,[Line],Trace1),
-	state(EntryS1,Table,Cin,Cout,Trace1),
-
-	resolveExpression(EntryS1,Condition,R,EntryS2),
-	R#=0,
-	state(EntryS2,Table2,Cin2,Cout2,Trace2),
-		apila(Table2,Table3),
-	state(EntryS3,Table3,Cin2,Cout2,Trace2),
-
-	execute(EntryS3,Else,EntryS4),
-	%write('he llegao asta aqui'),
-	state(EntryS4,Table4,Cin4,Cout4,Trace4),
-		desapila(Table4, Table5),
-	state(OutS1,Table5,Cin4,Cout4,Trace4),
-
-	execute(OutS1,RestInstructios,OutS).
+	resolveExpression(EntryS1,Condition,Value,EntryS2),
+	executeBranch(EntryS2,[('if',[_=Line],[_,('then',_,Then),('else',_,Body)])|RestInstructios],Value,OutS).
 
 %%%%%%WHILE%%%%%%
 
-execute(EntryS,[('while',Data,[Condition,B])|RestInstructios],OutS) :-
+execute(EntryS,[('while',Data,[Condition,B])|RestInstructios],OutS) :-!,
 	maxDepth(N),
 	write('vamos a evaluar el while\n'),
 	resolveExpression(EntryS,Condition,Value,EntryS1),
@@ -361,26 +326,56 @@ execute(EntryS,[('while',Data,[Condition,B])|RestInstructios],OutS) :-
 
 %%%%%%FOR%%%%%%
 
-execute(EntryS,[('for',Data,[Variable,C,A,('body',_,B)])|RestInstructios],OutS):-!,
+execute(EntryS,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstructios],OutS):-!,
 	maxDepth(N),
 	write('vamos a inicializar el for\n'),
-	variableAdvance(EntryS,Variable,VariableName,EntryS1),
+	variableAdvance(EntryS,Variable,EntryS1),
 	resolveExpression(EntryS1,Condition,Value,EntryS2),
 	state(EntryS2,T,_,_,_),
 	write('inicializada la variable de control '),write(T),write('\n'),
 	%read(U),
-	executeLoop(EntryS2,[('for',Data,[Variable,C,A,('body',_,B)])|RestInstructios],N,Value,OutS).
+	executeLoop(EntryS2,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstructios],N,Value,OutS).
+
+%%%%%%EXECUTE-BRANCH%%%%%%
+ 	
+executeBranch(EntryS,[('if',[_],[_,('then',_,Then),_])|RestInstructios],1,OutS):-
+	write('\n\nTRUE IF\n\n'),
+	state(EntryS,Table,Cin,Cout,Trace),
+		apila(Table,Table1),
+	state(EntryS1,Table1,Cin,Cout,Trace),
+	execute(EntryS1,Then,EntryS2),
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		desapila(Table2, Table3),
+	state(OutS1,Table3,Cin2,Cout2,Trace2),
+	write('%%%%%%%%$"·$"·$!·!"$%·$·he llegao asta THEEEEENNNNN\n'),
+	write(RestInstructios),
+	execute(OutS1,RestInstructios,OutS),
+	write('hecho el ifTRUE').
+
+executeBranch(EntryS,[('if',[_],[_,_,('else',_,Else)])|RestInstructios],0,OutS):- 
+	state(EntryS,Table,Cin,Cout,Trace),
+		apila(Table,Table1),
+	state(EntryS1,Table1,Cin,Cout,Trace),
+
+	execute(EntryS1,Else,EntryS2),
+	write('%%%%%%%%$"·$"·$!·!"$%·$·he llegao asta aqui'),
+	state(EntryS2,Table2,Cin2,Cout2,Trace2),
+		desapila(Table2, Table3),
+	state(OutS1,Table3,Cin2,Cout2,Trace2),
+	write(Table3),
+	execute(OutS1,RestInstructios,OutS),
+	write('hecho el ifFALSE\n').
 
 %%%%%%EXECUTE-LOOP-WHILE%%%%%%
 
-executeLoop(EntryS,[('while',Data,[Condition,('body',_,B)])|RestInstructios],1,_,OutS):-!,
+executeLoop(EntryS1,[('while',_,[Condition,('body',_,B)])|RestInstructios],1,_,OutS):-!,
 	write('Deberia salirse del while debido al limite: ejecuta el cuerpo una ultima vez'),write('\n'),
 	%read(A),
-	execute(EntryS,B,EntryS1),
+	%execute(EntryS,B,EntryS1),
 	resolveExpression(EntryS1,Condition,0,EntryS2),
 	execute(EntryS2,RestInstructios,OutS).
 
-executeLoop(EntryS,[('while',[_=Line],[Condition,B])|RestInstructios],N,0,OutS):-N>=0,
+executeLoop(EntryS,[('while',[_=Line],_)|RestInstructios],N,0,OutS):-N>=0,
 	write('llegando con valor N: '),write(N),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
@@ -408,7 +403,7 @@ executeLoop(EntryS,[('while',[_=Line],[Condition,('body',_,B)])|RestInstructios]
 
 %%%%%%EXECUTE-LOOP-FOR%%%%%%
 
-executeLoop(EntryS,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstructios],1,_,OutS):-!,
+executeLoop(EntryS,[('for',_,[_,Condition,Advance,('body',_,B)])|RestInstructios],1,_,OutS):-!,
 	write('Deberia salirse del for debido al limite: ejecuta la ultima vuelta'),write('\n'),
 	%read(A),
 	execute(EntryS,B,EntryS1),
@@ -416,7 +411,7 @@ executeLoop(EntryS,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstruc
 	resolveExpression(EntryS2,Condition,0,EntryS3),
 	execute(EntryS3,RestInstructios,OutS).
 
-executeLoop(EntryS,[('for',[_=Line],[Variable,Condition,Advance,('body',_,B)])|RestInstructios],N,1,OutS):-N >= 0,!,
+executeLoop(EntryS,[('for',[_=Line],[_,Condition,Advance,('body',_,B)])|RestInstructios],N,1,OutS):-N >= 0,!,
 	write('ha entrado en una iteracion del for\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' ',Line],Trace1),
@@ -433,9 +428,9 @@ executeLoop(EntryS,[('for',[_=Line],[Variable,Condition,Advance,('body',_,B)])|R
 	N1 is N -1,
 	write('evaluando el valor '),write(Value),write('\n'),
 	%read(U),
-	executeLoop(EntryS4,[('for',[_=Line],[Variable,Condition,Advance,('body',_,B)])|RestInstructios],N1,Value,OutS).
+	executeLoop(EntryS4,[('for',[_=Line],[_,Condition,Advance,('body',_,B)])|RestInstructios],N1,Value,OutS).
 
-executeLoop(EntryS,[('for',[_=Line],[Variable,Condition,Advance,('body',_,B)])|RestInstructios],N,0,OutS):-N >= 0,!,
+executeLoop(EntryS,[('for',[_=Line],_)|RestInstructios],N,0,OutS):-N >= 0,!,
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
@@ -472,16 +467,16 @@ resolveExpression(EntryS,('signOperator',[type='+'],[Expr]),Result,OutS):-
 	resolveExpression(EntryS,Expr,Result,OutS),write(Result),write('\n').
 
 
-resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-!,
+resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-
 	getContent(Operator,Op),
-	%write(cosa),write('\n'),
+	write('\nOperator: '),write(Operator),write('\n'),
 	%write(X),write('\n'),
 	%write(Y),write('\n'),
 	resolveExpression(EntryS,X, Operand1,EntryS1),
 	resolveExpression(EntryS1,Y, Operand2,OutS),
 	write('operand '),write(Operand1),write('\n'),
 	write('operand '),write(Operand2),write('\n'),
-	work(Op, Operand1, Operand2,Result),!,
+	work(Op, Operand1, Operand2,Result),
 	write('result '),write(Result),write('\n').
 
 resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
@@ -491,8 +486,6 @@ resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
 	%write('\nTable \n'),write(Table),write('\n'),
 	%write('\nOperandName \n'),write(OperandName),write('\n'),
 	%write('\nOperandValue \n'),write(OperandValue),write('\n').
-
-resolveExpression(EntryS,('constValue',Value,_),Value,EntryS). % DEPRECATED?
 
 resolveExpression(EntryS,('const',[_=Value],_),Result,EntryS):-
 	write('const: '),write(Value),write('\n'),
@@ -562,28 +555,28 @@ not(Value,1):-Value#=0.
 not(Value,0):-Value#=1.
 
 work('<', Op1,Op2,1):- Op1 #< Op2.
-work('<', _,_,0).
+work('<', Op1,Op2,0):- Op1 #>= Op2.
 
 work('<=', Op1,Op2, 1):- Op1 #=< Op2.
-work('<=', _,_,0).
+work('<=', Op1,Op2,0):- Op1 #> Op2.
 
 work('>=', Op1,Op2,1):- Op1 #>= Op2.
-work('>=', _,_,0).
+work('>=', Op1,Op2,0):- Op1 #< Op2.
 
 work('>', Op1,Op2,1):- Op1 #> Op2.
-work('>', _,_,0).
+work('>', Op1,Op2,0):- Op1 #=< Op2.
 
 work('==', Op1,Op2,1):- Op1 #= Op2.
-work('==', _,_,0).
+work('==', Op1,Op2,0):- Op1 #\= Op2.
 
 work('!=', Op1,Op2,1):- Op1 #\= Op2.
-work('!=', _,_,0).
+work('!=', Op1,Op2,0):- Op1 #= Op2.
 
 work('&&', Op1,Op2,1):- Op1 #/\ Op2.
-work('&&', _,_,0).
+work('&&', Op1,Op2,0):- not(Op1,Op1N),not(Op2,Op2N),work('||', Op1N,Op2N,1).
 
 work('||', Op1,Op2,1):- Op1 #\/ Op2.
-work('||', _,_,0).
+work('||', Op1,Op2,0):-	not(Op1,Op1N),not(Op2,Op2N),work('&&', Op1N,Op2N,1).
 
 
 
