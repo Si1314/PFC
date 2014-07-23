@@ -2,7 +2,7 @@ Gramatica
 ===
 
 ##Reglas gramaticales
-==
+
 
 ElementosEntrada : ElementoEntrada
 
@@ -27,8 +27,7 @@ identificador : “_” [ letra | digito | “_” | “$” ]* letra [ letra | 
 palabra_reservada : “class” | “else” | “for” | “if” | “int” | “return” | “void” | “while” 
 
 
-## LITERALES y OPERADORES
-==
+### LITERALES y OPERADORES
 
 literal : literal_integer
 
@@ -49,8 +48,7 @@ operadorAsignacion : = | += | -= | *= | /=
 operadorUnario : & | * | + | – | !
 
 
-## TIPOS DE DATOS
-==
+### TIPOS DE DATOS
 
 tipo : tipo_primitivo identificador
 
@@ -59,8 +57,7 @@ tipo_primitivo : “int”
 listaArgumentos : expresionAsignacion | listaArgumentos , expresionAsignacion
 
 
-## EXPRESIONES
-==
+### EXPRESIONES
 
 expresion : expresionAsignacion | expresion , expresionAsignacion
 
@@ -89,14 +86,12 @@ expresionSufijo : expresionPrimaria | expresionSufijo [ expresion ] | expresionS
 expresionPrimaria : identificador | digito | literalCadena | ( expresion )
 
 
-## EXPRESIONES CONSTANTES
-==
+### EXPRESIONES CONSTANTES
 
 expresionConstante : expresionCondicional
 
 
-## SENTENCIAS
-==
+### SENTENCIAS
 
 sentencia : sentenciaCompuesta | sentenciaExpresion | sentenciaSeleccion | sentenciaIteracion | sentenciaSalto
 
