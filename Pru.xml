@@ -1,0 +1,19 @@
+<function name="foo" type="int" line="3">
+    <params>
+        <param type="int" name="a"/>
+        <param type="int" name="b"/>
+    </params>
+    <body>
+        <declarations>
+            <declaration type="int" name="c" line="4">
+                <binaryOperator type="arithmetic" operator="+">
+	                <variable name="a"/>
+	                <variable name="b"/>
+            	</binaryOperator>
+            </declaration>
+        </declarations>
+        <return line="6">
+            <variable name="c"/>
+        </return>
+    </body>
+</function>

@@ -57,8 +57,9 @@ interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):-
 
 interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Cinput,Coutput):-
 	load_xml_file(EntryFile, Program),
-
+	write(Program), write('\n'),
 	removeEmpty(Program,GoodProgram),
+	write(GoodProgram), write('\n'),
 	retractall(program(_)),
 	assert(program(GoodProgram)),
 	
