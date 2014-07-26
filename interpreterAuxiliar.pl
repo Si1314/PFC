@@ -1,13 +1,3 @@
-:-use_module(library(sgml)).
-:-use_module(library(clpfd)).
-%:-use_module(library(sgml_write)).
-
-
-:- include('VariablesTable.pl').
-:- include('AuxiliaryFunctions.pl').
-
-:- include('backend.pl').
-
 interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Cinput,Coutput):-
 	load_xml_file(EntryFile, Program),
 	write(Program), write('\n'),
