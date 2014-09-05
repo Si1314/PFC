@@ -71,3 +71,28 @@ se convierte en:
 		    </body>
 		</function>
 
+##Los resultados devueltos
+
+		<caso>
+		  <variable name="ret" value="10"/>
+		  <variable name="a" value="1"/>
+		  <data>
+		    <traza> 132 133 134 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 138</traza>
+		    <cin/>
+		    <cout/>
+		  </data>
+		</caso>
+		<caso>
+		  <variable name="ret" value="-1"/>
+		  <variable name="a" value="-5"/>
+		  <data>
+		    <traza> 132 133 140</traza>
+		    <cin/>
+		    <cout/>
+		  </data>
+		</caso>
+
+---
+
+##Librerías usadas
+
