@@ -20,8 +20,8 @@ Donde se puede simular con valores específicos en las variables Inf, Sup y MaxD
 
 		interpreter(EntryFile, OutFile, FunctionName).
 
-Con valores predeterminados **Inf=-5**, **Sup=5** y **MaxDepth=10**.
-===
+Con valores predeterminados Inf=-5**, **Sup=5** y **MaxDepth=10**.
+---
 ##La representación en XML del código
 
 Este proyecto va de la mano del proyecto AST2XML.
