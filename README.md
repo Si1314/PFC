@@ -19,7 +19,8 @@ Para ejecutar el interprete se invoca el predicado interpreter. Puede haber dos 
 Donde se puede simular con valores específicos en las variables Inf, Sup y MaxDepth.
 
 		interpreter(EntryFile, OutFile, FunctionName).
-Con valores predeterminados **Inf = -5**, **Sup = 5** y **MaxDepth = 10 **.
+
+Con valores predeterminados **Inf=-5**, **Sup=5** y **MaxDepth=10**.
 ===
 ##La representación en XML del código
 
