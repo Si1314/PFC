@@ -3,6 +3,24 @@ Intérprete simbólico en Prolog de Árboles de Sintaxis Abstracta obenidos a pa
 
 Este proyecto consiste en un intérprete simbólico que a partir de la representación en XML de un código en C++ realiza una ejecución simbólica de éste.
 
+##Funcionamiento
+
+El interprete recorre la representación del código de una función asignando valores simbólicos a una tabla de variables. Cuando ya ha recorrido el código razona sobre dichos valores y devuelve un conjunto de posibles entradas, posibles salidas, interacciones por consola y la traza de dicha función. Dichos valores resultantes se recogen en un fichero XML.
+
+La ejecución se controla mediante las variables **Inf**, **Sup** y **MaxDepth**. 
+Inf y Sup acotan inferior y superiormente el rango que pueden adoptar los valores enteros de las variables.
+MaxDepth restringe el número de iteraciones que puede ejecutarse un bucle en la simulación. 
+
+##Uso
+
+Para ejecutar el interprete se invoca el predicado interpreter. Puede haber dos modalidades:
+
+		interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName).
+Donde se puede simular con valores específicos en las variables Inf, Sup y MaxDepth.
+
+		interpreter(EntryFile, OutFile, FunctionName).
+Con valores predeterminados **Inf = -5**, **Sup = 5** y **MaxDepth = 10 **.
+===
 ##La representación en XML del código
 
 Este proyecto va de la mano del proyecto AST2XML.
