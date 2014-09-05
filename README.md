@@ -74,19 +74,21 @@ se convierte en:
 ##Los resultados devueltos
 
 		<caso>
-		  <variable name="ret" value="10"/>
-		  <variable name="a" value="1"/>
+		  <variable name="ret" value="-4"/>
+		  <variable name="a" value="-4"/>
+		  <variable name="b" value="-5"/>
 		  <data>
-		    <traza> 132 133 134 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 135 136 135 138</traza>
+		    <traza> 3 4 5</traza>
 		    <cin/>
 		    <cout/>
 		  </data>
 		</caso>
 		<caso>
-		  <variable name="ret" value="-1"/>
+		  <variable name="ret" value="-5"/>
 		  <variable name="a" value="-5"/>
+		  <variable name="b" value="-5"/>
 		  <data>
-		    <traza> 132 133 140</traza>
+		    <traza> 3 4 7</traza>
 		    <cin/>
 		    <cout/>
 		  </data>
@@ -96,3 +98,37 @@ se convierte en:
 
 ##Librerías usadas
 
+###CLPFD
+
+###SGML & SGML_WRITE
+
+###Executers & Expressions
+
+Librerías de creación propia para gestionar la ejecución simbólica de las instrucciones y el cálculo de las expresiones.
+
+Las instrucciones se simulan una a una consumiendo la lista de instrucciones que se obtiene a partir del fichero de entrada mediante el predicado **execute**. Este predicado es recursivo, de forma que cada instrucción en algun momento tiene la forma:
+
+		execute(EntryS,[Instruccion|RestoDeInstrucciones],OutS):-
+			
+			...
+			
+			execute(EntryS1,RestoDeInstrucciones,OutS).
+
+Las expresiones se calculan de forma similar:
+
+		resolveExpression(EntryS,('NombreDeLaOperacion',Operador,[ExpresionA,ExpresionB]),Resultado,OutS):-
+
+			...
+
+			work(Operador,OperandoA,OperandoB,Result).
+
+Siendo en nuestra nomenclatura EntryS y OutS los estados previo y posterior a la simulación de la instrucción o expresión.
+
+####El estado
+
+En cada ejecución del interprete simulamos la fluctuación de los valores de un conjunto de variables. 
+Estas variables las manejamos mediante la tupla **state**.
+
+		state = (Tabla,Consola,Trace)
+
+Esta tupla contiene una tabla variable-valor, una lista de interacciones de consola simuladas y una lista de las líneas ejecutadas del código.
