@@ -100,11 +100,19 @@ se convierte en:
 
 ###CLPFD
 
+La librería **C**onstraint **L**ogic **P**rogramming over **F**inite **D**omains se emplea para el modelado de la simulación.
+Mediante su sistema de restriccioens y asignación de valores simbólicos a las variables lógicas modelamos la ejecución simbólica del programa introducido.
+
 ###SGML & SGML_WRITE
 
-###Executers & Expressions
+Estas librerías adaptadas a la manipulación de ficheros que emplean el sistema **S**tandard **G**eneralized **M**arkup **L**anguage. 
+Se emplean en el proyecto a la hora de gestionar la apertura de los documentos XML que contienen el código representado y en la escritura del fichero devuelto.
+
+##Librerías propias
 
 Librerías de creación propia para gestionar la ejecución simbólica de las instrucciones y el cálculo de las expresiones.
+
+###Executers.pl
 
 Las instrucciones se simulan una a una consumiendo la lista de instrucciones que se obtiene a partir del fichero de entrada mediante el predicado **execute**. Este predicado es recursivo, de forma que cada instrucción en algun momento tiene la forma:
 
@@ -113,6 +121,8 @@ Las instrucciones se simulan una a una consumiendo la lista de instrucciones que
 			...
 			
 			execute(EntryS1,RestoDeInstrucciones,OutS).
+
+###Expressions.pl
 
 Las expresiones se calculan de forma similar:
 
@@ -124,7 +134,12 @@ Las expresiones se calculan de forma similar:
 
 Siendo en nuestra nomenclatura EntryS y OutS los estados previo y posterior a la simulación de la instrucción o expresión.
 
-####El estado
+###AuxiliaryFunctions.pl
+
+En esta librería están presentes las distintas funciones auxiliares que ayudan a hacer más comprensible el código de las librerías Expressions y Executers.
+Destaca la implementación del estado en el que se apoyan dichas librerías.
+
+####El State
 
 En cada ejecución del interprete simulamos la fluctuación de los valores de un conjunto de variables. 
 Estas variables las manejamos mediante la tupla **state**.
@@ -132,3 +147,7 @@ Estas variables las manejamos mediante la tupla **state**.
 		state = (Tabla,Consola,Trace)
 
 Esta tupla contiene una tabla variable-valor, una lista de interacciones de consola simuladas y una lista de las líneas ejecutadas del código.
+
+###VariablesTable.pl
+
+En esta librería están aglutinadas las diferentes funcionalidades que soporta la tabla de variables-valor empleada en la ejecución simbólica de los programas.
