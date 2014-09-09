@@ -3,9 +3,9 @@
 
 interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Cinput,Coutput):-
 	load_xml_file(EntryFile, Program),
-	write(Program), write('\n'),
+	%write(Program), write('\n'),
 	removeEmpty(Program,GoodProgram),
-	write(GoodProgram), write('\n'),
+	%write(GoodProgram), write('\n'),
 	retractall(program(_)),
 	assert(program(GoodProgram)),
 	
@@ -18,10 +18,13 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Ci
 	state(EndS,ExitTable,Cinput,Coutput,Trace),
 	write('\n\n\n'),write(ExitTable),write('\n\n\n'),
 	labelList(ExitTable,LabelTableNames,LabelTableValues),
-		write('\ndespues del label\n\n'),
-	once(label(LabelTableValues)),
-	write(ExitTable),
-	write(Cinput),
-	write(Coutput),
-	write(Trace).
+	write('\ndespues del label\n\n'),
+	write('\n LabelTableValues \n'),
+	write(LabelTableValues),
+	write('\n'),
+	once(label(LabelTableValues)).
+	%write(ExitTable),
+	%write(Cinput),
+	%write(Coutput),
+	%write(Trace),
 	%label(LabelTableValues).

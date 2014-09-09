@@ -311,7 +311,10 @@
     </params>
     <body>
         <return line="80">
-            <callFunction name="reproduceEntero" type="int">
+            <callFunction name="potencia" type="int">
+                <arg>
+                    <const value="2"/>
+                </arg> 
                 <arg>
                     <variable name="a"/>
                 </arg>
@@ -363,12 +366,9 @@
             <else>
                 <body>
                     <assignment name="r" line="88">
-                        <callFunction name="potencia" type="int">
+                        <callFunction name="reproduceEntero" type="int">
                             <arg>
                                 <variable name="b"/>
-                            </arg>
-                            <arg>
-                                <variable name="a"/>
                             </arg>
                         </callFunction>
                     </assignment>

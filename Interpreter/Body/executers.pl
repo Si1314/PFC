@@ -288,7 +288,7 @@ executeBranch(EntryS,[('if',[_],[_,_,('else',_,Else)])|RestInstructions],0,OutS)
 
 %%%%%%EXECUTE-LOOP-WHILE%%%%%%
 
-executeLoop(EntryS1,[('while',_,[Condition,('body',_,B)])|RestInstructions],1,_,OutS):-!,
+executeLoop(EntryS1,[('while',_,[Condition,('body',_,B)])|RestInstructions],0,_,OutS):-!,
 	write('Deberia salirse del while debido al limite: ejecuta el cuerpo una ultima vez'),write('\n'),
 	%read(A),
 	%execute(EntryS,B,EntryS1),
