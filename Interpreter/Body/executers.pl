@@ -9,21 +9,22 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-execute(EntryS,[],EntryS):-!.
+execute(1,S,_,S,1):-!.
+
+execute(R,EntryS,[],EntryS,R):-!.
 
 %%%%%%FUNCTION%%%%%%
 
-execute(EntryS,[('function',[_,_=void,_=Line],FunctionBody)|RestInstructions],OutS) :- 
+execute(0,EntryS,[('function',[_,_=void,_=Line],FunctionBody)|_],OutS,R) :- 
 	write('Metodo'),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table1,Cin,Cout,Trace1),
-	execute(EntryS1,FunctionBody,OutS1),
-	execute(OutS1,RestInstructions,OutS).
+	execute(0,EntryS1,FunctionBody,OutS,R).
 
-execute(EntryS,[('function',[_,_=ExitValue,_=Line],FunctionBody)|RestInstructions],OutS) :- 
+execute(0,EntryS,[('function',[_,_=ExitValue,_=Line],FunctionBody)|_],OutS,R) :- 
 	write('Funcion'),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 	write('esta es la tabla nada más comenzandoA: '), write(Table),write('\n'),
@@ -35,17 +36,17 @@ execute(EntryS,[('function',[_,_=ExitValue,_=Line],FunctionBody)|RestInstruction
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table2,Cin,Cout,Trace1),
 	write('esta es la tabla nada más comenzandoB: '), write(Table2),write('\n'),
-	execute(EntryS1,FunctionBody,OutS),
+	execute(0,EntryS1,FunctionBody,OutS,R),
 	write('estamos saliendo de la funcion\n').
 
 %%%%%%PARAMS%%%%%%
 
-execute(EntryS,[('params',_,Params)|RestInstructions],OutS) :- !,
+execute(0,EntryS,[('params',_,Params)|RestInstructions],OutS,R) :- !,
 	write('estoy en Params: '), write(Params),write('\n'),
-	execute(EntryS,Params,OutS1),
-	execute(OutS1,RestInstructions,OutS).
+	execute(0,EntryS,Params,OutS1,R1),
+	execute(R1,OutS1,RestInstructions,OutS,R).
 
-execute(EntryS,[('param',[_=int,_=ParamName],ParamBody)|RestInstructions],OutS) :- !,
+execute(0,EntryS,[('param',[_=int,_=ParamName],ParamBody)|RestInstructions],OutS,R) :- !,
 	inf(X), sup(Y),
 	Value in X..Y,
 
@@ -53,26 +54,26 @@ execute(EntryS,[('param',[_=int,_=ParamName],ParamBody)|RestInstructions],OutS) 
 		add(Table,(int,ParamName,Value),Table1),
 	state(EntryS1,Table1,Cin,Cout,Trace),
 
-	execute(EntryS1,ParamBody,OutS1),
-	execute(OutS1,RestInstructions,OutS).
+	execute(0,EntryS1,ParamBody,OutS1,R1),
+	execute(R1,OutS1,RestInstructions,OutS,R).
 
-execute(EntryS,[('param',[_=ParamType,_=ParamName],ParamBody)|RestInstructions],OutS) :- !,
+execute(0,EntryS,[('param',[_=ParamType,_=ParamName],ParamBody)|RestInstructions],OutS,R) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
 		add(Table,(ParamType,ParamName,_),Table1),
 	state(EntryS1,Table1,Cin,Cout,Trace),
-	execute(EntryS1,ParamBody,OutS1),
-	execute(OutS1,RestInstructions,OutS).
+	execute(0,EntryS1,ParamBody,OutS1,R1),
+	execute(R1,OutS1,RestInstructions,OutS,R).
 
 %%%%%%BODY%%%%%%
 
-execute(EntryS,[('body',_,Body)|RestInstructions],OutS) :- !,
+execute(0,EntryS,[('body',_,Body)|RestInstructions],OutS,R) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table, Table1),
 	state(EntryS1,Table1,Cin,Cout,Trace),
 	write('hacer un bodyA\n'),
 	write(Body),
 	write('hacer un bodyB\n'),
-	execute(EntryS1,Body,EntryS2),
+	execute(0,EntryS1,Body,EntryS2,R1),
 	write('el state tras el body '),write(EntryS2),write('\n'),
 	write('hecho un body\n'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
@@ -81,33 +82,30 @@ execute(EntryS,[('body',_,Body)|RestInstructions],OutS) :- !,
 		write('la tabla tras el desapila '),write(Table3),write('\n'),
 	state(OutS1,Table3,Cin2,Cout2,Trace2),
 	write('la tabla tras el body '),write(Table3),write('\n'),
-	execute(OutS1,RestInstructions,OutS).
+	execute(R1,OutS1,RestInstructions,OutS,R).
 
 %%%%%%DECLARATIONS%%%%%%
 
-execute(EntryS,[('declarations',_,Body)|RestInstructions],OutS) :- !,
+execute(0,EntryS,[('declarations',_,Body)|RestInstructions],OutS,R) :- !,
 write('entra en declarations\n'),
-	execute(EntryS,Body,OutS1),
+	execute(0,EntryS,Body,OutS1,R1),
 	write('sale de declarations\n'),
 	write(RestInstructions),write('\n'),
-	execute(OutS1,RestInstructions,OutS).
+	execute(R1,OutS1,RestInstructions,OutS,R).
 
-execute(EntryS,[('declaration',[_=int,_=Name,_=Line],[])|RestInstructions],OutS):- !,
+execute(0,EntryS,[('declaration',[_=int,_=Name,_=Line],[])|RestInstructions],OutS,R):- !,
 	inf(X), sup(Y),
 	Value in X..Y,
 	write('declara2 '),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
-	state(EntryS2,Table,Cin,Cout,Trace1),
-	write('declara2 '),write(Line),write('\n'),
-	state(EntryS2,Table2,Cin2,Cout2,Trace2),
-		add(Table2,(int,Name,Value),Table3),
-	state(OutS1,Table3,Cin2,Cout2,Trace2),
-	write('la tabla tras la decl '),write(Table3),write('\n'),
-	execute(OutS1,RestInstructions,OutS).
+		add(Table,(int,Name,Value),Table1),
+	state(OutS1,Table1,Cin,Cout,Trace1),
+	write('la tabla tras la decl '),write(Table1),write('\n'),
+	execute(0,OutS1,RestInstructions,OutS,R).
 
-execute(EntryS,[('declaration',[_,_=Name,_=Line],[DecBody])|RestInstructions],OutS):- !,
+execute(0,EntryS,[('declaration',[_,_=Name,_=Line],[DecBody])|RestInstructions],OutS,R):- !,
 	write('declara3'),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 	write('mi tabla recien llegado '),write(Table),write('\n'),
@@ -122,11 +120,11 @@ execute(EntryS,[('declaration',[_,_=Name,_=Line],[DecBody])|RestInstructions],Ou
 	state(OutS1,Table3,Cin2,Cout2,Trace2),
 	write(RestInstructions),write('\n'),
 	write('la tabla tras la decl '),write(Table3),write('\n'),
-	execute(OutS1,RestInstructions,OutS).
+	execute(0,OutS1,RestInstructions,OutS,R).
 
 %%%%%%ASSIGMENT%%%%%%
 
-execute(EntryS,[('assignment',[_=Name,_=Line],[AssigBody])|RestInstructions],OutS) :- !,
+execute(0,EntryS,[('assignment',[_=Name,_=Line],[AssigBody])|RestInstructions],OutS,R) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
 	write('mi tabla recien llegado assignment '),write(Table),write('\n'),
 		append(Trace,[' '],Space),
@@ -141,11 +139,11 @@ execute(EntryS,[('assignment',[_=Name,_=Line],[AssigBody])|RestInstructions],Out
 		update(Table2,(Name,Value),Table3),
 	state(OutS1,Table3,Cin2,Cout2,Trace2),
 	write('mi tabla recien saliendo assignment'),write(Table3),write('\n'),
-	execute(OutS1,RestInstructions,OutS).
+	execute(0,OutS1,RestInstructions,OutS,R).
 
 %%%%%%ASSIGMENT-OPERATOR%%%%%%
 
-execute(EntryS,[('assignmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody])|RestInstructions],OutS) :- !,
+execute(0,EntryS,[('assignmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody])|RestInstructions],OutS,R) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
@@ -161,11 +159,11 @@ execute(EntryS,[('assignmentOperator',[_=Name,_,_=Operator,_=Line],[AssigBody])|
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		update(Table2,(Name,Value),Table3),
 	state(OutS1,Table3,Cin2,Cout2,Trace2),
-	execute(OutS1,RestInstructions,OutS).
+	execute(0,OutS1,RestInstructions,OutS,R).
 
 %%%%%%UNARY-OPERATOR%%%%%%
 
-execute(EntryS,[('unaryOperator',[_=Name,_=Operator,_=Line],[])|RestInstructions],OutS):-!,
+execute(0,EntryS,[('unaryOperator',[_=Name,_=Operator,_=Line],[])|RestInstructions],OutS,R):-!,
 	write('unary'),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
@@ -181,11 +179,11 @@ execute(EntryS,[('unaryOperator',[_=Name,_=Operator,_=Line],[])|RestInstructions
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		update(Table2,(Name,Value),Table3),
 	state(OutS1,Table3,Cin2,Cout2,Trace2),
-	execute(OutS1,RestInstructions,OutS).
+	execute(0,OutS1,RestInstructions,OutS,R).
 
 %%%%%%CONSOLE-OUT%%%%%%
 
-execute(EntryS,[('consoleOut',[_=Line],[Expr])|RestInstructions],OutS):-!,
+execute(0,EntryS,[('consoleOut',[_=Line],[Expr])|RestInstructions],OutS,R):-!,
 	write('hagoOut'),write(Line),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
@@ -198,11 +196,11 @@ execute(EntryS,[('consoleOut',[_=Line],[Expr])|RestInstructions],OutS):-!,
 		append(Cout2,[' '],Space2),
 		append(Space2,[Value],Cout3),
 	state(OutS1,Table2,Cin2,Cout3,Trace2),
-	execute(OutS1,RestInstructions,OutS).
+	execute(0,OutS1,RestInstructions,OutS,R).
 
 %%%%%%RETURN%%%%%%
 
-execute(EntryS,[('return',[_=Line],[Body])|_],OutS):-!,
+execute(0,EntryS,[('return',[_=Line],[Body])|_],OutS,1):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
@@ -218,13 +216,13 @@ execute(EntryS,[('return',[_=Line],[Body])|_],OutS):-!,
 	state(OutS,Table3,Cin2,Cout2,Trace2).
 %%%%%%IF%%%%%%
 
-execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then)])|RestInstructions],OutS):-!,
-	write('lno tiene else 1'),write(Table),write('\n\n'),
-	execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),('else',_,[])])|RestInstructions],OutS).
+execute(0,EntryS,[('if',[_=Line],[Condition,('then',_,Then)])|RestInstructions],OutS,R):-!,
+	write('lno tiene else 1'),%write(Table),write('\n\n'),
+	execute(0,EntryS,[('if',[_=Line],[Condition,('then',_,Then),('else',_,[])])|RestInstructions],OutS,R).
 
 %%%%%%IF-THEN%%%%%%
 
-execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),('else',_,Body)])|RestInstructions],OutS):-!,
+execute(0,EntryS,[('if',[_=Line],[Condition,('then',_,Then),('else',_,Body)])|RestInstructions],OutS,R):-!,
 	state(EntryS,Table,Cin,Cout,Trace),
 		write('la tabla entrando al IF 1'),write(Table),write('\n\n'),
 		append(Trace,[' '],Space),
@@ -232,21 +230,21 @@ execute(EntryS,[('if',[_=Line],[Condition,('then',_,Then),('else',_,Body)])|Rest
 	state(EntryS1,Table,Cin,Cout,Trace1),
 
 	resolveExpression(EntryS1,Condition,Value,EntryS2),
-	executeBranch(EntryS2,[('if',[_=Line],[_,('then',_,Then),('else',_,Body)])|RestInstructions],Value,OutS).
+	executeBranch(0,EntryS2,[('if',[_=Line],[_,('then',_,Then),('else',_,Body)])|RestInstructions],Value,OutS,R).
 
 %%%%%%WHILE%%%%%%
 
-execute(EntryS,[('while',Data,[Condition,B])|RestInstructions],OutS) :-!,
+execute(0,EntryS,[('while',Data,[Condition,B])|RestInstructions],OutS,R) :-!,
 	maxDepth(N),
 	write('vamos a evaluar el while\n'),
 	resolveExpression(EntryS,Condition,Value,EntryS1),
 	write('evaluando el valor '),write(Value),write('\n'),
 	%read(A),
-	executeLoop(EntryS1,[('while',Data,[Condition,B])|RestInstructions],N,Value,OutS).
+	executeLoop(0,EntryS1,[('while',Data,[Condition,B])|RestInstructions],N,Value,OutS,R).
 
 %%%%%%FOR%%%%%%
 
-execute(EntryS,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstructions],OutS):-!,
+execute(0,EntryS,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstructions],OutS,R):-!,
 	maxDepth(N),
 	write('vamos a inicializar el for\n'),
 	variableAdvance(EntryS,Variable,EntryS1),
@@ -254,48 +252,48 @@ execute(EntryS,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstruction
 	state(EntryS2,T,_,_,_),
 	write('inicializada la variable de control '),write(T),write('\n'),
 	%read(U),
-	executeLoop(EntryS2,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstructions],N,Value,OutS).
+	executeLoop(0,EntryS2,[('for',Data,[Variable,Condition,A,('body',_,B)])|RestInstructions],N,Value,OutS,R).
 
 %%%%%%EXECUTE-BRANCH%%%%%%
  	
-executeBranch(EntryS,[('if',[_],[_,('then',_,Then),_])|RestInstructions],1,OutS):-
+executeBranch(0,EntryS,[('if',[_],[_,('then',_,Then),_])|RestInstructions],1,OutS,R):-
 	write('\n\nTRUE IF\n\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
 	state(EntryS1,Table1,Cin,Cout,Trace),
-	execute(EntryS1,Then,EntryS2),
+	execute(0,EntryS1,Then,EntryS2,R1),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		desapila(Table2, Table3),
 	state(OutS1,Table3,Cin2,Cout2,Trace2),
 	write('%%%%%%%%$"·$"·$!·!"$%·$·he llegao asta THEEEEENNNNN\n'),
 	write(RestInstructions),
-	execute(OutS1,RestInstructions,OutS),
+	execute(R1,OutS1,RestInstructions,OutS,R),
 	write('hecho el ifTRUE').
 
-executeBranch(EntryS,[('if',[_],[_,_,('else',_,Else)])|RestInstructions],0,OutS):- 
+executeBranch(0,EntryS,[('if',[_],[_,_,('else',_,Else)])|RestInstructions],0,OutS,R):- 
 	state(EntryS,Table,Cin,Cout,Trace),
 		apila(Table,Table1),
 	state(EntryS1,Table1,Cin,Cout,Trace),
 
-	execute(EntryS1,Else,EntryS2),
+	execute(0,EntryS1,Else,EntryS2,R1),
 	write('%%%%%%%%$"·$"·$!·!"$%·$·he llegao asta aqui'),
 	state(EntryS2,Table2,Cin2,Cout2,Trace2),
 		desapila(Table2, Table3),
 	state(OutS1,Table3,Cin2,Cout2,Trace2),
 	write(Table3),
-	execute(OutS1,RestInstructions,OutS),
+	execute(R1,OutS1,RestInstructions,OutS,R),
 	write('hecho el ifFALSE\n').
 
 %%%%%%EXECUTE-LOOP-WHILE%%%%%%
 
-executeLoop(EntryS1,[('while',_,[Condition,('body',_,B)])|RestInstructions],0,_,OutS):-!,
+executeLoop(0,EntryS1,[('while',_,[Condition,('body',_,_)])|RestInstructions],0,_,OutS,R):-!,
 	write('Deberia salirse del while debido al limite: ejecuta el cuerpo una ultima vez'),write('\n'),
 	%read(A),
 	%execute(EntryS,B,EntryS1),
 	resolveExpression(EntryS1,Condition,0,EntryS2),
-	execute(EntryS2,RestInstructions,OutS).
+	execute(0,EntryS2,RestInstructions,OutS,R).
 
-executeLoop(EntryS,[('while',[_=Line],_)|RestInstructions],N,0,OutS):-N>=0,
+executeLoop(0,EntryS,[('while',[_=Line],_)|RestInstructions],N,0,OutS,R):-N>=0,
 	write('llegando con valor N: '),write(N),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
@@ -304,43 +302,43 @@ executeLoop(EntryS,[('while',[_=Line],_)|RestInstructions],N,0,OutS):-N>=0,
 	write('ha casado con el salirse while\n'),
 	%read(A),
 	write(Table),write('\n'),
-	execute(EntryS1,RestInstructions,OutS).
+	execute(0,EntryS1,RestInstructions,OutS,R).
 	
-executeLoop(EntryS,[('while',[_=Line],[Condition,('body',_,B)])|RestInstructions],N,1,OutS):-N>=0,
+executeLoop(0,EntryS,[('while',[_=Line],[Condition,('body',_,B)])|RestInstructions],N,1,OutS,R):-N>=0,
 	write('llegando con valor N: '),write(N),write('\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 	write('ha casado con el seguir\n'),
-	execute(EntryS1,B,EntryS2),
+	execute(0,EntryS1,B,EntryS2,R1),
 	write('ha hecho el body\n'),
 	resolveExpression(EntryS2,Condition,Value,EntryS3),
 	N1 is N-1,
 	write('evaluando el valor '),write(Value),write('\n'),
 	%read(A),
-	executeLoop(EntryS3,[('while',[_=Line],[Condition,('body',_,B)])|RestInstructions],N1,Value,OutS).
+	executeLoop(R1,EntryS3,[('while',[_=Line],[Condition,('body',_,B)])|RestInstructions],N1,Value,OutS,R).
 
 %%%%%%EXECUTE-LOOP-FOR%%%%%%
 
-executeLoop(EntryS,[('for',_,[_,Condition,Advance,('body',_,B)])|RestInstructions],0,_,OutS):-!,
+executeLoop(0,EntryS,[('for',_,[_,Condition,_,('body',_,_)])|RestInstructions],0,_,OutS,R):-!,
 	write('Deberia salirse del for debido al limite: NO ejecuta la ultima vuelta'),write('\n'),
 	%read(A),
-	%execute(EntryS,B,EntryS1),
-	%execute(EntryS1,[Advance],EntryS2),
+	%execute(R,EntryS,B,EntryS1),
+	%execute(R,EntryS1,[Advance],EntryS2),
 	resolveExpression(EntryS,Condition,0,EntryS1),
-	execute(EntryS1,RestInstructions,OutS).
+	execute(0,EntryS1,RestInstructions,OutS,R).
 
-executeLoop(EntryS,[('for',[_=Line],[_,Condition,Advance,('body',_,B)])|RestInstructions],N,1,OutS):-N >= 0,!,
+executeLoop(0,EntryS,[('for',[_=Line],[_,Condition,Advance,('body',_,B)])|RestInstructions],N,1,OutS,R):-N >= 0,!,
 	write('ha entrado en una iteracion del for\n'),
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' ',Line],Trace1),
 	state(EntryS1,Table,Cin,Cout,Trace1),
 	write('queriendo ejecutar el body\n'),write(B),write('\n'),
-	execute(EntryS1,B,EntryS2),
+	execute(0,EntryS1,B,EntryS2,R1),
 	write('habiendo ejecutado el body\n'),
 	%read(Ujh),
-	execute(EntryS2,[Advance],EntryS3),
+	execute(R1,EntryS2,[Advance],EntryS3,R2),
 	state(EntryS3,T3,_,_,_),
 	write('tras hacer el avance con la tabla\n'),write(T3),write('\n'),
 	%read(Ujhgg),
@@ -348,9 +346,9 @@ executeLoop(EntryS,[('for',[_=Line],[_,Condition,Advance,('body',_,B)])|RestInst
 	N1 is N -1,
 	write('evaluando el valor '),write(Value),write('\n'),
 	%read(U),
-	executeLoop(EntryS4,[('for',[_=Line],[_,Condition,Advance,('body',_,B)])|RestInstructions],N1,Value,OutS).
+	executeLoop(R2,EntryS4,[('for',[_=Line],[_,Condition,Advance,('body',_,B)])|RestInstructions],N1,Value,OutS,R).
 
-executeLoop(EntryS,[('for',[_=Line],_)|RestInstructions],N,0,OutS):-N >= 0,!,
+executeLoop(0,EntryS,[('for',[_=Line],_)|RestInstructions],N,0,OutS,R):-N >= 0,!,
 	state(EntryS,Table,Cin,Cout,Trace),
 		append(Trace,[' '],Space),
 		append(Space,[Line],Trace1),
@@ -358,4 +356,4 @@ executeLoop(EntryS,[('for',[_=Line],_)|RestInstructions],N,0,OutS):-N >= 0,!,
 	write('ha casado con el salirse for\n'),
 	%read(A),
 	write(Table),write('\n'),
-	execute(EntryS1,RestInstructions,OutS).
+	execute(0,EntryS1,RestInstructions,OutS,R).

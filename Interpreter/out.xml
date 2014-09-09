@@ -1,17 +1,98 @@
 <caso>
-  <variable name="ret" value="-50"/>
+  <variable name="ret" value="2"/>
   <variable name="a" value="-5"/>
   <data>
-    <traza> 17 18 19 20 24 25 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 30</traza>
+    <traza> 56 57 57 58 59 60 61 62 62 67</traza>
     <cin/>
     <cout/>
   </data>
 </caso>
 <caso>
-  <variable name="ret" value="0"/>
+  <variable name="ret" value="2"/>
   <variable name="a" value="0"/>
   <data>
-    <traza> 17 18 19 22 24 25 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 27 28 26 30</traza>
+    <traza> 56 57 58 58 59 60 61 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="a" value="1"/>
+  <data>
+    <traza> 56 57 58 58 59 60 61 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="55"/>
+  <variable name="a" value="9"/>
+  <data>
+    <traza> 56 57 58 59 60 61 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="34"/>
+  <variable name="a" value="8"/>
+  <data>
+    <traza> 56 57 58 59 60 61 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="21"/>
+  <variable name="a" value="7"/>
+  <data>
+    <traza> 56 57 58 59 60 61 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="13"/>
+  <variable name="a" value="6"/>
+  <data>
+    <traza> 56 57 58 59 60 61 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="8"/>
+  <variable name="a" value="5"/>
+  <data>
+    <traza> 56 57 58 59 60 61 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="5"/>
+  <variable name="a" value="4"/>
+  <data>
+    <traza> 56 57 58 59 60 61 62 62 63 64 65 62 62 63 64 65 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="a" value="3"/>
+  <data>
+    <traza> 56 57 58 59 60 61 62 62 63 64 65 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="2"/>
+  <variable name="a" value="2"/>
+  <data>
+    <traza> 56 57 58 59 60 61 62 62 67</traza>
     <cin/>
     <cout/>
   </data>

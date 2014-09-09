@@ -13,7 +13,7 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Ci
 	lookForFunction(GoodProgram,FunctionName,Function),
 	
 	state(InitS,[],[],[],[]),
-		execute(InitS,Function,EndS),
+		execute(0,InitS,Function,EndS,_),
 		write('\ndespues de la funcion\n\n'),
 	state(EndS,ExitTable,Cinput,Coutput,Trace),
 	write('\n\n\n'),write(ExitTable),write('\n\n\n'),

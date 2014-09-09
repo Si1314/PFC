@@ -9,35 +9,35 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-resolveExpression(Entry,[],_,Entry):-!.
+resolveExpression(Rin,Entry,[],_,Entry,Rout):-!.
 
-resolveExpression(EntryS,('notOperator',_,[Expr]),NotResult,OutS):-
-	resolveExpression(EntryS,Expr,Result,OutS),
+resolveExpression(Rin,EntryS,('notOperator',_,[Expr]),NotResult,OutS,Rout):-
+	resolveExpression(Rin,EntryS,Expr,Result,OutS),
 	not(Result,NotResult).
 
-resolveExpression(EntryS,('signOperator',[type='-'],[Expr]),InvResult,OutS):-
+resolveExpression(Rin,EntryS,('signOperator',[type='-'],[Expr]),InvResult,OutS,Rout):-
 	write(Expr),write('\n'),
-	resolveExpression(EntryS,Expr,Result,OutS),
+	resolveExpression(Rin,EntryS,Expr,Result,OutS),
 	work('*',-1,Result,InvResult),write(InvResult),write('\n').
 
-resolveExpression(EntryS,('signOperator',[type='+'],[Expr]),Result,OutS):-
+resolveExpression(Rin,EntryS,('signOperator',[type='+'],[Expr]),Result,OutS,Rout):-
 	write('signOp'),write('\n'),
-	resolveExpression(EntryS,Expr,Result,OutS),write(Result),write('\n').
+	resolveExpression(Rin,EntryS,Expr,Result,OutS),write(Result),write('\n').
 
 
-resolveExpression(EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS):-
+resolveExpression(Rin,EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS,Rout):-
 	getContent(Operator,Op),
 	write('\nOperator: '),write(Operator),write('\n'),
 	%write(X),write('\n'),
 	%write(Y),write('\n'),
-	resolveExpression(EntryS,X, Operand1,EntryS1),
-	resolveExpression(EntryS1,Y, Operand2,OutS),
+	resolveExpression(Rin,EntryS,X, Operand1,EntryS1),
+	resolveExpression(Rin,EntryS1,Y, Operand2,OutS),
 	write('operand '),write(Operand1),write('\n'),
 	write('operand '),write(Operand2),write('\n'),
 	work(Op, Operand1, Operand2,Result),
 	write('result '),write(Result),write('\n').
 
-resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
+resolveExpression(Rin,EntryS,('variable',[_=OperandName],_),OperandValue,EntryS,Rout):-
 	state(EntryS,Table,_,_,_),
 	%write('---resolveExpression---'),write('\n'),
 	getValue(Table,OperandName,OperandValue).
@@ -45,12 +45,12 @@ resolveExpression(EntryS,('variable',[_=OperandName],_),OperandValue,EntryS):-
 	%write('\nOperandName \n'),write(OperandName),write('\n'),
 	%write('\nOperandValue \n'),write(OperandValue),write('\n').
 
-resolveExpression(EntryS,('const',[_=Value],_),Result,EntryS):-
+resolveExpression(Rin,EntryS,('const',[_=Value],_),Result,EntryS,Rout):-
 	write('const: '),write(Value),write('\n'),
 	atom_number(Value,Result),
 	write('result const: '),write(Result),write('\n').
 
-resolveExpression(EntryS,('consoleIn',[_=int],_),Value,OutS):-
+resolveExpression(Rin,EntryS,('consoleIn',[_=int],_),Value,OutS,Rout):-
 	state(EntryS,Table,Cin,Cout,Trace),
 	inf(X), sup(Y),
 	Value in X..Y,
@@ -58,7 +58,7 @@ resolveExpression(EntryS,('consoleIn',[_=int],_),Value,OutS):-
 	state(OutS,Table,Cin1,Cout,Trace).
 
 
-resolveExpression(EntryS,('callFunction',[name=Name, type=Type],Args),ValueReturned,OutS):-
+resolveExpression(Rin,EntryS,('callFunction',[name=Name, type=Type],Args),ValueReturned,OutS,Rout):-
 	write('en la caallllfunciton '),write('\n'),
 	program(Program),
 	lookForFunction(Program,Name,Type,[(_,_,Params),Function]),
@@ -71,7 +71,7 @@ resolveExpression(EntryS,('callFunction',[name=Name, type=Type],Args),ValueRetur
 	buildCallTable(EntryS,EntryS1,TCall1,Params,Args,TCall2),
 	state(EntryS1,Table,Cin,Cout,Trace),
 	state(EntryCall,TCall2,Cin,Cout,Trace),!,
-	execute(EntryCall,[Function],EntryS2),
+	execute(Rin,EntryCall,[Function],EntryS2,Rout),
 	state(EntryS2,[[(_,_,ValueReturned)|_]],Cin2,Cout2,Trace2),
 	write('el estado de vuelta '),write(ValueReturned),write('\n'),
 	state(OutS,Table,Cin2,Cout2,Trace2).
@@ -86,14 +86,14 @@ write('tablitaaa'),write(T),write('\n').
 
 buildCallTable(EntryS,OutS,Tin,[(_,[_=Type,_=Name],_)|Params],[(_,_,[Arg])|Args],Tout):-
 	write('estamos construyendo la tabla '),write('\n'),
-	resolveExpression(EntryS,Arg,Value,EntryS1),
+	resolveExpression(Rin,EntryS,Arg,Value,EntryS1),
 	write('meteremos el valor en la tabla '),write('\n'),
 	add(Tin,(Type,Name,Value),T1),
 	write('metido el valor en la tabla '),write('\n'),
 	buildCallTable(EntryS1,OutS,T1,Params,Args,Tout).
 
 
-%resolveExpression((Entry,Cin,Cout,Trace),[('callFunction',[name=Name, type=Type],Params)],ValueReturned, (Out,Cin1,Cout1,Trace1)):-!,	% he añadido el Out
+%resolveExpression(Rin,(Entry,Cin,Cout,Trace),[('callFunction',[name=Name, type=Type],Params)],ValueReturned, (Out,Cin1,Cout1,Trace1)):-!,	% he añadido el Out
 %	apila(Entry,Entry1),
 %	addListParams(Entry1,Params,Out1),
 %	program(Program),
