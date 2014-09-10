@@ -1,14 +1,153 @@
-PFC
+Intérprete simbólico en Prolog de Árboles de Sintaxis Abstracta obenidos a partir de código en C++
 ===
 
-##Hay que hacer hoy: (En orden de prioridad)
+Este proyecto consiste en un intérprete simbólico que a partir de la representación en XML de un código en C++ realiza una ejecución simbólica de éste.
 
- - Conseguir que funcione tanto los "while" como los "for".
+##Funcionamiento
 
- - Ponerle un tope de profundidad.
+El interprete recorre la representación del código de una función asignando valores simbólicos a una tabla de variables. Cuando ya ha recorrido el código razona sobre dichos valores y devuelve un conjunto de posibles entradas, posibles salidas, interacciones por consola y la traza de dicha función. Dichos valores resultantes se recogen en un fichero XML.
 
-##Cosas que hacer despues de la entrega
- 
- - Recibir el nombre del fichero para crear un fichero .xml con ese nombre que acabe en output, por ejemplo: `ficheroPrueba.xml`saldría: `ficheroPruebaOutput.xml`.
+La ejecución se controla mediante las variables **Inf**, **Sup** y **MaxDepth**. 
+Inf y Sup acotan inferior y superiormente el rango que pueden adoptar los valores enteros de las variables.
+MaxDepth restringe el número de iteraciones que puede ejecutarse un bucle en la simulación. 
 
- - Conseguir leer el for tambien asi: for(int i=0, j=0;....)
+##Uso
+
+Para ejecutar el interprete se invoca el predicado interpreter. Puede haber dos modalidades:
+
+		interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName).
+Donde se puede simular con valores específicos en las variables Inf, Sup y MaxDepth.
+
+		interpreter(EntryFile, OutFile, FunctionName).
+
+Con valores predeterminados **Inf=-5**, **Sup=5** y **MaxDepth=10**.
+
+---
+
+##La representación en XML del código
+
+Este proyecto va de la mano del proyecto AST2XML.
+
+		https://github.com/si1314/AST2XML
+
+El proyecto AST2XML se encarga de traducir el código fuente en una estructura basada en XML equivalente. De esta forma el código:
+
+		int dameMayor(int a, int b){
+			if(a > b){
+				return a;
+			}else{
+				return b;
+			}
+		}
+
+se convierte en:
+
+		<function name="dameMayor" type="int" line="3">
+		    <params>
+		        <param type="int" name="a"/>
+		        <param type="int" name="b"/>
+		    </params>
+		    <body>
+		        <if line="4">
+		            <binaryOperator type="comparison" operator="&gt;">
+		                <variable name="a"/>
+		                <variable name="b"/>
+		            </binaryOperator>
+		            <then>
+		                <body>
+		                    <return line="5">
+		                        <variable name="a"/>
+		                    </return>
+		                </body>
+		            </then>
+		            <else>
+		                <body>
+		                    <return line="7">
+		                        <variable name="b"/>
+		                    </return>
+		                </body>
+		            </else>
+		        </if>
+		    </body>
+		</function>
+
+##Los resultados devueltos
+
+		<caso>
+		  <variable name="ret" value="-4"/>
+		  <variable name="a" value="-4"/>
+		  <variable name="b" value="-5"/>
+		  <data>
+		    <traza> 3 4 5</traza>
+		    <cin/>
+		    <cout/>
+		  </data>
+		</caso>
+		<caso>
+		  <variable name="ret" value="-5"/>
+		  <variable name="a" value="-5"/>
+		  <variable name="b" value="-5"/>
+		  <data>
+		    <traza> 3 4 7</traza>
+		    <cin/>
+		    <cout/>
+		  </data>
+		</caso>
+
+---
+
+##Librerías usadas
+
+###CLPFD
+
+La librería **C**onstraint **L**ogic **P**rogramming over **F**inite **D**omains se emplea para el modelado de la simulación.
+Mediante su sistema de restriccioens y asignación de valores simbólicos a las variables lógicas modelamos la ejecución simbólica del programa introducido.
+
+###SGML & SGML_WRITE
+
+Estas librerías adaptadas a la manipulación de ficheros que emplean el sistema **S**tandard **G**eneralized **M**arkup **L**anguage. 
+Se emplean en el proyecto a la hora de gestionar la apertura de los documentos XML que contienen el código representado y en la escritura del fichero devuelto.
+
+##Librerías propias
+
+Librerías de creación propia para gestionar la ejecución simbólica de las instrucciones y el cálculo de las expresiones.
+
+###Executers.pl
+
+Las instrucciones se simulan una a una consumiendo la lista de instrucciones que se obtiene a partir del fichero de entrada mediante el predicado **execute**. Este predicado es recursivo, de forma que cada instrucción en algun momento tiene la forma:
+
+		execute(EntryS,[Instruccion|RestoDeInstrucciones],OutS):-
+			
+			...
+			
+			execute(EntryS1,RestoDeInstrucciones,OutS).
+
+###Expressions.pl
+
+Las expresiones se calculan de forma similar:
+
+		resolveExpression(EntryS,('NombreDeLaOperacion',Operador,[ExpresionA,ExpresionB]),Resultado,OutS):-
+
+			...
+
+			work(Operador,OperandoA,OperandoB,Result).
+
+Siendo en nuestra nomenclatura EntryS y OutS los estados previo y posterior a la simulación de la instrucción o expresión.
+
+###AuxiliaryFunctions.pl
+
+En esta librería están presentes las distintas funciones auxiliares que ayudan a hacer más comprensible el código de las librerías Expressions y Executers.
+Destaca la implementación del estado en el que se apoyan dichas librerías.
+
+####El State
+
+En cada ejecución del interprete simulamos la fluctuación de los valores de un conjunto de variables. 
+Estas variables las manejamos mediante la tupla **state**.
+
+		state = (Tabla,Consola,Trace)
+
+Esta tupla contiene una tabla variable-valor, una lista de interacciones de consola simuladas y una lista de las líneas ejecutadas del código.
+
+###VariablesTable.pl
+
+En esta librería están aglutinadas las diferentes funcionalidades que soporta la tabla de variables-valor empleada en la ejecución simbólica de los programas.

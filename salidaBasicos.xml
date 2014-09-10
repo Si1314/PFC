@@ -1,0 +1,27 @@
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="a" value="-5"/>
+  <data>
+    <traza> 56 57 57 58 59 60 61 62 62 63 64 65 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="3"/>
+  <variable name="a" value="0"/>
+  <data>
+    <traza> 56 57 58 58 59 60 61 62 62 63 64 65 62 62 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>
+<caso>
+  <variable name="ret" value="233"/>
+  <variable name="a" value="12"/>
+  <data>
+    <traza> 56 57 58 59 60 61 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 62 63 64 65 62 63 64 65 67</traza>
+    <cin/>
+    <cout/>
+  </data>
+</caso>

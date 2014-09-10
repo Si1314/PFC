@@ -9,12 +9,12 @@
 % Devuelve la variable de avance en un "for", si no esta declarada la declara
 % si esta declarada solo devuelve el nombre
 
-variableAdvance(Entry,('declarations',_,Variable),Out):-
+variableAdvance(Rin,Entry,('declarations',_,Variable),Out,Rout):-
 	write('\nempezando el variableAdvance\n'),
 	%getContent(Variable,VarName), !,
 	%write(hechoGetContent),write('\n'),
 	%write(Variable),write('\n'),
-	execute(Entry,Variable,Out),
+	execute(Rin,Entry,Variable,Out,Rout),
 	state(Out,T,_,_,_),
 	write('haciendo variable advance con la variable '),
 	%write(VarName),
