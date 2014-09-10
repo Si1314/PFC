@@ -346,7 +346,7 @@ execute(EntryS,[('if',[_=Line],[_,_,('else',_,Else)])|RestInstructios],OutS):-
 	state(EntryS4,Table4,Cin4,Cout4,Trace4),
 		desapila(Table4, Table5),
 	state(OutS1,Table5,Cin4,Cout4,Trace4),
-
+	write(Table5),
 	execute(OutS1,RestInstructios,OutS).
 
 %%%%%%WHILE%%%%%%
