@@ -9,20 +9,21 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-resolveExpression(Rin,Entry,[],_,Entry,Rout):-!.
+resolveExpression(Rin,Entry,[],_,Entry,Rin):-!.
 
 resolveExpression(Rin,EntryS,('notOperator',_,[Expr]),NotResult,OutS,Rout):-
-	resolveExpression(Rin,EntryS,Expr,Result,OutS),
+	resolveExpression(Rin,EntryS,Expr,Result,OutS,Rout),
 	not(Result,NotResult).
 
 resolveExpression(Rin,EntryS,('signOperator',[type='-'],[Expr]),InvResult,OutS,Rout):-
 	write(Expr),write('\n'),
-	resolveExpression(Rin,EntryS,Expr,Result,OutS),
+	resolveExpression(Rin,EntryS,Expr,Result,OutS,Rout),
 	work('*',-1,Result,InvResult),write(InvResult),write('\n').
 
 resolveExpression(Rin,EntryS,('signOperator',[type='+'],[Expr]),Result,OutS,Rout):-
 	write('signOp'),write('\n'),
-	resolveExpression(Rin,EntryS,Expr,Result,OutS),write(Result),write('\n').
+	resolveExpression(Rin,EntryS,Expr,Result,OutS,Rout),
+	write(Result),write('\n').
 
 
 resolveExpression(Rin,EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS,Rout):-
@@ -30,14 +31,14 @@ resolveExpression(Rin,EntryS,('binaryOperator',Operator,[X,Y]),Result,OutS,Rout)
 	write('\nOperator: '),write(Operator),write('\n'),
 	%write(X),write('\n'),
 	%write(Y),write('\n'),
-	resolveExpression(Rin,EntryS,X, Operand1,EntryS1),
-	resolveExpression(Rin,EntryS1,Y, Operand2,OutS),
+	resolveExpression(Rin,EntryS,X, Operand1,EntryS1,Rin1),
+	resolveExpression(Rin1,EntryS1,Y, Operand2,OutS,Rout),
 	write('operand '),write(Operand1),write('\n'),
 	write('operand '),write(Operand2),write('\n'),
 	work(Op, Operand1, Operand2,Result),
 	write('result '),write(Result),write('\n').
 
-resolveExpression(Rin,EntryS,('variable',[_=OperandName],_),OperandValue,EntryS,Rout):-
+resolveExpression(Rin,EntryS,('variable',[_=OperandName],_),OperandValue,EntryS,Rin):-
 	state(EntryS,Table,_,_,_),
 	%write('---resolveExpression---'),write('\n'),
 	getValue(Table,OperandName,OperandValue).
@@ -45,12 +46,12 @@ resolveExpression(Rin,EntryS,('variable',[_=OperandName],_),OperandValue,EntryS,
 	%write('\nOperandName \n'),write(OperandName),write('\n'),
 	%write('\nOperandValue \n'),write(OperandValue),write('\n').
 
-resolveExpression(Rin,EntryS,('const',[_=Value],_),Result,EntryS,Rout):-
+resolveExpression(Rin,EntryS,('const',[_=Value],_),Result,EntryS,Rin):-
 	write('const: '),write(Value),write('\n'),
 	atom_number(Value,Result),
 	write('result const: '),write(Result),write('\n').
 
-resolveExpression(Rin,EntryS,('consoleIn',[_=int],_),Value,OutS,Rout):-
+resolveExpression(Rin,EntryS,('consoleIn',[_=int],_),Value,OutS,Rin):-
 	state(EntryS,Table,Cin,Cout,Trace),
 	inf(X), sup(Y),
 	Value in X..Y,
