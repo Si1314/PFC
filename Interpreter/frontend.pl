@@ -48,7 +48,8 @@ interpreter(EntryFile, OutFile, Inf, Sup, MaxDepth, FunctionName):-
 
 	findall((N,L,T,Cin,Cout),interpreterAux(EntryFile,N,L,FunctionName,T,Cin,Cout),V),
 	%interpreterAux(EntryFile, N,L),
-	%write(V), write('\n'),
+	write('nuestra tabla de casos \n'),
+	write(V), write('\n'),
 	open(OutFile, write, Stream, []),
 
     writeList(Stream,V),

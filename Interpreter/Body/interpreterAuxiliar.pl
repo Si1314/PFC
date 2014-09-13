@@ -22,9 +22,24 @@ interpreterAux(EntryFile,LabelTableNames, LabelTableValues,FunctionName,Trace,Ci
 	write('\n LabelTableValues \n'),
 	write(LabelTableValues),
 	write('\n'),
-	once(label(LabelTableValues)).
+	once(label(LabelTableValues)),
+	write('cinputear'),write(Cinput),
+	labelArrange(Cinput,CinputValues),
+	write(Cinput),write('labelarrangeado:----'),write(CinputValues),
+	once(label(CinputValues)),
+	write('se ha hecho el label'),
+	write(LabelTableValues).
 	%write(ExitTable),
 	%write(Cinput),
 	%write(Coutput),
 	%write(Trace),
 	%label(LabelTableValues).
+
+labelArrange([],[]).
+labelArrange([' '|L],LA):-
+write('\nen larrange espacio\n'),write(L),write('\n'),
+	labelArrange2(L,LA),
+	write('hecho el larragne\n').
+labelArrange2([V|L],[V|LA]):-
+	write('en larrange'),write(V),write('\n'),
+	labelArrange(L,LA).

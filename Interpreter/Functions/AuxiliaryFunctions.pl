@@ -121,7 +121,7 @@ getTuple(int,(int,ret,Value)):-
 	inf(X), sup(Y),
 	Value in X..Y.
 
-getTuple(bool,(int,ret,Value)):-
+getTuple('_Bool',(int,ret,Value)):-
 	Value in 0..1.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -57,6 +57,16 @@ execute(0,EntryS,[('param',[_=int,_=ParamName],ParamBody)|RestInstructions],OutS
 	execute(0,EntryS1,ParamBody,OutS1,R1),
 	execute(R1,OutS1,RestInstructions,OutS,R).
 
+execute(0,EntryS,[('param',[_='_Bool',_=ParamName],ParamBody)|RestInstructions],OutS,R) :- !,
+	Value in 0..1,
+
+	state(EntryS,Table,Cin,Cout,Trace),
+		add(Table,(int,ParamName,Value),Table1),
+	state(EntryS1,Table1,Cin,Cout,Trace),
+
+	execute(0,EntryS1,ParamBody,OutS1,R1),
+	execute(R1,OutS1,RestInstructions,OutS,R).
+
 execute(0,EntryS,[('param',[_=ParamType,_=ParamName],ParamBody)|RestInstructions],OutS,R) :- !,
 	state(EntryS,Table,Cin,Cout,Trace),
 		add(Table,(ParamType,ParamName,_),Table1),
