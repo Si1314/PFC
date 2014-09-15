@@ -1,0 +1,59 @@
+<function name="reproducePalabra" type="int" line="3">
+    <params>
+        <param type="int" name="a"/>
+    </params>
+    <body>
+        <consoleOut line="4">
+            <string value="hola caracola"/>
+        </consoleOut>
+        <consoleOut line="5">
+            <binaryOperator type="arithmetic" operator="+">
+                <variable name="a"/>
+                <const value="3"/>
+            </binaryOperator>
+        </consoleOut>
+        <return line="6">
+            <const value="0"/>
+        </return>
+    </body>
+</function>
+
+<function name="deco2" type="int" line="9">
+    <params>
+        <param type="_Bool" name="a"/>
+        <param type="_Bool" name="b"/>
+    </params>
+    <body>
+        <declarations>
+            <declaration type="int" name="r" line="10">
+                <const value="0"/>
+            </declaration>
+        </declarations>
+        <if line="11">
+            <variable name="a"/>
+            <then>
+                <body>
+                    <assignmentOperator name="r" type="arithmetic" operator="+" line="11">
+                        <const value="2"/>
+                    </assignmentOperator>
+                </body>
+            </then>
+        </if>
+        <if line="12">
+            <variable name="b"/>
+            <then>
+                <body>
+                    <assignmentOperator name="r" type="arithmetic" operator="+" line="12">
+                        <const value="1"/>
+                    </assignmentOperator>
+                </body>
+            </then>
+        </if>
+        <consoleOut line="13">
+            <const value="3"/>
+        </consoleOut>
+        <return line="14">
+            <variable name="r"/>
+        </return>
+    </body>
+</function>

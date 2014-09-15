@@ -188,11 +188,54 @@ updateReturnValueAux(([X,Y|Xs],Cin,Cout,Trace),ValueReturned,([X,Out1|Xs],Cin,Co
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% convierte strings en atomos
+
 fixNumber([],[]).
 
 fixNumber([' '|Xs],[' '|Xs2]):-!,
 	fixNumber(Xs,Xs2).
 
+fixNumber([Mensaje|Xs],[AMensaje|Xs2]):-
+	write('\n\n este es el mensaje: '),write(Mensaje),write('\n'),
+	atom_chars(Mensaje,LMensaje),!,
+	write('\n\n este es el Lmensaje: '),write(LMensaje),write('\n'),
+	atom_codes(AMensaje,LMensaje),
+	write('\n\n este es el Amensaje: '),write(AMensaje),write('\n'),
+	write('si es un string\n'),
+	fixNumber(Xs,Xs2).
+
 fixNumber([N|Xs],[AN|Xs2]):-
 	atom_number(AN,N),
+	write("si es un numero\n"),
 	fixNumber(Xs,Xs2).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ayuda en el label de Cin
+
+labelArrange([],[]).
+labelArrange([' '|L],LA):-
+write('\nen larrange espacio\n'),write(L),write('\n'),
+	labelArrange2(L,LA),
+	write('hecho el larragne\n').
+labelArrange2([V|L],[V|LA]):-
+	write('en larrange'),write(V),write('\n'),
+	labelArrange(L,LA).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Elimina las repeticiones seguidas
+
+removeRepetitions(TraceRaw,Trace):-
+	removeRepetitionsAux(TraceRaw,[],Trace).
+
+
+removeRepetitionsAux([],Ac,Ac):- !.
+
+removeRepetitionsAux([' ',X],Ac,Z):- !,
+	append(Ac,[' ',X],Z).
+
+removeRepetitionsAux([' ',X,' ',X|Xs],Ac,Zs):- !,
+	removeRepetitionsAux([' ',X|Xs],Ac,Zs).
+
+removeRepetitionsAux([' ',X,' ',Y|Xs],Ac,Zs):- 
+	append(Ac,[' ',X],Ac2),
+	removeRepetitionsAux([' ',Y|Xs],Ac2,Zs).

@@ -51,6 +51,9 @@ resolveExpression(Rin,EntryS,('const',[_=Value],_),Result,EntryS,Rin):-
 	atom_number(Value,Result),
 	write('result const: '),write(Result),write('\n').
 
+resolveExpression(Rin,EntryS,('string',[_=Value],_),Value,EntryS,Rin):-
+	write('result string: '),write(Value),write('\n').
+
 resolveExpression(Rin,EntryS,('consoleIn',[_=int],_),Value,OutS,Rin):-
 	state(EntryS,Table,Cin,Cout,Trace),
 	inf(X), sup(Y),

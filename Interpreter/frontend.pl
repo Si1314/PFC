@@ -12,7 +12,6 @@
 
 
 :- include('Functions/VariablesTable.pl').
-:- include('Functions/AuxiliaryFunctions.pl').
 :- include('Body/interpreterAuxiliar.pl').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
