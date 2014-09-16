@@ -146,10 +146,11 @@ work('||', Op1,Op2,0):-	not(Op1,Op1N),not(Op2,Op2N),work('&&', Op1N,Op2N,1).
 						%   Arithmetic   %
 						%%%%%%%%%%%%%%%%%%
 
-work('+', Op1,Op2,Z):- !, Z #= Op1 + Op2.
-work('-', Op1,Op2,Z):- !, Z #= Op1 - Op2.
-work('*', Op1,Op2,Z):- !, Z #= Op1 * Op2.
-%work('/', _,0,_):- !, fail.
-work('/', Op1,Op2,Z):- !, Z #= Op1 / Op2.
+work('+', Op1, Op2, Z):- !, Z #= Op1 + Op2.
+work('-', Op1, Op2, Z):- !, Z #= Op1 - Op2.
+work('*', Op1, Op2, Z):- !, Z #= Op1 * Op2.
+%work('/', _, 0, _):- !, fail.
+work('/', Op1, Op2, Z):- !, Z #= Op1 / Op2.
+work('%', Op1, Op2, Z):- !, Z #= Op1 mod Op2.
 
 
